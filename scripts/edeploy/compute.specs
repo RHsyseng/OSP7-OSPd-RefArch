@@ -1,0 +1,4 @@
+[
+ ('cpu', '$cpu', 'cores', '8'),
+ ('memory', 'total', 'size', 'ge(64000000000)'),
+]

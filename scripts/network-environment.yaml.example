@@ -1,0 +1,29 @@
+resource_registry:
+  OS::TripleO::BlockStorage::Net::SoftwareConfig: /home/stack/nic-configs/cinder-storage.yaml
+  OS::TripleO::Compute::Net::SoftwareConfig: /home/stack/nic-configs/compute.yaml
+  OS::TripleO::Controller::Net::SoftwareConfig: /home/stack/nic-configs/controller.yaml
+  OS::TripleO::ObjectStorage::Net::SoftwareConfig: /home/stack/nic-configs/swift-storage.yaml
+  OS::TripleO::CephStorage::Net::SoftwareConfig: /home/stack/nic-configs/ceph-storage.yaml
+
+parameters:
+  Controller-1::NeutronExternalNetworkBridge: "br-ex"
+
+parameter_defaults:
+  InternalApiNetCidr: 172.16.1.0/24
+  StorageNetCidr: 172.16.2.0/24
+  StorageMgmtNetCidr: 172.16.3.0/24
+  TenantNetCidr: 172.16.4.0/24
+  ExternalNetCidr: 10.19.136.0/21
+  InternalApiAllocationPools: [{'start': '172.16.1.10', 'end': '172.16.1.100'}]
+  StorageAllocationPools: [{'start': '172.16.2.10', 'end': '172.16.2.200'}]
+  StorageMgmtAllocationPools: [{'start': '172.16.3.10', 'end': '172.16.3.200'}]
+  TenantAllocationPools: [{'start': '172.16.4.10', 'end': '172.16.4.200'}]
+  ExternalAllocationPools: [{'start': '10.19.137.121', 'end': '10.19.137.151'}]
+  InternalApiNetworkVlanID: 4041
+  StorageNetworkVlanID: 4042
+  StorageMgmtNetworkVlanID: 4043
+  TenantNetworkVlanID: 4044
+  ExternalNetworkVlanID: 168
+  ExternalInterfaceDefaultRoute: "10.19.143.254"
+  BondInterfaceOvsOptions:
+      "bond_mode=balance-tcp lacp=active other-config:lacp-fallback-ab=true"

@@ -1,0 +1,56 @@
+{
+  "nodes": [
+    {
+      "pm_password": "100Mgmt-",
+      "pm_type": "pxe_ipmitool",
+      "mac": [
+        "d4:ae:52:b2:20:d2"
+      ],
+      "cpu": "12",
+      "memory": "49152",
+      "disk": "500",
+      "arch": "x86_64",
+      "pm_user": "root",
+      "pm_addr": "10.19.143.153"
+    },
+    {
+      "pm_password": "100Mgmt-",
+      "pm_type": "pxe_ipmitool",
+      "mac": [
+        "d4:ae:52:b2:28:95"
+      ],
+      "cpu": "12",
+      "memory": "49152",
+      "disk": "500",
+      "arch": "x86_64",
+      "pm_user": "root",
+      "pm_addr": "10.19.143.154"
+    },
+    {
+      "pm_password": "redhat",
+      "pm_type": "pxe_ipmitool",
+      "mac": [
+        "d4:ae:52:b2:1c:37"
+      ],
+      "cpu": "12",
+      "memory": "49152",
+      "disk": "500",
+      "arch": "x86_64",
+      "pm_user": "root",
+      "pm_addr": "10.19.143.151"
+    },
+    {
+      "pm_password": "redhat",
+      "pm_type": "pxe_ipmitool",
+      "mac": [
+        "d4:ae:52:b2:2e:80"
+      ],
+      "cpu": "12",
+      "memory": "49152",
+      "disk": "500",
+      "arch": "x86_64",
+      "pm_user": "root",
+      "pm_addr": "10.19.143.152"
+    }
+  ]
+}
