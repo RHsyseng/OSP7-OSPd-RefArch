@@ -68,29 +68,41 @@ done
 # configure overcloud nameserver
 neutron subnet-update $(neutron subnet-list | awk ' /192.0.2/ { print $2 } ') --dns-nameserver 10.19.143.247
 
-# export overcloud env vars
-# TODO: test this with trown when https://bugzilla.redhat.com/show_bug.cgi?id=1231214 hits
-
-# get deployment plan name
-uuid=$(openstack management plan list | awk ' /overcloud/ { print $2 } ')
-echo $uuid
-openstack management plan show $uuid
-
-# increase neutron port quotas
-neutron quota-update --port 100
-neutron quota-show
-
 # copy network isolation files into place
 cp /pub/projects/rhos/kilo/scripts/jliberma/new/network-environment.yaml.example ~/network-environment.yaml
 mkdir ~/nic-configs
 cp /pub/projects/rhos/kilo/scripts/jliberma/new/nic-configs/*.yaml ~/nic-configs/
 
+# copy storage environment templates into place
+mkdir ~/templates
+cp -rp /usr/share/openstack-tripleo-heat-templates/ ~/templates
+cp -b /pub/projects/rhos/kilo/scripts/jliberma/new/templates/ceph.yaml ~/templates/openstack-tripleo-heat-templates/puppet/hieradata/ceph.yaml
+
+# TODO: test this with trown when https://bugzilla.redhat.com/show_bug.cgi?id=1231214 hits
+
+# get deployment plan name
+#uuid=$(openstack management plan list | awk ' /overcloud/ { print $2 } ')
+#echo $uuid
+#openstack management plan show $uuid
+
+# to verify clean environment before updating after a failed deployment attempt
+ironic node-list
+nova list --all-tenants
+heat stack-list
+#for i in $(ironic node-list | awk ' /power on/ { print $2 } '); do ironic node-set-power-state $i off; done
+
 # deploy the overcloud
 # defaults to vxlan
-openstack overcloud deploy -e /usr/share/openstack-tripleo-heat-templates/environments/network-isolation.yaml -e /home/stack/network-environment.yaml --plan $uuid --control-flavor control --compute-flavor compute --ceph-storage-flavor ceph --ntp-server 10.16.255.2 --control-scale 3 --compute-scale 4 --ceph-storage-scale 4 --block-storage-scale 0 --swift-storage-scale 0 -t 90
+#openstack overcloud deploy -e /usr/share/openstack-tripleo-heat-templates/environments/network-isolation.yaml -e /home/stack/network-environment.yaml --plan $uuid --control-flavor control --compute-flavor compute --ceph-storage-flavor ceph --ntp-server 10.16.255.2 --control-scale 3 --compute-scale 4 --ceph-storage-scale 4 --block-storage-scale 0 --swift-storage-scale 0 -t 90
 
 # no ahc profile matching
 #openstack overcloud deploy -e /usr/share/openstack-tripleo-heat-templates/environments/network-isolation.yaml -e /home/stack/network-environment.yaml --plan $uuid --ntp-server 10.16.255.2 --control-scale 3 --compute-scale 4 --ceph-storage-scale 0 --block-storage-scale 0 --swift-storage-scale 0 --neutron-public-interface nic2 -t 90
 
 # no network iso / no ahc profile matching
 #openstack overcloud deploy --plan $uuid --ntp-server 10.16.255.2 --control-scale 1 --compute-scale 1 --ceph-storage-scale 0 --block-storage-scale 0 --swift-storage-scale 0 --neutron-public-interface nic2 --libvirt-type kvm -t 45
+
+# plan based with ahc profiles, ceph, and nics
+#openstack overcloud deploy -e /usr/share/openstack-tripleo-heat-templates/environments/network-isolation.yaml -e /home/stack/network-environment.yaml --control-flavor control --compute-flavor compute --ceph-storage-flavor ceph --ntp-server 10.16.255.2 --control-scale 3 --compute-scale 4 --ceph-storage-scale 4 --block-storage-scale 0 --swift-storage-scale 0 -t 90 --templates /home/stack/templates/openstack-tripleo-heat-templates/ -e /usr/share/openstack-tripleo-heat-templates/environments/storage-environment.yaml
+
+# no ceph customization
+openstack overcloud deploy -e /usr/share/openstack-tripleo-heat-templates/environments/network-isolation.yaml -e /home/stack/network-environment.yaml --control-flavor control --compute-flavor compute --ceph-storage-flavor ceph --ntp-server 10.16.255.2 --control-scale 3 --compute-scale 4 --ceph-storage-scale 4 --block-storage-scale 0 --swift-storage-scale 0 -t 90 --templates -e /usr/share/openstack-tripleo-heat-templates/environments/storage-environment.yaml
