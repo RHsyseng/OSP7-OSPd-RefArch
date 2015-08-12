@@ -12,7 +12,7 @@ function enable_stonith {
 	for i in $(nova list | awk ' /controller/ { print $12 } ' | cut -f2 -d=)
 	do 
 		# create the fence device
-		$SSH_CMD $i 'sudo pcs stonith create $(hostname -s)-ipmi fence_ipmilan pcmk_host_list=$(hostname -s) ipaddr=$(sudo ipmitool lan print 1 | awk " /IP Address / { print $4 } ") login=root passwd=100Mgmt- lanplus=1 cipher=1 op monitor interval=60s'
+		$SSH_CMD $i 'sudo pcs stonith create $(hostname -s)-ipmi fence_ipmilan pcmk_host_list=$(hostname -s) ipaddr=$(sudo ipmitool lan print 1 | awk " /IP Address  / { print \$4 } ") login=root passwd=100Mgmt- lanplus=1 cipher=1 op monitor interval=60sr'
 		# avoid fencing yourself
 		$SSH_CMD $i 'sudo pcs constraint location $(hostname -s)-ipmi avoids $(hostname -s)'
 	done
@@ -49,10 +49,12 @@ function test_fence {
 	echo "IUUID $IUUID"
 
 	# stonith REDIS_IP owner
-	$SSH_CMD $FENCER sudo pcs stonith $FENCE_DEVICE
+	$SSH_CMD $FENCER sudo pcs stonith fence $FENCE_DEVICE
+
+	sleep 30
 	
 	# fence REDIS_IP owner to keep ironic from powering it on
-	ironic node-set-power-state $UUID off
+	sudo ironic node-set-power-state $UUID off
 	
 	sleep 60
 	
