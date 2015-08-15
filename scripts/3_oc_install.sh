@@ -101,7 +101,6 @@ heat stack-list
 # no network iso / no ahc profile matching
 #openstack overcloud deploy --plan $uuid --ntp-server 10.16.255.2 --control-scale 1 --compute-scale 1 --ceph-storage-scale 0 --block-storage-scale 0 --swift-storage-scale 0 --neutron-public-interface nic2 --libvirt-type kvm -t 45
 
-<<<<<<< HEAD
 # template based with ahc profiles, ceph, and nics
 #openstack overcloud deploy -e /usr/share/openstack-tripleo-heat-templates/environments/network-isolation.yaml -e /home/stack/network-environment.yaml --control-flavor control --compute-flavor compute --ceph-storage-flavor ceph --ntp-server 10.16.255.2 --control-scale 3 --compute-scale 4 --ceph-storage-scale 4 --block-storage-scale 0 --swift-storage-scale 0 -t 90 --templates /home/stack/templates/openstack-tripleo-heat-templates/ -e /usr/share/openstack-tripleo-heat-templates/environments/storage-environment.yaml
 
@@ -115,10 +114,3 @@ heat stack-list
 #openstack overcloud deploy -e /usr/share/openstack-tripleo-heat-templates/environments/network-isolation.yaml -e /home/stack/network-environment.yaml --control-flavor control --compute-flavor compute --ceph-storage-flavor ceph --ntp-server 10.16.255.2 --control-scale 3 --compute-scale 4 --ceph-storage-scale 4 --block-storage-scale 0 --swift-storage-scale 0 -t 90 --templates /home/stack/templates/openstack-tripleo-heat-templates/ -e /usr/share/openstack-tripleo-heat-templates/environments/storage-environment.yaml --rhel-reg --reg-method satellite --reg-sat-url http://se-sat6.syseng.bos.redhat.com --reg-org syseng --reg-activation-key OSPy-Overcloud
 
 openstack overcloud deploy -e /usr/share/openstack-tripleo-heat-templates/environments/network-isolation.yaml -e /home/stack/network-environment.yaml --control-flavor control --compute-flavor compute --ceph-storage-flavor ceph --ntp-server 10.16.255.2 --control-scale 3 --compute-scale 4 --ceph-storage-scale 4 --block-storage-scale 0 --swift-storage-scale 0 -t 90 --templates -e /usr/share/openstack-tripleo-heat-templates/environments/storage-environment.yaml --rhel-reg --reg-method portal --reg-org 7033380 --reg-activation-key osp-7-director-jliberma
-=======
-# plan based with ahc profiles, ceph, and nics
-#openstack overcloud deploy -e /usr/share/openstack-tripleo-heat-templates/environments/network-isolation.yaml -e /home/stack/network-environment.yaml --control-flavor control --compute-flavor compute --ceph-storage-flavor ceph --ntp-server 10.16.255.2 --control-scale 3 --compute-scale 4 --ceph-storage-scale 4 --block-storage-scale 0 --swift-storage-scale 0 -t 90 --templates /home/stack/templates/openstack-tripleo-heat-templates/ -e /usr/share/openstack-tripleo-heat-templates/environments/storage-environment.yaml
-
-# no ceph customization
-openstack overcloud deploy -e /usr/share/openstack-tripleo-heat-templates/environments/network-isolation.yaml -e /home/stack/network-environment.yaml --control-flavor control --compute-flavor compute --ceph-storage-flavor ceph --ntp-server 10.16.255.2 --control-scale 3 --compute-scale 4 --ceph-storage-scale 4 --block-storage-scale 0 --swift-storage-scale 0 -t 90 --templates -e /usr/share/openstack-tripleo-heat-templates/environments/storage-environment.yaml
->>>>>>> 61b6826a78e5a2d2b94557bb788542803e3a9a26

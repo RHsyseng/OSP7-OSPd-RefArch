@@ -89,12 +89,8 @@ sudo mysql -e "SHOW GLOBAL VARIABLES LIKE 'max_connections'"
 
 # increase neutron port quotas
 # https://bugzilla.redhat.com/show_bug.cgi?id=1251571
-<<<<<<< HEAD
 neutron quota-update --port -1
 #neutron quota-update --port 100
-=======
-neutron quota-update --port 100
->>>>>>> 61b6826a78e5a2d2b94557bb788542803e3a9a26
 neutron quota-show
 
 # increase ironic timeouts
