@@ -134,6 +134,19 @@
       "pm_password": "100Mgmt-",
       "pm_type": "pxe_ipmitool",
       "mac": [
+        "54:9F:35:F6:70:97"
+      ],
+      "cpu": "32",
+      "memory": "98304",
+      "disk": "130",
+      "arch": "x86_64",
+      "pm_user": "root",
+      "pm_addr": "10.19.143.40"
+     },
+    {
+      "pm_password": "100Mgmt-",
+      "pm_type": "pxe_ipmitool",
+      "mac": [
         "54:9F:35:F6:70:70"
       ],
       "cpu": "32",

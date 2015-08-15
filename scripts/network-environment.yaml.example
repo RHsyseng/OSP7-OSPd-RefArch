@@ -6,7 +6,10 @@ resource_registry:
   OS::TripleO::CephStorage::Net::SoftwareConfig: /home/stack/nic-configs/ceph-storage.yaml
 
 parameters:
-  Controller-1::NeutronExternalNetworkBridge: "br-ex"
+  # plan based
+  #Controller-1::NeutronExternalNetworkBridge: "br-ex"
+  # template based
+  NeutronExternalNetworkBridge: "br-ex"
 
 parameter_defaults:
   InternalApiNetCidr: 172.16.1.0/24

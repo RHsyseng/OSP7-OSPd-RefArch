@@ -89,6 +89,7 @@ neutron router-gateway-set route1 ext-net
 floatip=$(openstack ip floating create ext-net | awk ' / ip/ { print $4 } ')
 echo $floatip
 openstack ip floating add $floatip inst1
+sleep 30
 
 # access inst1 by floating IP
 ssh -l cloud-user -i ~/demokp.pem $floatip uptime
