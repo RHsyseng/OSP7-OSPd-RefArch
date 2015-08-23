@@ -20,8 +20,9 @@ neutron subnet-create --name ext-net --allocation-pool=start=10.19.137.137,end=1
 export ext_net_id=$(neutron net-show ext-net | awk ' / id/ { print $4 } ')
 
 # copy HOT
-cp -b /pub/projects/rhos/kilo/scripts/jliberma/new/templates/simple.yaml ~/templates/simple.yaml
-cp -b /pub/projects/rhos/kilo/scripts/jliberma/new/templates/eapws.yaml ~/templates/eapws.yaml
+mkdir ~/templates/lib
+cp -b /pub/projects/rhos/kilo/scripts/jliberma/new/templates/eapws5.yaml ~/templates/eapws5.yaml
+cp -b /pub/projects/rhos/kilo/scripts/jliberma/new/templates/lib/* ~/templates/lib
 
 # create a tenant and tenant user
 openstack user create --password redhat demo
@@ -44,6 +45,7 @@ env | grep OS_
 
 # import the virtual machine disk image
 openstack image create --disk-format qcow2  --container-format bare --file /pub/projects/rhos/icehouse/scripts/jliberma/rhel-guest-image-7.0-20140506.1.x86_64.qcow2 rhel-server7
+openstack image create --disk-format qcow2  --container-format bare --file /pub/projects/rhos/common/images/rhel-guest-image-7.1-20150224.0.x86_64.qcow2 rhel-server7.1
 openstack image list
 
 # create a keypair
@@ -51,6 +53,8 @@ openstack keypair create demokp > ~/demokp.pem
 chmod 600 ~/demokp.pem
 openstack keypair list
 
-heat -v template-validate --template-file templates/simple.yaml
+#heat -v template-validate --template-file templates/simple.yaml
 #heat -v stack-create --template-file templates/simple.yaml simple  --parameters="public_net_id=$ext_net_id"
-heat -v stack-create --template-file templates/eapws.yaml eap  --parameters="public_net_id=$ext_net_id"
+#heat -v stack-create --template-file templates/eapws.yaml eap  --parameters="public_net_id=$ext_net_id"
+heat -v template-validate --template-file templates/eapws5.yaml
+heat -v stack-create --template-file templates/eapws5.yaml eap5  --parameters="public_net_id=$ext_net_id"
