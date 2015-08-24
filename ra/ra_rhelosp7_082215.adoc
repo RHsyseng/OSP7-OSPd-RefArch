@@ -516,7 +516,11 @@ image::images/REFARCH.png[align="center"]
 
 ==== Objective
 
-==== Work flow
+==== Reference Architecture Workflow
+
+[[reference-workflow]]
+.Reference Architecture Workflow
+image::images/WORKFLOW.png[align="center"]
 
 === Environment
 The reference architecture environment consists of the components required to build a small Red Hat Enterprise Linux OpenStack Platform cloud infrastructure. It includes small form factor servers for the OpenStack servers and Swift storage servers with more internal storage capacity. 
