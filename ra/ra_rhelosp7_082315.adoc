@@ -75,30 +75,30 @@ https://plus.google.com/u/0/b/114152126783830728030/
 Red Hat Enterprise Linux OpenStack Platform 7 delivers an integrated
 foundation to create, deploy, and scale an OpenStack cloud. RHEL OSP
 7, Red Hat's 5th iteration of OpenStack Platform, is based on the Kilo
-community OpenStack release. This reference architecture describes 
-a realistic use case for deploying a microservices architecture on RHEL 
+community OpenStack release. This reference architecture describes
+a realistic use case for deploying a microservices architecture on RHEL
 OSP 7 cluster. A microservice architecture is a complex, modular
-enterprise applications where individual instances or containers run 
-single services and communicate via lightweight protocols and APIs. The 
-microservice architecture deployed in this reference architecture was 
-built using Red Hat JBOSS Enterprise Application Server 6, Red Hat's 
-fully-certified Java EE platform. This reference architecture supplements 
-existing documentation by providing a _comprehensive example_ of deploying 
-a complex enterprise web application on OpenStack, demonstrating OSP 7's 
+enterprise applications where individual instances or containers run
+single services and communicate via lightweight protocols and APIs. The
+microservice architecture deployed in this reference architecture was
+built using Red Hat JBOSS Enterprise Application Server 6, Red Hat's
+fully-certified Java EE platform. This reference architecture supplements
+existing documentation by providing a _comprehensive example_ of deploying
+a complex enterprise web application on OpenStack, demonstrating OSP 7's
 features and tools in a realistic context.
 
-The reference architecture begins with steps for deploying OSP 7 on baremetal 
+The reference architecture begins with steps for deploying OSP 7 on baremetal
 servers via OSP director, Red Hat's new deployment toolchain. OSP director
 combines functionality from the upstream TripleO and Ironic projects
-with components from Red Hat's previous installers. Next it describes 
-Red Hat's approach to implementing highly available OpenStack. 
-Core OpenStack services are managed and monitored in a highly available 
-cluster. A load balancer provides access to the service endpoints. There 
+with components from Red Hat's previous installers. Next it describes
+Red Hat's approach to implementing highly available OpenStack.
+Core OpenStack services are managed and monitored in a highly available
+cluster. A load balancer provides access to the service endpoints. There
 are no direct connections from the clients to the services. This
 approach allows administrators to manage, operate, and scale services
-together or independently. The reference architecture concludes with 
-instructions for implementing a microservices architecture that provides 
-shopping cart functionality via a multi-tier web application. 
+together or independently. The reference architecture concludes with
+instructions for implementing a microservices architecture that provides
+shopping cart functionality via a multi-tier web application.
 
 <<<
 
@@ -108,22 +108,26 @@ foundation to create, deploy, and scale an OpenStack cloud. RHEL OSP
 7, Red Hat's 5th iteration of OpenStack Platform, is based on the
 community Kilo OpenStack release. Red Hat JBOSS Enterprise Application
 Server 6 is a fully-certified Java EE platform to quickly deploy and
-develop enterprise applications. This reference architecture describes 
+develop enterprise applications. This reference architecture describes
 a realistic use case for deploying an EAP 6 microservices architecture
 on a highly available RHEL OSP 7 cluster. It provides a comprehensive,
 end-to-end example of depoying an OSP 7 cloud on baremetal using
 OpenStack director then implementing the microservice architecture via
-Heat templates. 
+Heat templates.
 
-The first section of this reference architecture introduces the principal 
+[[OSP-director]]
+.OpenStack Platform director
+image::images/DIRECTOR.png[align="center",scaledwidth="50%"]
+
+The first section of this reference architecture introduces the principal
 components: Red Hat Enterprise Linux OpenStack Platform 7, OpenStack
-Plaform director, and a microservices architecture built with Red Hat JBOSS 
+Plaform director, and a microservices architecture built with Red Hat JBOSS
 Enterprise Application Platform 6. It also describes Red Hat's
 approach to making OpenStack highly availabile. The second section of
-the paper describes the lab environment, hardware, and software used to 
+the paper describes the lab environment, hardware, and software used to
 implement and test the reference architecture. The third section
-documents the installation and configuration procedure as performed by the 
-Red Hat Systems Engineering team to deploy the reference architecture in their 
+documents the installation and configuration procedure as performed by the
+Red Hat Systems Engineering team to deploy the reference architecture in their
 lab on bare metal servers using OSP director and production code. This
 reference architecture complements existing RHEL OSP documentation by
 providing a realistic, comprehensive example of a complete deployment.
@@ -141,11 +145,11 @@ RHEL OSP 7 is based on the community Kilo OpenStack release. This
 release is Red Hat's fifth iteration of RHEL OSP which has been
 successfully deployed by Red Hat customers worldwide across diverse
 vertical industries including financial, telecommunications, and
-education. 
+education.
 
 RHEL OSP 7 introduces OpenStack Platform director, a cloud installation and
-lifecycle management toolchain. OSP director is the first 
-Red Hat OpenStack Platform installer to deploy OpenStack on and with 
+lifecycle management toolchain. OSP director is the first
+Red Hat OpenStack Platform installer to deploy OpenStack on and with
 OpenStack. This section of the paper introduces RHEL OSP director's architecture
 and describes the following features:
 
@@ -291,7 +295,7 @@ interfaces
 When using network isolation, server roles require access to specific
 networks.
 
-[[flowroot]]
+[[network-topology]]
 .Network topology
 image::images/NETWORK.png[align="center"]
 
@@ -571,6 +575,10 @@ If a service fails to start, the node where the service is running
 will be fenced in order to guarantee data integrity.
 
 === Ceph Storage Integration
+
+[[ceph-integration]]
+.Ceph Integration
+image::images/CEPH.png[align="center"]
 
 
 <<<
