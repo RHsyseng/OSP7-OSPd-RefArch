@@ -1,0 +1,79 @@
+heat_template_version: 2013-05-23
+
+description: >
+  HOT template to create a new neutron network plus a router to the public
+  network, and for deploying five servers into the new network. The template also
+  assigns floating IP addresses to each server so they are routable from the
+  public network.
+
+parameters:
+  public_net_id:
+    type: string
+    description: Public network for floating IP addresses
+  private_net_name:
+    type: string
+    default: demo-net
+    description: Private network name
+  dns_nameservers:
+     type: string
+     default: [10.19.143.247]
+  key:
+    type: string
+    description: Server keypair name
+    default: demokp
+  image:
+    type: string
+    description: Server image name
+    default: rhel-server7.1
+  flavor:
+    type: string
+    description: Server flavor
+    default: m1.small
+    constraints:
+      - allowed_values: [m1.small, m1.medium, m1.large]
+        description: InstanceType must be m1.small, m1.medium or m1.large
+
+resources:
+
+  private_network:
+    type: lib/private_network.yaml
+    properties:
+      public_net_id: { get_param: public_net_id }
+
+  server1:
+    type: lib/product-db.yaml
+    properties:
+      image: { get_param: image }
+      flavor: { get_param: flavor }
+      private_net_name: { get_attr: [ private_network, name ] }
+      public_net_id: { get_param: public_net_id }
+      #security_group: { get attr: [security_group, name ] }
+
+  security_group:
+    type: OS::Neutron::SecurityGroup
+    properties:
+      description: Server security group rules
+      name: security-group
+      rules:
+        - remote_ip_prefix: 0.0.0.0/0
+          protocol: tcp
+          port_range_min: 22
+          port_range_max: 22
+        - remote_ip_prefix: 0.0.0.0/0
+          protocol: tcp
+          port_range_min: 80
+          port_range_max: 80
+        - remote_ip_prefix: 0.0.0.0/0
+          protocol: tcp
+          port_range_min: 443 
+          port_range_max: 443
+        - remote_ip_prefix: 0.0.0.0/0
+          protocol: tcp
+          port_range_min: 3306
+          port_range_max: 3306
+        - remote_ip_prefix: 0.0.0.0/0
+          protocol: tcp
+          port_range_min: 8080
+          port_range_max: 8080
+        - remote_ip_prefix: 0.0.0.0/0
+          protocol: icmp

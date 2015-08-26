@@ -1,10 +1,7 @@
 heat_template_version: 2013-05-23
 
 description: >
-  HOT template to create a new neutron network plus a router to the public
-  network, and for deploying five servers into the new network. The template also
-  assigns floating IP addresses to each server so they are routable from the
-  public network.
+  HOT template to deploy a database server for an EAP 6 microservices application.
 
 parameters:
   public_net_id:
@@ -14,26 +11,7 @@ parameters:
     type: string
     default: demo-net
     description: Private network name
-  private_net_cidr:
-    type: string
-    default: 172.16.5.0/24
-    description: Private network addresses
-  private_net_gateway:
-    type: string
-    default: 172.16.5.1
-    description: Private network gateway address
-  private_net_pool_start:
-    type: string
-    default: 172.16.5.2
-    description: Private network IP address allocation pool start
-  private_net_pool_end:
-    type: string
-    default: 172.16.5.254
-    description: Private network IP address allocation pool end
-  dns_nameservers:
-     type: string
-     default: [10.19.143.247]
-  key_name:
+  key:
     type: string
     description: Server keypair name
     default: demokp
@@ -55,64 +33,26 @@ parameters:
     constraints:
       - range: { min: 1, max: 1024 }
         description: must be between 1 and 1024 Gb.
+  security_group:
+    type: string
+    description: Tenant security group
+    default: security-group
 
 resources:
-  private_net:
-    type: OS::Neutron::Net
-    properties:
-      name: { get_param: private_net_name }
 
-  private_subnet:
-    type: OS::Neutron::Subnet
+  server1_port:
+    type: OS::Neutron::Port
     properties:
-      network_id: { get_resource: private_net }
-      cidr: { get_param: private_net_cidr }
-      gateway_ip: { get_param: private_net_gateway }
-      dns_nameservers: { get_param: dns_nameservers }
-      allocation_pools:
-        - start: { get_param: private_net_pool_start }
-          end: { get_param: private_net_pool_end }
+      security_groups:
+        - { get_param: security_group }
+      network: { get_param: private_net_name }
+      fixed_ips:
+        - ip_address: "172.16.5.11"
 
-  router:
-    type: OS::Neutron::Router
+  cinder_volume:
+    type: OS::Cinder::Volume
     properties:
-      external_gateway_info:
-        network: { get_param: public_net_id }
-
-  router_interface:
-    type: OS::Neutron::RouterInterface
-    properties:
-      router_id: { get_resource: router }
-      subnet_id: { get_resource: private_subnet }
-
-  security_group:
-    type: OS::Neutron::SecurityGroup
-    properties:
-      description: Server security group rules
-      name: security-group
-      rules:
-        - remote_ip_prefix: 0.0.0.0/0
-          protocol: tcp
-          port_range_min: 22
-          port_range_max: 22
-        - remote_ip_prefix: 0.0.0.0/0
-          protocol: tcp
-          port_range_min: 80
-          port_range_max: 80
-        - remote_ip_prefix: 0.0.0.0/0
-          protocol: tcp
-          port_range_min: 443 
-          port_range_max: 443
-        - remote_ip_prefix: 0.0.0.0/0
-          protocol: tcp
-          port_range_min: 3306
-          port_range_max: 3306
-        - remote_ip_prefix: 0.0.0.0/0
-          protocol: tcp
-          port_range_min: 8080
-          port_range_max: 8080
-        - remote_ip_prefix: 0.0.0.0/0
-          protocol: icmp
+      size: { get_param: volume_size }
 
   server1:
     type: OS::Nova::Server
@@ -120,15 +60,14 @@ resources:
       name: product-db
       image: { get_param: image }
       flavor: { get_param: flavor }
-      key_name: { get_param: key_name }
+      key_name: { get_param: key }
       networks:
         - port: { get_resource: server1_port }
       user_data: |
-      user_data: |
         #!/bin/bash -v
-        yum localinstall -y http://rhos-release.virt.bos.redhat.com/repos/rhos-release/rhos-release-latest.noarch.rpm
-        rhos-release 6
-        yum repolist
+        #yum localinstall -y http://rhos-release.virt.bos.redhat.com/repos/rhos-release/rhos-release-latest.noarch.rpm
+        #rhos-release 6
+        #yum repolist
         mkdir /pub
         echo "10.19.143.248:/pub /pub nfs defaults 0 0" >> /etc/fstab
         mount -av
@@ -145,19 +84,14 @@ resources:
         mount -L MYSQL /var/lib/mysql
         
         # configure the database
-        yum install -y mariadb-server
-        systemctl enable mariadb.service
-        systemctl start mariadb.service
-        mysql -u root < /pub/projects/rhos/kilo/scripts/jliberma/new/jboss/setup.sql
-        mysql -u root -e "SHOW TABLES;" product
-        mysql -u root -e "SHOW TABLES;" sales
-
+        #yum install -y mariadb-server
+        #systemctl enable mariadb.service
+        #systemctl start mariadb.service
+        #mysql -u root < /pub/projects/rhos/kilo/scripts/jliberma/new/jboss/setup.sql
+        #mysql -u root -e "SHOW TABLES;" product
+        #mysql -u root -e "SHOW TABLES;" sales
       user_data_format: RAW
             
-  cinder_volume:
-    type: OS::Cinder::Volume
-    properties:
-      size: { get_param: volume_size }
   volume_attachment:
     type: OS::Cinder::VolumeAttachment
     properties:
@@ -165,180 +99,11 @@ resources:
       instance_uuid: { get_resource: server1 }
       mountpoint: /dev/vdb
 
-  server1_port:
-    type: OS::Neutron::Port
-    properties:
-      security_groups: [{ get_resource: security_group }]
-      network_id: { get_resource: private_net }
-      fixed_ips:
-        - subnet_id: { get_resource: private_subnet }
-
   server1_floating_ip:
     type: OS::Neutron::FloatingIP
     properties:
       floating_network_id: { get_param: public_net_id }
       port_id: { get_resource: server1_port }
-
-  server2:
-    type: OS::Nova::Server
-    properties:
-      name: presentation-service
-      image: { get_param: image }
-      flavor: { get_param: flavor }
-      key_name: { get_param: key_name }
-      networks:
-        - port: { get_resource: server2_port }
-      user_data: |
-        #!/bin/bash -v
-        yum localinstall -y http://rhos-release.virt.bos.redhat.com/repos/rhos-release/rhos-release-latest.noarch.rpm
-        rhos-release 6
-        yum repolist
-        yum install -y unzip
-        mkdir /pub
-        echo "10.19.143.248:/pub /pub nfs defaults 0 0" >> /etc/fstab
-        mount -av
-        cp /pub/projects/rhos/kilo/scripts/jliberma/new/jboss/jboss-eap-6.4.0.zip /tmp
-        unzip /tmp/jboss-eap-6.4.0.zip
-        mv jboss-eap-6.4/ /opt
-      user_data_format: RAW
-
-  server2_port:
-    type: OS::Neutron::Port
-    properties:
-      security_groups: [{ get_resource: security_group }]
-      network_id: { get_resource: private_net }
-      fixed_ips:
-        - subnet_id: { get_resource: private_subnet }
-
-  server2_floating_ip:
-    type: OS::Neutron::FloatingIP
-    properties:
-      floating_network_id: { get_param: public_net_id }
-      port_id: { get_resource: server2_port }
-
-  server3:
-    type: OS::Nova::Server
-    properties:
-      name: product-service
-      image: { get_param: image }
-      flavor: { get_param: flavor }
-      key_name: { get_param: key_name }
-      networks:
-        - port: { get_resource: server3_port }
-      user_data: |
-        #!/bin/bash -v
-        yum localinstall -y http://rhos-release.virt.bos.redhat.com/repos/rhos-release/rhos-release-latest.noarch.rpm
-        rhos-release 6
-        yum repolist
-        yum install -y unzip
-        mkdir /pub
-        echo "10.19.143.248:/pub /pub nfs defaults 0 0" >> /etc/fstab
-        mount -av
-        cp /pub/projects/rhos/kilo/scripts/jliberma/new/jboss/jboss-eap-6.4.0.zip /tmp
-        unzip /tmp/jboss-eap-6.4.0.zip
-        mv jboss-eap-6.4/ /opt
-        yum install -y java-1.7.0-openjdk
-        # database connector
-        cp -f /pub/projects/rhos/kilo/scripts/jliberma/new/jboss/standalone.xml /opt/jboss-eap-6.4/standalone/configuration/standalone.xml
-        mkdir -p /opt/jboss-eap-6.4/modules/system/layers/base/com/mysql/main
-        cp /pub/projects/rhos/kilo/scripts/jliberma/new/jboss/{mysql-connector-java-5.1.34.jar,module.xml} /opt/jboss-eap-6.4/modules/system/layers/base/com/mysql/main
-        ln -s /opt/jboss-eap-6.4/modules/system/layers/base/com/mysql/main/mysql-connector-java-5.1.34.jar /opt/jboss-eap-6.4/modules/system/layers/base/com/mysql/main/mysql-connector-java-5.1.34-bin.jar
-      user_data_format: RAW
-
-  server3_port:
-    type: OS::Neutron::Port
-    properties:
-      security_groups: [{ get_resource: security_group }]
-      network_id: { get_resource: private_net }
-      fixed_ips:
-        - subnet_id: { get_resource: private_subnet }
-
-  server3_floating_ip:
-    type: OS::Neutron::FloatingIP
-    properties:
-      floating_network_id: { get_param: public_net_id }
-      port_id: { get_resource: server3_port }
-
-  server4:
-    type: OS::Nova::Server
-    properties:
-      name: billing-service
-      image: { get_param: image }
-      flavor: { get_param: flavor }
-      key_name: { get_param: key_name }
-      networks:
-        - port: { get_resource: server4_port }
-      user_data: |
-        #!/bin/bash -v
-        yum localinstall -y http://rhos-release.virt.bos.redhat.com/repos/rhos-release/rhos-release-latest.noarch.rpm
-        rhos-release 6
-        yum repolist
-        yum install -y unzip
-        mkdir /pub
-        echo "10.19.143.248:/pub /pub nfs defaults 0 0" >> /etc/fstab
-        mount -av
-        cp /pub/projects/rhos/kilo/scripts/jliberma/new/jboss/jboss-eap-6.4.0.zip /tmp
-        unzip /tmp/jboss-eap-6.4.0.zip
-        mv jboss-eap-6.4/ /opt
-        yum install -y java-1.7.0-openjdk
-      user_data_format: RAW
-
-  server4_port:
-    type: OS::Neutron::Port
-    properties:
-      security_groups: [{ get_resource: security_group }]
-      network_id: { get_resource: private_net }
-      fixed_ips:
-        - subnet_id: { get_resource: private_subnet }
-
-  server4_floating_ip:
-    type: OS::Neutron::FloatingIP
-    properties:
-      floating_network_id: { get_param: public_net_id }
-      port_id: { get_resource: server4_port }
-
-  server5:
-    type: OS::Nova::Server
-    properties:
-      name: sales-service
-      image: { get_param: image }
-      flavor: { get_param: flavor }
-      key_name: { get_param: key_name }
-      networks:
-        - port: { get_resource: server5_port }
-      user_data: |
-        #!/bin/bash -v
-        yum localinstall -y http://rhos-release.virt.bos.redhat.com/repos/rhos-release/rhos-release-latest.noarch.rpm
-        rhos-release 6
-        yum repolist
-        yum install -y unzip
-        mkdir /pub
-        echo "10.19.143.248:/pub /pub nfs defaults 0 0" >> /etc/fstab
-        mount -av
-        cp /pub/projects/rhos/kilo/scripts/jliberma/new/jboss/jboss-eap-6.4.0.zip /tmp
-        unzip /tmp/jboss-eap-6.4.0.zip
-        mv jboss-eap-6.4/ /opt
-        yum install -y java-1.7.0-openjdk
-        # database connector
-        cp -f /pub/projects/rhos/kilo/scripts/jliberma/new/jboss/standalone.xml /opt/jboss-eap-6.4/standalone/configuration/standalone.xml
-        mkdir -p /opt/jboss-eap-6.4/modules/system/layers/base/com/mysql/main
-        cp /pub/projects/rhos/kilo/scripts/jliberma/new/jboss/{mysql-connector-java-5.1.34.jar,module.xml} /opt/jboss-eap-6.4/modules/system/layers/base/com/mysql/main
-        ln -s /opt/jboss-eap-6.4/modules/system/layers/base/com/mysql/main/mysql-connector-java-5.1.34.jar /opt/jboss-eap-6.4/modules/system/layers/base/com/mysql/main/mysql-connector-java-5.1.34-bin.jar
-      user_data_format: RAW
-
-  server5_port:
-    type: OS::Neutron::Port
-    properties:
-      security_groups: [{ get_resource: security_group }]
-      network_id: { get_resource: private_net }
-      fixed_ips:
-        - subnet_id: { get_resource: private_subnet }
-
-  server5_floating_ip:
-    type: OS::Neutron::FloatingIP
-    properties:
-      floating_network_id: { get_param: public_net_id }
-      port_id: { get_resource: server5_port }
 
 outputs:
   server1_private_ip:
@@ -347,27 +112,3 @@ outputs:
   server1_public_ip:
     description: Floating IP address of server1 in public network
     value: { get_attr: [ server1_floating_ip, floating_ip_address ] }
-  server2_private_ip:
-    description: IP address of server2 in private network
-    value: { get_attr: [ server2, first_address ] }
-  server2_public_ip:
-    description: Floating IP address of server2 in public network
-    value: { get_attr: [ server2_floating_ip, floating_ip_address ] }
-  server3_private_ip:
-    description: IP address of server3 in private network
-    value: { get_attr: [ server3, first_address ] }
-  server3_public_ip:
-    description: Floating IP address of server3 in public network
-    value: { get_attr: [ server3_floating_ip, floating_ip_address ] }
-  server4_private_ip:
-    description: IP address of server4 in private network
-    value: { get_attr: [ server4, first_address ] }
-  server4_public_ip:
-    description: Floating IP address of server4 in public network
-    value: { get_attr: [ server4_floating_ip, floating_ip_address ] }
-  server5_private_ip:
-    description: IP address of server5 in private network
-    value: { get_attr: [ server5, first_address ] }
-  server5_public_ip:
-    description: Floating IP address of server5 in public network
-    value: { get_attr: [ server5_floating_ip, floating_ip_address ] }
