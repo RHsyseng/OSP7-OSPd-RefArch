@@ -1,4 +1,4 @@
-= Deploying HA Red Hat Enterprise Linux OpenStack Platform 7 via OSP director to run an EAP 6 Microservices Architecture
+= Deploying an EAP 6 Microservices Architecture on HA OSP 7 via OSP director
 Jacob Liberman <jliberma@redhat.com>
 v1.0, 2015-08-05
 :description: Reference architecture
@@ -117,7 +117,7 @@ Heat templates.
 
 [[OSP-director]]
 .OpenStack Platform director
-image::images/DIRECTOR.png[align="center",scaledwidth="50%"]
+image::images/DIRECTOR.png[align="center",scaledheight="50%"]
 
 The first section of this reference architecture introduces the principal
 components: Red Hat Enterprise Linux OpenStack Platform 7, OpenStack
@@ -230,12 +230,12 @@ from the eNovance SpinalStack installer. These tools validate server
 hardware prior to installation. *Profile matching* lets administrators
 specify hardware requirements for each server role. OSP director only
 matches servers that meet minimum hardware requirements for each role.
-Profile to matching is performed after introspection but prior to deployment. 
+Profile to matching is performed after introspection but prior to deployment.
 
 OSP director also supports pre-installation *benchmark collection*.
 Servers boot to a customized RAMdisk and run a series of benchmarks.
 The benchmarks report performance outliers to identify underperforming
-nodes prior to installation. 
+nodes prior to installation.
 
 NOTE: RHEL OSP 7 requires Red Hat Enterprise Linux 7 Server on all servers.
 Supported guest operating systems can be found at
@@ -243,15 +243,15 @@ https://access.redhat.com/articles/973163. Deployment limitations are
 listed at https://access.redhat.com/articles/1436373.
 
 === Network Isolation
-OpenStack requires multiple network functions. While it is possible to 
+OpenStack requires multiple network functions. While it is possible to
 collapse all network functions onto a single network interface,
 isolating communication streams in their own physical or virtual
 networks generally provides better performance and scalability.
 
-OSP director supports isolating network traffic by type. One or more 
+OSP director supports isolating network traffic by type. One or more
 network traffic types can be flexibily assigned to a physical,
-virtual, or bonded interface. Multiple traffic types can be combined  
-across the same physical interfaces or switches. 
+virtual, or bonded interface. Multiple traffic types can be combine
+across the same physical interfaces or switches.
 
 OPS director supports network isolation for the following traffic
 types:
@@ -259,7 +259,7 @@ types:
 [[traffic-types]]
 [glossary]
 *Provisioning*::
-    The control plane installs the overcloud via this network. All cluster 
+    The control plane installs the overcloud via this network. All cluster
     nodes must have a physical interface attached to the provisioning network.
     This network must carry PXE traffic so it should be on a native
     VLAN. The provisioning interface can act as a default gateway for
@@ -274,7 +274,7 @@ types:
     both core OpenStack services and the supporting services.
 *Tenant*::
     Virtual machines communicate over the tenant network. It supports
-    three modes of operation: VXLAN, GRE, and VLAN. 
+    three modes of operation: VXLAN, GRE, and VLAN.
 *Storage*::
     This network carries storage communication including Ceph, Cinder,
     and Swift traffic. Data-internsive OpenStack deployments should
@@ -305,9 +305,9 @@ each server role must have access to its required network traffic
 types. <<network-topology-table>> summarizes the required network
 types by server role.
 
-[[network-topology]]
+[[network-topology-diagram]]
 .Network topology
-image::images/NETWORK.png[align="center"]
+image::images/NETWORK.png[align="center", scaledwidth="80%"]
 
 <<network-topology>> depicts the network roles by server type used in
 this reference architecture.
@@ -470,7 +470,7 @@ is beyond the scope of this document.
 
 [[segregated-cluster]]
 .Segregated cluster
-image::images/HA_SEGREGATED.png[align="center"]
+image::images/HA_SEGREGATED.png[align="center", scaledwidth="80%"]
 
 ==== Cluster Services and Quorum
 Each clustered service operates in one of the following modes:
@@ -508,7 +508,7 @@ OpenStack service.
 
 [[collapsed-cluster]]
 .Collapsed cluster
-image::images/HA_COLLAPSED.png[align="center"]
+image::images/HA_COLLAPSED.png[align="center", scaledwidth="80%"]
 
 The following table lists service mode by service.
 
@@ -606,7 +606,7 @@ communicate directly with the primary data-owning OSD.
 
 [[ceph-integration]]
 .Ceph Integration
-image::images/CEPH.png[align="center"]
+image::images/CEPH.png[align="center", scaledwidth="80%"]
 
 OSP director can install a Ceph cluster with one or more OSD servers.
 By default the OSD server will use free space on its primary disk for
@@ -632,40 +632,108 @@ Platform.
 <<<
 
 == Reference Architecture Configuration Details
+This section of the paper discusses the reference architecture use
+case. It includes an overview of the objective and workflow. This
+section also describes the test environment used to execute the use
+case in the Red Hat Systems Engineering lab.
 
 === Objective
+This use case provides a comprehensive example for deploying an EAP 6
+microservices architecture on a high availability OpenStack Platform 7
+cloud using OSP 7 director. The Red Hat Systems Engineering team
+validated all commands on bare metal servers using generally available
+software. The use case highlights many of OSP director's features
+including:
+
+* high availability
+* network isolation
+* advanced profile matching
+* Ceph integration
+* Ceph customization
+* Satellite subscription
+
+The use case concludes with instructions for installing the EAP 6
+microservices architecture via Heat. The microservices architecture
+demonstrates OpenStack's ability to deploy and run a complex
+application typical to a production cloud. The microservices
+architecture used in this example is a multi-tier shopping cart that
+includes a web presentation layer, product and customer databases, and
+sales, billing, and product microservices.
 
 === Workflow
+<<reference-workflow>> depicts a high-level overview of the use case
+workflow. 
 
 [[reference-workflow]]
 .Reference Architecture Workflow
-image::images/WORKFLOW.png[align="center"]
+image::images/WORKFLOW.png[align="center", scaledwidth="80%"]
 
-== Conceptual Diagram of the Solution Stack
-Figure XX depicts the solution stack including networks, server roles, and service placement.
+The use case is divided into the following steps:
 
-[[reference-architecture]]
+. *Install the undercloud*:
+.. Get the software.
+.. Deploy the undercloud baremetal server.
+. *Prepare the overcloud*:
+.. Import overcloud disk images.
+.. Discover baremetal servers for overcloud deployment.
+.. Match the servers to hardware profiles.
+.. Customize the Ceph OSDs.
+.. Define the network isolation configuration.
+. *Create the overcloud*: 
+.. Deploy the overcloud via Heat.
+.. Configure HA fencing devices.
+.. Test the overcloud deployment.
+. *Deploy the EAP 6 MSA*:
+.. Configure the tenant
+.. Deploy EAP 6 MSA via Heat templates
+.. Test EAP6
+
+=== Conceptual Diagram of the Solution Stack
+<<reference-architecture-diagram>> depicts the deployed solution stack
+including, server roles, and service placement.
+
+[[reference-architecture-diagram]]
 .Reference Architecture
-image::images/REFARCH.png[align="center"]
+image::images/REFARCH.png[align="center", scaledwidth="70%"]
 
-=== Server Roles
+<<network-topology-section>> describes the networking components in detail.
 
+==== Server Roles
+As depicted in <<reference-architecture-diagram>>, the use case requires 12
+bare metal servers deployed with the following roles:
 
+* 1 undercoud server
+* 3 cloud controllers
+* 4 compute nodes
+* 4 Ceph storage servers
 
-=== Network Topology
+Servers are assigned to roles based on their hardware characteristics.
 
-Figure 2 shows the network topology of this reference architecture. 
+[[server-roles]]
+.Server hardware by role
+[options="header,footer"]
+|====
+|Role|Count|Model
+|Undercloud|1|Dell PowerEdge M720
+|Cloud controller|3|Dell PowerEdge M520
+|Compute node|4|Dell PowerEdge M520
+|Ceph storage server|4|Dell PowerEdge R520
+|====
 
+<<hardware-specifications>> lists hardware specifics for each server
+model.
 
-?? Describe the network graphic
+[[network-topology-section]]
+==== Network Topology
+<<reference-architecture-diagram>> shows the network topology of this
+reference architecture. This section describes the graphic in greater
+detail.
 
-NOTE: The tenant network carries tenant network traffic over tagged VLANs. The interfaces connected to this network are not configured with IPv4 addresses by the OpenStack administrator. Instead, instances and services are allocated addresses within user-created subnets on tenant networks. Network namespaces prevent different users' subnets from conflicting with each other or with the infrastructure's own subnets.
+Each server has two Gigabit interfaces (nic1:2) and two 10-Gigabit
+interfaces (nic3:4). This reference architecture network isolation to
+segment openstack communication by type.
 
-=== Network Configuration
-
-This reference architecture uses the network isolation feature to
-segment openstack communication by type. The following network traffic
-types are segmented:
+The following network traffic types are isolated:
 
 * Provisioning
 * Internal API
@@ -674,47 +742,53 @@ types are segmented:
 * Tenant
 * External
 
-In some cases more than one traffic type will share a physical
-interface. This is because there are more traffic types than physical
-interfaces in the servers. The network isolation feature uses both tagged and native VLANs to
-segment network both within and across interfaces.
+There are six isolated networks but only four physical interfaces.
+Two networks are isolated on each physical 10 Gb interface using a
+combination of tagged and native VLANs.
 
-Each server has two Gigabit interfaces (nic1:2) and two 10-Gigabit
-interfaces (nic3:4).
+NOTE: The OSP 7 network isolation feature supports bonded interfaces.
+Limitations in the Systems Engineering lab precluded the use of bonded
+interfaces in this reference architecture. Bonded interfaces are
+recommended for production deployments.
 
+[[network-isolation-table]]
 .Network isolation
 [options="header, footer"]
 |====
-|Role|Interface|Network|VLAN ID|VLAN Type
-.6+^.^|Undercloud|nic1|4041|External|Native
-|nic2|168|Provisioning|Native
-|nic3|4042|Storage Mgmt|Tagged
-|nic3|4043|Tenant|Native
-|nic4|4044|Internal API|Tagged
-|nic4|4045|Storage|Native
-.6+^.^|Control|nic1|4041|External|Native
-|nic2|168|Provisioning|Native
-|nic3|4042|Storage Mgmt|Tagged
-|nic3|4043|Tenant|Native
-|nic4|4044|Internal API|Tagged
-|nic4|4045|Storage|Native
-.6+^.^|Compute|nic1|4041|External|Native
-|nic2|168|Provisioning|Native
-|nic3|4042|Storage Mgmt|Tagged
-|nic3|4043|Tenant|Native
-|nic4|4044|Internal API|Tagged
-|nic4|4045|Storage|Native
-.6+^.^|Ceph storage|nic1|4041|External|Native
-|nic2|168|Provisioning|Native
-|nic3|4042|Storage Mgmt|Tagged
-|nic3|4043|Tenant|Native
-|nic4|4044|Internal API|Tagged
-|nic4|4045|Storage|Native
+|Role|Interface|Network|VLAN ID|VLAN Type|Network
+.2+^.^|Undercloud|nic1|168|External|Native|10.19.137.0/21
+|nic2|4040|Provisioning|Native|192.0.2.0/24
+.6+^.^|Control|nic1|168|External|Native|10.19.137.0/21
+|nic2|4040|Provisioning|Native|192.0.2.0/24
+|nic3|4043|Storage Mgmt|Tagged|172.16.3.0/24
+|nic3|4044|Tenant|Native|172.16.4.0/24
+|nic4|4041|Internal API|Tagged|172.16.1.0/24
+|nic4|4042|Storage|Native|172.16.2.0/24
+.4+^.^|Compute|nic2|4040|Provisioning|Native|192.0.2.0/24
+|nic3|4044|Tenant|Native|172.16.4.0/24
+|nic4|4041|Internal API|Tagged|172.16.1.0/24
+|nic4|4042|Storage|Native|172.16.2.0/24
+.4+^.^|Ceph storage|nic2|4040|Provisioning|Native|192.0.2.0/24
+|nic3|4043|Storage Mgmt|Tagged|172.16.3.0/24
+|nic4|4041|Internal API|Tagged|172.16.1.0/24
+|nic4|4042|Storage|Native|172.16.2.0/24
 |====
 
-= Install OSP 7 with OSP-D
+NOTE: All switch ports must be added to their respective VLANs before
+deploying the overcloud.
+
+Deciding how to isolate networks is a crucial decision when
+designing for performance and scalability. There is
+no one-size-fits-all approach. Hardware constraints and workload
+characteristics must dictate this design decision. The design used in
+in this reference architecture is suitable for this use case when
+tested at a small scale.
+
+https://access.redhat.com/articles/1507893[This paper] shares an approach to using cloud benchmarks to guide OSP 7 design decisions.
+
+= Install the undercloud
 This section lists the steps that were followed to install and
-configure OSP 7 with OSP-d in the Red Hat Systems Engineering lab. 
+configure OSP 7 with OSP-d in the Red Hat Systems Engineering lab.
 
 == Prepare the undercloud server
 
@@ -875,6 +949,11 @@ openstack-swift-proxy (pid 16334) is active
 openstack-tuskar-api (pid 20076) is active
 ----
 
+<<<
+
+= Prepare the overcloud
+This section describes steps for deploying the overcloud.
+
 . Get the images
 
 . Upload the images
@@ -893,9 +972,6 @@ $ openstack image list
 | bdbd5a52-2307-4baa-abc7-12370b8ed396 | overcloud-full-vmlinuz |
 +--------------------------------------+------------------------+
 ----
-
-== Deploy the Overcloud
-This section describes steps for deploying the overcloud. 
 
 . Create the host definition file. The openstack-ironic-discoverd
   service uses this file to discover nodes and populate the ironic
@@ -1033,8 +1109,7 @@ $ openstack baremetal introspection bulk status
 +--------------------------------------+----------+-------+
 ----
 
-=== Configure hardware profiles
-
+== Configure hardware profiles
 
 . Create the default flavor for baremetal deployments.
 [source, shell]
@@ -1079,18 +1154,15 @@ $ *openstack flavor set --property "cpu_arch"="x86_64"
 +----------------------------+-----------------------------------------------------+
 ----
 
-.
+== Configure network isolation
 
-
-=== Configure network isolation
-
-=== Configure Ceph Storage
-
-=== Deploy the Overcloud servers
+== Configure Ceph Storage
 
 <<<
 
-= Test the Overcloud
+= Deploy and Test the overcloud
+
+== Deploy the Overcloud servers
 
 == Configure controller fencing
 
@@ -1136,7 +1208,7 @@ maintaining, and scaling a MSA.
 
 [[EAP6-MSA]]
 .EAP6 Microservices Architecture
-image::images/EAP6_MSA.png[align="center"]
+image::images/EAP6_MSA.png[align="center", scaledwidth="80%"]
 
 == Define heat templates
 
@@ -1149,7 +1221,7 @@ image::images/EAP6_MSA.png[align="center"]
 
 [[EAP6-web]]
 .EAP6 Web Interface
-image::images/EAP6_WEB.png[align="center"]
+image::images/EAP6_WEB.png[align="center", scaledwidth="80%"]
 
 <<<
 
@@ -1203,6 +1275,7 @@ Red Hat Ceph Architecture Guide]
   Orchestration Template (HOT) Guide]
 
 [appendix]
+[[hardware-specifications]]
 == Hardware specifications
 
 .Hardware specifications
