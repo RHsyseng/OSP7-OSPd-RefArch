@@ -33,7 +33,7 @@ parameters:
 
 resources:
 
-  server3_port:
+  presentation-service_port:
     type: OS::Neutron::Port
     properties:
       security_groups:
@@ -42,7 +42,7 @@ resources:
       fixed_ips:
         - ip_address: "172.16.5.12"
 
-  server3:
+  presentation-service:
     type: OS::Nova::Server
     properties:
       name: presentation-service
@@ -50,12 +50,13 @@ resources:
       flavor: { get_param: flavor }
       key_name: { get_param: key }
       networks:
-        - port: { get_resource: server3_port }
+        - port: { get_resource: presentation-service_port }
       user_data: |
         #!/bin/bash -v
         yum localinstall -y http://rhos-release.virt.bos.redhat.com/repos/rhos-release/rhos-release-latest.noarch.rpm
         rhos-release 6
         yum repolist
+        yum install -y unzip
         mkdir /pub
         echo "10.19.143.248:/pub /pub nfs defaults 0 0" >> /etc/fstab
         mount -av
@@ -77,24 +78,25 @@ resources:
         yum install -y java-1.7.0-openjdk
 
         export NAME=$(hostname -s | cut -f1 -d-)
-        export ADDR=$(hostname -i --all-ip-addresses)
+        export ADDR=$(hostname -i --all-ip-addresses | sed 's/ //') 
         cp /pub/projects/rhos/kilo/scripts/jliberma/new/jboss/$NAME.war /opt/jboss-eap-6.4/standalone/deployments/
         tar zxvf /pub/projects/rhos/kilo/scripts/jliberma/new/jboss/images.tgz --directory=/opt/jboss-eap-6.4/welcome-content/
         ls -al /opt/jboss-eap-6.4/welcome-content/
         sed -i.orig "s/127.0.0.1/$ADDR/" /opt/jboss-eap-6.4/standalone/configuration/standalone.xml
-        #nohup /opt/jboss-eap-6.4/bin/standalone.sh &
+        nohup /opt/jboss-eap-6.4/bin/standalone.sh &
+
       user_data_format: RAW
             
-  server3_floating_ip:
+  presentation-service_floating_ip:
     type: OS::Neutron::FloatingIP
     properties:
       floating_network_id: { get_param: public_net_id }
-      port_id: { get_resource: server3_port }
+      port_id: { get_resource: presentation-service_port }
 
 outputs:
-  server3_private_ip:
-    description: IP address of server3 in private network
-    value: { get_attr: [ server3, first_address ] }
-  server3_public_ip:
-    description: Floating IP address of server3 in public network
-    value: { get_attr: [ server3_floating_ip, floating_ip_address ] }
+  presentation-service_private_ip:
+    description: IP address of presentation-service in private network
+    value: { get_attr: [ presentation-service, first_address ] }
+  presentation-service_public_ip:
+    description: Floating IP address of presentation-service in public network
+    value: { get_attr: [ presentation-service_floating_ip, floating_ip_address ] }
