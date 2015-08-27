@@ -1,0 +1,98 @@
+heat_template_version: 2013-05-23
+
+description: >
+  HOT template to deploy a database server for an EAP 6 microservices application.
+
+parameters:
+  public_net_id:
+    type: string
+    description: Public network for floating IP addresses
+  private_net_name:
+    type: string
+    default: demo-net
+    description: Private network name
+  key:
+    type: string
+    description: Server keypair name
+    default: demokp
+  image:
+    type: string
+    description: Server image name
+    default: rhel-server7.1
+  flavor:
+    type: string
+    description: Server flavor
+    default: m1.small
+    constraints:
+      - allowed_values: [m1.small, m1.medium, m1.large]
+        description: InstanceType must be m1.small, m1.medium or m1.large
+  security_group:
+    type: string
+    description: Tenant security group
+    default: security-group
+
+resources:
+
+  server4_port:
+    type: OS::Neutron::Port
+    properties:
+      security_groups:
+        - { get_param: security_group }
+      network: { get_param: private_net_name }
+      fixed_ips:
+        - ip_address: "172.16.5.13"
+
+  server4:
+    type: OS::Nova::Server
+    properties:
+      name: product-service
+      image: { get_param: image }
+      flavor: { get_param: flavor }
+      key_name: { get_param: key }
+      networks:
+        - port: { get_resource: server4_port }
+      user_data: |
+        #!/bin/bash -v
+        yum localinstall -y http://rhos-release.virt.bos.redhat.com/repos/rhos-release/rhos-release-latest.noarch.rpm
+        rhos-release 6
+        yum repolist
+        mkdir /pub
+        echo "10.19.143.248:/pub /pub nfs defaults 0 0" >> /etc/fstab
+        mount -av
+
+        # create hosts file
+        cat > /etc/hosts <<EOF
+        127.0.0.1 localhost localhost.localdomain localhost4 localhost4.localdomain4
+        172.16.5.10 sales-db
+        172.16.5.11 product-db
+        172.16.5.12 presentation-service
+        172.16.5.13 product-service
+        172.16.5.14 billing-service
+        172.16.5.15 sales-service
+        EOF
+
+        cp /pub/projects/rhos/kilo/scripts/jliberma/new/jboss/jboss-eap-6.4.0.zip /tmp
+        unzip /tmp/jboss-eap-6.4.0.zip
+        mv jboss-eap-6.4/ /opt
+        yum install -y java-1.7.0-openjdk
+
+        export NAME=$(hostname -s | cut -f1 -d-)
+        export ADDR=$(hostname -i --all-ip-addresses)
+        cp /pub/projects/rhos/kilo/scripts/jliberma/new/jboss/$NAME.war /opt/jboss-eap-6.4/standalone/deployments/
+        sed -i.orig "s/127.0.0.1/$ADDR/" /opt/jboss-eap-6.4/standalone/configuration/standalone.xml
+        nohup /opt/jboss-eap-6.4/bin/standalone.sh &
+      user_data_format: RAW
+            
+  server4_floating_ip:
+    type: OS::Neutron::FloatingIP
+    properties:
+      floating_network_id: { get_param: public_net_id }
+      port_id: { get_resource: server4_port }
+
+outputs:
+  server4_private_ip:
+    description: IP address of server4 in private network
+    value: { get_attr: [ server4, first_address ] }
+  server4_public_ip:
+    description: Floating IP address of server4 in public network
+    value: { get_attr: [ server4_floating_ip, floating_ip_address ] }

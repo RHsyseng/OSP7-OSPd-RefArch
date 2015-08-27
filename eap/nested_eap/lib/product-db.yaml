@@ -1,0 +1,125 @@
+heat_template_version: 2013-05-23
+
+description: >
+  HOT template to deploy a database server for an EAP 6 microservices application.
+
+parameters:
+  public_net_id:
+    type: string
+    description: Public network for floating IP addresses
+  private_net_name:
+    type: string
+    default: demo-net
+    description: Private network name
+  key:
+    type: string
+    description: Server keypair name
+    default: demokp
+  image:
+    type: string
+    description: Server image name
+    default: rhel-server7.1
+  flavor:
+    type: string
+    description: Server flavor
+    default: m1.small
+    constraints:
+      - allowed_values: [m1.small, m1.medium, m1.large]
+        description: InstanceType must be m1.small, m1.medium or m1.large
+  volume_size:
+    type: number
+    description: Volume size
+    default: 1
+    constraints:
+      - range: { min: 1, max: 1024 }
+        description: must be between 1 and 1024 Gb.
+  security_group:
+    type: string
+    description: Tenant security group
+    default: security-group
+
+resources:
+
+  server1_port:
+    type: OS::Neutron::Port
+    properties:
+      security_groups:
+        - { get_param: security_group }
+      network: { get_param: private_net_name }
+      fixed_ips:
+        - ip_address: "172.16.5.11"
+
+  cinder_volume1:
+    type: OS::Cinder::Volume
+    properties:
+      size: { get_param: volume_size }
+
+  server1:
+    type: OS::Nova::Server
+    properties:
+      name: product-db
+      image: { get_param: image }
+      flavor: { get_param: flavor }
+      key_name: { get_param: key }
+      networks:
+        - port: { get_resource: server1_port }
+      user_data: |
+        #!/bin/bash -v
+        yum localinstall -y http://rhos-release.virt.bos.redhat.com/repos/rhos-release/rhos-release-latest.noarch.rpm
+        rhos-release 6
+        yum repolist
+        mkdir /pub
+        echo "10.19.143.248:/pub /pub nfs defaults 0 0" >> /etc/fstab
+        mount -av
+
+        # configure the  persistent database storage
+        mkfs.ext4 -L MYSQL /dev/vdb
+        mount -L MYSQL /mnt
+        chown 27.27 /mnt
+        chcon system_u:object_r:mysqld_db_t:s0 /mnt
+        umount /mnt
+        sleep 1
+        mkdir /var/lib/mysql
+        sleep 2
+        mount -L MYSQL /var/lib/mysql
+        
+        # configure the database
+        yum install -y mariadb-server
+        systemctl enable mariadb.service
+        systemctl start mariadb.service
+        mysql -u root < /pub/projects/rhos/kilo/scripts/jliberma/new/jboss/setup_product.sql
+        mysql -u root -e "SHOW TABLES;" product
+
+        # create hosts file
+        cat > /etc/hosts <<EOF
+        127.0.0.1 localhost localhost.localdomain localhost4 localhost4.localdomain4
+        172.16.5.10 sales-db
+        172.16.5.11 product-db
+        172.16.5.12 presentation-service
+        172.16.5.13 product-service
+        172.16.5.14 billing-service
+        172.16.5.15 sales-service
+        EOF
+
+      user_data_format: RAW
+            
+  volume_attachment:
+    type: OS::Cinder::VolumeAttachment
+    properties:
+      volume_id: { get_resource: cinder_volume1 }
+      instance_uuid: { get_resource: server1 }
+      mountpoint: /dev/vdb
+
+  server1_floating_ip:
+    type: OS::Neutron::FloatingIP
+    properties:
+      floating_network_id: { get_param: public_net_id }
+      port_id: { get_resource: server1_port }
+
+outputs:
+  server1_private_ip:
+    description: IP address of server1 in private network
+    value: { get_attr: [ server1, first_address ] }
+  server1_public_ip:
+    description: Floating IP address of server1 in public network
+    value: { get_attr: [ server1_floating_ip, floating_ip_address ] }

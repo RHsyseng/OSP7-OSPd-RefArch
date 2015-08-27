@@ -1,0 +1,67 @@
+heat_template_version: 2013-05-23
+
+description: >
+  HOT for a private  neutron network connected to a public router
+  and a security group for an EAP 6 web application.
+
+parameters:
+  public_net_id:
+    type: string
+    description: Public network for floating IP addresses
+  private_net_name:
+    type: string
+    default: demo-net
+    description: Private network name
+  private_net_cidr:
+    type: string
+    default: 172.16.5.0/24
+    description: Private network addresses
+  private_net_gateway:
+    type: string
+    default: 172.16.5.1
+    description: Private network gateway address
+  private_net_pool_start:
+    type: string
+    default: 172.16.5.20
+    description: Private network IP address allocation pool start
+  private_net_pool_end:
+    type: string
+    default: 172.16.5.254
+    description: Private network IP address allocation pool end
+  dns_nameservers:
+     type: string
+     default: [10.19.143.247]
+
+resources:
+  private_net:
+    type: OS::Neutron::Net
+    properties:
+      name: { get_param: private_net_name }
+
+  private_subnet:
+    type: OS::Neutron::Subnet
+    properties:
+      network_id: { get_resource: private_net }
+      cidr: { get_param: private_net_cidr }
+      gateway_ip: { get_param: private_net_gateway }
+      dns_nameservers: { get_param: dns_nameservers }
+      allocation_pools:
+        - start: { get_param: private_net_pool_start }
+          end: { get_param: private_net_pool_end }
+
+  router:
+    type: OS::Neutron::Router
+    properties:
+      external_gateway_info:
+        network: { get_param: public_net_id }
+
+  router_interface:
+    type: OS::Neutron::RouterInterface
+    properties:
+      router_id: { get_resource: router }
+      subnet_id: { get_resource: private_subnet }
+
+outputs:
+  name:
+    description: The private network.
+    value: { get_attr: [private_net, name] }
