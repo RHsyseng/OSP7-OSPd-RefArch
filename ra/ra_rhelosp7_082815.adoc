@@ -1425,30 +1425,76 @@ $ neutron subnet-show $(neutron subnet-list | awk ' /192.0.2/ { print $2 } ') | 
 == Configure network isolation
 This section describes how to configure network isolation.
 configuration for the reference architecture. Configure network
-solation by defining networks in environment files. Pass the
+isolation by defining networks in environment files. Pass the
 environment files to Heat.
 
 The network isolation environment files used in this section produce
 the network described in <<reference-architecture-diagram>>.
 
-1. Set the provisioning network nameserver. The overcloud servers use
+1. Define isolated networks in  _network-environment.yaml_.
 +
-[source, shell]
+[source, ruby, numbered]
 ----
-$ neutron subnet-update $(neutron subnet-list | awk ' /192.0.2/ { print $2 } ') --dns-nameserver 10.19.143.247
+resource_registry:
+  OS::TripleO::BlockStorage::Net::SoftwareConfig:/home/stack/nic-configs/cinder-storage.yaml
+  OS::TripleO::Compute::Net::SoftwareConfig:/home/stack/nic-configs/compute.yaml
+  OS::TripleO::Controller::Net::SoftwareConfig:/home/stack/nic-configs/controller.yaml
+  OS::TripleO::ObjectStorage::Net::SoftwareConfig:/home/stack/nic-configs/swift-storage.yaml
+  OS::TripleO::CephStorage::Net::SoftwareConfig:/home/stack/nic-configs/ceph-storage.yaml
+
+parameters:
+  NeutronExternalNetworkBridge: "br-ex"
+
+parameter_defaults:
+  InternalApiNetCidr: 172.16.1.0/24
+  StorageNetCidr: 172.16.2.0/24
+  StorageMgmtNetCidr: 172.16.3.0/24
+  TenantNetCidr: 172.16.4.0/24
+  ExternalNetCidr: 10.19.136.0/21
+  InternalApiAllocationPools: [{'start':'172.16.1.10', 'end': '172.16.1.100'}]
+  StorageAllocationPools: [{'start':'172.16.2.10', 'end': '172.16.2.200'}]
+  StorageMgmtAllocationPools: [{'start':'172.16.3.10', 'end': '172.16.3.200'}]
+  TenantAllocationPools: [{'start':'172.16.4.10', 'end': '172.16.4.200'}]
+  ExternalAllocationPools: [{'start':'10.19.137.121', 'end':'10.19.137.151'}]
+  InternalApiNetworkVlanID: 4041
+  StorageNetworkVlanID: 4042
+  StorageMgmtNetworkVlanID: 4043
+  TenantNetworkVlanID: 4044
+  ExternalNetworkVlanID: 168
+  ExternalInterfaceDefaultRoute: "10.19.143.254"
+  BondInterfaceOvsOptions:
+    "bond_mode=balance-tcp lacp=active other-config:lacp-fallback-ab=true"
 ----
-2. Set the provisioning network nameserver. The overcloud servers use
 +
-[source, shell]
-----
-$ neutron subnet-update $(neutron subnet-list | awk ' /192.0.2/ { print $2 } ') --dns-nameserver 10.19.143.247
-----
-3. Set the provisioning network nameserver. The overcloud servers use
+The _resource_registery_ section defines role-specific configuration.
+These files are created in subsequent steps.
 +
-[source, shell]
+The _parameters_ section names the external network bridge created by
+Open vSwitch.
++
+The _parameter_defaults_ section defines default parameters used
+across the resource registry. These include CIDRs, VLAN IDs, and IP
+allocation pools for each network.
++
+The parameters defined in this file match the network configuration
+used in the reference architecture.
++
+2. Create the _nic-configs_ files to define network configuration for
+   each interface by server role.
++
 ----
-$ neutron subnet-update $(neutron subnet-list | awk ' /192.0.2/ { print $2 } ') --dns-nameserver 10.19.143.247
+$ mkdir ~/nic-configs
+
+$ ls ~/nic-configs
+ceph-storage.yaml  cinder-storage.yaml  compute.yaml  controller.yaml swift-storage.yaml
 ----
+Complete examples of each network configuration file are in
+<<Appendix-nic-configs>>.
++
+NOTE: Swift and Cinder servers are not used in this reference
+architecture. Their files are included for completeness but not called
+by the installer.
++
 4. Set the provisioning network nameserver. The overcloud servers use
 +
 [source, shell]
@@ -1456,13 +1502,138 @@ $ neutron subnet-update $(neutron subnet-list | awk ' /192.0.2/ { print $2 } ') 
 $ neutron subnet-update $(neutron subnet-list | awk ' /192.0.2/ { print $2 } ') --dns-nameserver 10.19.143.247
 ----
 
-== Configure Ceph Storage
+== Customize Ceph Storage
+Like network isolation, Ceph is customized by passing Heat additional
+environment files. The customization produce the Ceph cluster depicted
+in the <<ceph-integration,Ceph integration graphic>>.
+
+In this reference architecture ten SAS disks in each R510 are
+configured as OSD drives. The log file for each OSD is created as a
+separate partition on the OSD drive. This is the recommended log
+configuration for Ceph OSDs when SSD drives are not used.
+
+1. Configure Ceph OSD disks as single-drive RAID 0 virtual disks for
+   best performance. Ceph data is protected through replication across
+   OSDs so RAID is not recommended.
+2. Initialize the virtual disks to remove all partition and MBR data.
+3. Create a _templates_ directory for Heat template customization.
++
+[source, shell]
+----
+$ mkdir ~/templates
+
+$ cp -rp /usr/share/openstack-tripleo-heat-templates/ ~/templates
+----
+4. Edit
+   _~/templates/openstack-tripleo-heat-templates/puppet/hieradata/ceph.yaml_
+   to include the Ceph custiomizations. This example includes the
+   additional OSDs accepting the Puppet defaults for logging.
+[source, ruby, numbered]
+----
+ceph::profile::params::osd_journal_size: 1024
+ceph::profile::params::osd_pool_default_pg_num: 128
+ceph::profile::params::osd_pool_default_pgp_num: 128
+ceph::profile::params::osd_pool_default_size: 3
+ceph::profile::params::osd_pool_default_min_size: 1
+ceph::profile::params::osds: 
+  '/dev/sdb':
+    journal: {}
+  '/dev/sdc':
+    journal: {}
+  '/dev/sdd':
+    journal: {}
+  '/dev/sde':
+    journal: {}
+  '/dev/sdf':
+    journal: {}
+  '/dev/sdg':
+    journal: {}
+  '/dev/sdh':
+    journal: {}
+  '/dev/sdi':
+    journal: {}
+  '/dev/sdj':
+    journal: {}
+  '/dev/sdk':
+    journal: {}
+ceph::profile::params::manage_repo: false
+ceph::profile::params::authentication_type: cephx
+
+ceph_pools:
+- volumes
+- vms
+- images
+
+ceph_osd_selinux_permissive: true
+----
++
+NOTE: By default Ceph creates one OSD per storage server using the remaining
+free space on the operating system disk. The OSD log file is
+configured as a 5 GB file on the disk. This configuration is only
+suitable for evaluation and proof of concept.
 
 <<<
-
 = Deploy and Test the overcloud
+This section describes how to deploy and test the overcloud defined in
+the previous section.
 
 == Deploy the Overcloud servers
+1. Use *ironic node-list* to verify all Ironic nodes are powered off,
+   available for provisioning, and not in maintenance mode.
++
+[source, shell]
+----
+$ ironic node-list
++--------------------------------------+------+---------------+-------------+-----------------+-------------+
+| UUID                                 | Name | Instance UUID | Power State | Provision State | Maintenance |
++--------------------------------------+------+---------------+-------------+-----------------+-------------+
+| 1adc6792-0bd6-4bd2-b8fc-4d9867d74597 | None | None          | power off   | available       | False       |
+| 382ab2a5-b5c0-4017-b59f-82eee0fb9864 | None | None          | power off   | available       | False       |
+| 84efb518-15e6-45c7-8f6a-56a5097c0b85 | None | None          | power off   | available       | False       |
+| 15ca1ded-0914-469f-af63-3340f91bc56a | None | None          | power off   | available       | False       |
+| 8e6c96ad-c039-498d-8bd2-61a489bbae87 | None | None          | power off   | available       | False       |
+| 84e34eb3-2352-49c8-8748-8bc6b6185587 | None | None          | power off   | available       | False       |
+| abb19869-b92f-42b3-9db1-f69f6ee00f2e | None | None          | power off   | available       | False       |
+| db878d37-5b7a-4140-8809-1b50d4ddbec4 | None | None          | power off   | available       | False       |
+| d472af62-5547-4f9a-8fbb-fc8556eb4110 | None | None          | power off   | available       | False       |
+| c8400dc0-4246-44ee-a406-9362381d7ce1 | None | None          | power off   | available       | False       |
+| 0c7af223-1a7d-43cd-a0ff-19226872e09c | None | None          | power off   | available       | False       |
+| 5f52affb-cfe2-49dc-aa89-b57d99e5372a | None | None          | power off   | available       | False       |
++--------------------------------------+------+---------------+-------------+-----------------+-------------+
+----
+2. Deploy the overcloud.
++
+[source, shell]
+----
+$ openstack overcloud deploy -e /usr/share/openstack-tripleo-heat-templates/environments/network-isolation.yaml 
+-e /home/stack/network-environment.yaml --control-flavor control --compute-flavor compute --ceph-storage-flavor ceph 
+--ntp-server 10.16.255.2 --control-scale 3 --compute-scale 4 --ceph-storage-scale 4 --block-storage-scale 0 --swift-storage-scale 0 
+-t 90 --templates /home/stack/templates/openstack-tripleo-heat-templates/ 
+-e /usr/share/openstack-tripleo-heat-templates/environments/storage-environment.yaml 
+--rhel-reg --reg-method satellite --reg-sat-url http://se-sat6.syseng.bos.redhat.com --reg-org syseng --reg-activation-key OSP-Overcloud
+Deploying templates in the directory /home/stack/templates/openstack-tripleo-heat-templates
+----
+This lengthy command does the following:
++
+* Specifies the location of _network-environment.yaml_ to customize
+  the network conigurations.
+* Specifies which flavors and how many control, compute, and
+  ceph-storage nodes to instantiate.
+* Specifies the location of the _storage-environment.yaml_ for Ceph
+  customization.
+* Registers the overcloud servers with the lab satellite server using a
+  pre-defined activation key.
+3. Watch deployment progress in a separate console window.
++
+[source, shell]
+----
+$ heat resource-list overcloud | grep CREATE_COMPLETE
+| BlockStorage                      | 8565b42e-0b24-41ec-88d3-7d0d6bc18834 | OS::Heat::ResourceGroup | CREATE_COMPLETE | 2015-08-28T16:25:53Z |
+| ControlVirtualIP                  | c4926ff9-2ea7-40f1-9677-d7f26e3517db | OS::Neutron::Port | CREATE_COMPLETE    | 2015-08-28T16:25:53Z |
+| HeatAuthEncryptionKey             | overcloud-HeatAuthEncryptionKey-paa5lxc3ubon  | OS::Heat::RandomString | CREATE_COMPLETE    | 2015-08-28T16:25:53Z |
+| HorizonSecret                     | overcloud-HorizonSecret-mpgdt65yqsud          | OS::Heat::RandomString | CREATE_COMPLETE    | 2015-08-28T16:25:53Z |
+...
+----
 
 == Configure controller fencing
 
@@ -1781,6 +1952,309 @@ deployments and updates.
      }
   ]
 }
+----
+[appendix]
+[[Appendix-nic-configs]]
+== nic-config files
+
+[[controller-yaml]]
+* *controller.yaml*:
+[source,ruby,numbered]
+----
+heat_template_version: 2015-04-30
+
+description: >
+  Software Config to drive os-net-config to configure VLANs for the
+  controller role.
+
+parameters:
+  ExternalIpSubnet:
+    default: ''
+    description: IP address/subnet on the external network
+    type: string
+  InternalApiIpSubnet:
+    default: ''
+    description: IP address/subnet on the internal API network
+    type: string
+  StorageIpSubnet:
+    default: ''
+    description: IP address/subnet on the storage network
+    type: string
+  StorageMgmtIpSubnet:
+    default: ''
+    description: IP address/subnet on the storage mgmt network
+    type: string
+  TenantIpSubnet:
+    default: ''
+    description: IP address/subnet on the tenant network
+    type: string
+  ExternalNetworkVlanID:
+    default: 168
+    description: Vlan ID for the external network traffic.
+    type: number
+  InternalApiNetworkVlanID:
+    default: 4041
+    description: Vlan ID for the internal_api network traffic.
+    type: number
+  StorageNetworkVlanID:
+    default: 4042
+    description: Vlan ID for the storage network traffic.
+    type: number
+  StorageMgmtNetworkVlanID:
+    default: 4043
+    description: Vlan ID for the storage mgmt network traffic.
+    type: number
+  TenantNetworkVlanID:
+    default: 4044
+    description: Vlan ID for the tenant network traffic.
+    type: number
+  ExternalInterfaceDefaultRoute:
+    default: '10.19.143.254'
+    description: Default route for the external network.
+    type: string
+
+resources:
+  OsNetConfigImpl:
+    type: OS::Heat::StructuredConfig
+    properties:
+      group: os-apply-config
+      config:
+        os_net_config:
+          network_config:
+            -
+              type: ovs_bridge
+              name: br-ex
+              use_dhcp: false
+              addresses:
+              -
+                ip_netmask: {get_param: ExternalIpSubnet}
+              routes:
+                -
+                  ip_netmask: 0.0.0.0/0
+                  next_hop: {get_param: ExternalInterfaceDefaultRoute}
+              members:
+                -
+                  type: interface
+                  name: nic1
+                  primary: true
+            -
+              type: ovs_bridge
+              name: br-nic3
+              use_dhcp: false
+              addresses:
+                -
+                  ip_netmask: {get_param: TenantIpSubnet}
+              members:
+                -
+                  type: interface
+                  name: nic3
+                  primary: true
+                -
+                  type: vlan
+                  vlan_id: {get_param: StorageMgmtNetworkVlanID}
+                  addresses:
+                  -
+                    ip_netmask: {get_param: StorageMgmtIpSubnet}
+            -
+              type: ovs_bridge
+              name: br-nic4
+              use_dhcp: false
+              addresses:
+                -
+                  ip_netmask: {get_param: StorageIpSubnet}
+              members:
+                -
+                  type: interface
+                  name: nic4
+                  primary: true
+                -
+                  type: vlan
+                  vlan_id: {get_param: InternalApiNetworkVlanID}
+                  addresses:
+                  -
+                    ip_netmask: {get_param: InternalApiIpSubnet}
+
+outputs:
+  OS::stack_id:
+    description: The OsNetConfigImpl resource.
+    value: {get_resource: OsNetConfigImpl}
+----
+
+[[compute-yaml]]
+* *compute.yaml*:
+[source,ruby,numbered]
+----
+heat_template_version: 2015-04-30
+
+description: >
+  Software Config to drive os-net-config with 2 bonded nics on a bridge
+  with a VLANs attached for the compute role.
+
+parameters:
+  ExternalIpSubnet:
+    default: ''
+    description: IP address/subnet on the external network
+    type: string
+  InternalApiIpSubnet:
+    default: ''
+    description: IP address/subnet on the internal API network
+    type: string
+  StorageIpSubnet:
+    default: ''
+    description: IP address/subnet on the storage network
+    type: string
+  StorageMgmtIpSubnet:
+    default: ''
+    description: IP address/subnet on the storage mgmt network
+    type: string
+  TenantIpSubnet:
+    default: ''
+    description: IP address/subnet on the tenant network
+    type: string
+  InternalApiNetworkVlanID:
+    default: 4041
+    description: Vlan ID for the internal_api network traffic.
+    type: number
+  StorageNetworkVlanID:
+    default: 4042
+    description: Vlan ID for the storage network traffic.
+    type: number
+  TenantNetworkVlanID:
+    default: 4044
+    description: Vlan ID for the tenant network traffic.
+    type: number
+
+resources:
+  OsNetConfigImpl:
+    type: OS::Heat::StructuredConfig
+    properties:
+      group: os-apply-config
+      config:
+        os_net_config:
+          network_config:
+            -
+              type: interface
+              name: nic1
+              use_dhcp: false
+            -
+              type: ovs_bridge
+              name: br-nic3
+              use_dhcp: false
+              addresses:
+                -
+                  ip_netmask: {get_param: TenantIpSubnet}
+              members:
+                -
+                  type: interface
+                  name: nic3
+                  primary: true
+            -
+              type: ovs_bridge
+              name: br-nic4
+              use_dhcp: false
+              addresses:
+                -
+                  ip_netmask: {get_param: StorageIpSubnet}
+              members:
+                -
+                  type: interface
+                  name: nic4
+                  primary: true
+                -
+                  type: vlan
+                  vlan_id: {get_param: InternalApiNetworkVlanID}
+                  addresses:
+                  -
+                    ip_netmask: {get_param: InternalApiIpSubnet}
+
+
+outputs:
+  OS::stack_id:
+    description: The OsNetConfigImpl resource.
+    value: {get_resource: OsNetConfigImpl}
+----
+
+[[ceph-storage-yaml]]
+* *ceph-storage.yaml*:
+[source,ruby,numbered]
+----
+heat_template_version: 2015-04-30
+
+description: >
+  Software Config to drive os-net-config with 2 bonded nics on a bridge
+  with a VLANs attached for the compute role.
+
+parameters:
+  ExternalIpSubnet:
+    default: ''
+    description: IP address/subnet on the external network
+    type: string
+  InternalApiIpSubnet:
+    default: ''
+    description: IP address/subnet on the internal API network
+    type: string
+  StorageIpSubnet:
+    default: ''
+    description: IP address/subnet on the storage network
+    type: string
+  StorageMgmtIpSubnet:
+    default: ''
+    description: IP address/subnet on the storage mgmt network
+    type: string
+  TenantIpSubnet:
+    default: ''
+    description: IP address/subnet on the tenant network
+    type: string
+  StorageNetworkVlanID:
+    default: 4042
+    description: Vlan ID for the storage network traffic.
+    type: number
+  StorageMgmtNetworkVlanID:
+    default: 4043
+    description: Vlan ID for the storage network traffic.
+    type: number
+
+resources:
+  OsNetConfigImpl:
+    type: OS::Heat::StructuredConfig
+    properties:
+      group: os-apply-config
+      config:
+        os_net_config:
+          network_config:
+            -
+              type: interface
+              name: nic1
+              use_dhcp: false
+            -
+              type: ovs_bridge
+              name: br-nic3
+              use_dhcp: false
+              addresses:
+                -
+                  ip_netmask: {get_param: StorageMgmtIpSubnet}
+              members:
+                -
+                  type: interface
+                  name: nic3
+                  primary: true
+            -
+              type: ovs_bridge
+              name: br-nic4
+              use_dhcp: false
+              addresses:
+                -
+                  ip_netmask: {get_param: StorageIpSubnet}
+              members:
+                -
+                  type: interface
+                  name: nic4
+                  primary: true
+
+outputs:
+  OS::stack_id:
+    description: The OsNetConfigImpl resource.
+    value: {get_resource: OsNetConfigImpl}
 ----
 
 // vim: set syntax=asciidoc:
