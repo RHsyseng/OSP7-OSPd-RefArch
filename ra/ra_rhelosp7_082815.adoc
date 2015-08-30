@@ -1930,26 +1930,275 @@ https://access.redhat.com/articles/1452603[ Microservice Architecture:
 Building Microservices with JBOSS EAP 6]. 
 
 == Create the test environment
+The MSA application does not exist in a vaccuumm. This section
+describes the steps for installing the supporting infrastructure
+around the MSA including a public Neutron network and subnet, a demo
+tenant and user, a RHEL 7.1 Glance image, and a keypair for accessing
+the MSA application servers via *ssh*.
 
-. Create an external network and subnet.
+. Source *overcloudrc*.
++
+[source, shell]
+----
+$source overcloudrc
+
+$ env | grep OS_
+OS_PASSWORD=009fe566ba853020923a06c67c5c6a05fe7f9877
+OS_AUTH_URL=http://10.19.137.121:5000/v2.0/
+OS_USERNAME=admin
+OS_TENANT_NAME=admin
+OS_NO_CACHE=True
+OS_CLOUDNAME=overcloud
+----
+. Create an external network and subnet. This will be the public
+  network for the MSA application. Export the external network ID.
++
+[source, shell]
+----
+$ neutron net-create ext-net -- --router:external=True --shared=True
+Created a new network:
++---------------------------+--------------------------------------+
+| Field                     | Value                                |
++---------------------------+--------------------------------------+
+| admin_state_up            | True                                 |
+| id                        | b1f27b52-6229-41e7-a597-02a070320ab4 |
+| mtu                       | 0                                    |
+| name                      | ext-net                              |
+| provider:network_type     | gre                                  |
+| provider:physical_network |                                      |
+| provider:segmentation_id  | 1                                    |
+| router:external           | True                                 |
+| shared                    | True                                 |
+| status                    | ACTIVE                               |
+| subnets                   |                                      |
+| tenant_id                 | 346a061a7ef44605bd611efbe5d42b6e     |
++---------------------------+--------------------------------------+
+$ neutron subnet-create --name ext-net --allocation-pool=start=10.19.137.137,end=10.19.137.150 --gateway_ip=10.19.143.254 ext-net 10.19.136.0/21
+
+Created a new subnet:
++-------------------+----------------------------------------------------+
+| Field             | Value
++-------------------+----------------------------------------------------+
+| allocation_pools  | {"start": "10.19.137.137", "end": "10.19.137.150"} |
+| cidr              | 10.19.136.0/21
+| dns_nameservers   |
+| enable_dhcp       | True
+| gateway_ip        | 10.19.143.254
+| host_routes       |
+| id                | aebba97c-443d-42da-b8ad-ecb94d3ac607
+| ip_version        | 4
+| ipv6_address_mode |
+| ipv6_ra_mode      |
+| name              | ext-net
+| network_id        | b1f27b52-6229-41e7-a597-02a070320ab4
+| subnetpool_id     |
+| tenant_id         | 346a061a7ef44605bd611efbe5d42b6e
++-------------------+----------------------------------------------------+
+$ export ext_net_id=$(neutron net-show ext-net | awk ' / id/ { print $4 } ')
+
+$ echo $ext_net_id
+b1f27b52-6229-41e7-a597-02a070320ab4
+----
 . Create a demo user and tenant.
++
+[source, shell]
+----
+$ openstack user create --password redhat demo
++----------+----------------------------------+
+| Field    | Value                            |
++----------+----------------------------------+
+| email    | None                             |
+| enabled  | True                             |
+| id       | 3082d95300e546a3aa3525d81d695d72 |
+| name     | demo                             |
+| username | demo                             |
++----------+----------------------------------+
+
+$ openstack project create demo-tenant
++-------------+----------------------------------+
+| Field       | Value                            |
++-------------+----------------------------------+
+| description | None                             |
+| enabled     | True                             |
+| id          | a81f507d72c947739d911779f4403ae9 |
+| name        | demo-tenant                      |
++-------------+----------------------------------+
+
+$ openstack role add --user demo --project demo-tenant _member_
++-------+----------------------------------+
+| Field | Value                            |
++-------+----------------------------------+
+| id    | 9fe2ff9ee4384b1894a90878d3e92bab |
+| name  | _member_                         |
++-------+----------------------------------+
+----
 . Create and source a keystonerc file for the demo user.
++
+[source, shell]
+----
+$ cat > ~/demorc << EOF
+export OS_USERNAME=demo
+export OS_TENANT_NAME=demo-tenant
+export OS_PASSWORD=redhat
+export OS_CLOUDNAME=overcloud
+export OS_AUTH_URL=${OS_AUTH_URL}
+export PS1='[\u@\h \W(demo_member)]\$ '
+EOF
+
+$ source ~/demorc
+
+$ env | grep OS_
+OS_PASSWORD=redhat
+OS_AUTH_URL=http://10.19.137.121:5000/v2.0/
+OS_USERNAME=demo
+OS_TENANT_NAME=demo-tenant
+OS_NO_CACHE=True
+OS_CLOUDNAME=overcloud
+----
 . Upload a RHEL 7.1 image for the MSA application servers.
++
+[source, shell]
+----
+$ openstack image create --disk-format qcow2  --container-format bare
+--file /pub/rhel-guest-image-7.1-20150224.0.x86_64.qcow2 rhel-server7.1
++------------------+--------------------------------------+
+| Field            | Value                                |
++------------------+--------------------------------------+
+| checksum         | b068d0e9531699516174a436bf2c300c     |
+| container_format | bare                                 |
+| created_at       | 2015-08-30T03:20:25.000000           |
+| deleted          | False                                |
+| deleted_at       | None                                 |
+| disk_format      | qcow2                                |
+| id               | c5bfc6bd-2b3e-4a2b-ac29-985ec45c8092 |
+| is_public        | False                                |
+| min_disk         | 0                                    |
+| min_ram          | 0                                    |
+| name             | rhel-server7.1                       |
+| owner            | a81f507d72c947739d911779f4403ae9     |
+| properties       | {}                                   |
+| protected        | False                                |
+| size             | 425956864                            |
+| status           | active                               |
+| updated_at       | 2015-08-30T03:20:38.000000           |
+| virtual_size     | None                                 |
++------------------+--------------------------------------+
+
+$ openstack image list
++--------------------------------------+----------------+
+| ID                                   | Name           |
++--------------------------------------+----------------+
+| c5bfc6bd-2b3e-4a2b-ac29-985ec45c8092 | rhel-server7.1 |
++--------------------------------------+----------------+
+----
 . Create a keypair for accessing the MSA application servers via
   *ssh*.
++
+[source, shell]
+----
+$ openstack keypair create demokp > ~/demokp.pem
 
-== Define heat templates
-Heat Orchestration Templates are...
-These are examples of nested HOTs...
-Main HOT calls one for each microservice and one for the public
-network
+$ chmod 600 ~/demokp.pem
+
+$ openstack keypair list
++--------+-------------------------------------------------+
+| Name   | Fingerprint                                     |
++--------+-------------------------------------------------+
+| demokp | 94:55:b1:fa:cd:79:91:07:ad:b9:18:e4:1c:2b:00:22 |
++--------+-------------------------------------------------+
+----
+
+== Deploy the MSA Application via Heat
+Heat Orchestration Template (HOT) is the template format natively
+supported by Heat. Heat templates define resources. They accept user
+input to promote re-use.
+
+The MSA application used in this reference architecture is defined as
+a series of nested templates. Each of the four services and two
+databases are defined in templates called by the master template. The
+private Neutron network, subnet, and router are also defined in a
+nested template.
+
+NOTE: The Heat templates used in this example are provided via ??.
+They are too lengthy to document.
+
+. Create the _templates/lib_ directory.
++
+[source, shell]
+----
+$ mkdir ~/templates/lib
+----
+. Extract the nested example templates to _templates/lib_.
++
+[source, shell]
+----
+$ ls templates/
+eapws5_nested.yaml  lib  openstack-tripleo-heat-templates
+
+$ ls templates/lib/
+billing-service.yaml       private_network.yaml  product-service.yaml sales-service.yaml
+presentation-service.yaml  product-db.yaml       sales-db.yaml
+----
+. Deploy the MSA application with Heat.
++
+[source, shell]
+----
+$ heat stack-create --template-file templates/eapws5_nested.yaml eap5 --parameters="public_net_id=$ext_net_id"
++--------------------------------------+------------+--------------------+----------------------+
+| id                                   | stack_name | stack_status       | creation_time        |
++--------------------------------------+------------+--------------------+----------------------+
+| 91c16a0e-62a3-485a-a7ae-d999384fabf9 | eap5       | CREATE_IN_PROGRESS | 2015-08-30T03:59:15Z |
++--------------------------------------+------------+--------------------+----------------------+
+----
+. Watch progress with *heat resource-list*.
++
+[source, shell]
+----
+$ heat resource-list eap5
++----------------------+--------------------------------------+------------------------------------------------------------+--------------------+----------------------
+| resource_name        | physical_resource_id                 | resource_type                                              | resource_status    | updated_time         
++----------------------+--------------------------------------+------------------------------------------------------------+--------------------+----------------------
+| billing-service      | ca3dc55e-42a4-4501-a9ff-848856a4982d | file:///home/stack/templates/lib/billing-service.yaml      | CREATE_IN_PROGRESS | 2015-08-30T03:59:16Z 
+| presentation-service | 5262f57a-846e-4ff5-8535-b66a049f0743 | file:///home/stack/templates/lib/presentation-service.yaml | CREATE_IN_PROGRESS | 2015-08-30T03:59:16Z 
+| private_network      | aa0fda9e-dc55-4ec2-af62-1d184db5b409 | file:///home/stack/templates/lib/private_network.yaml      | CREATE_COMPLETE    | 2015-08-30T03:59:16Z 
+| product-db           | 3b5ca63d-22f4-40cc-a691-79eec5a317b5 | file:///home/stack/templates/lib/product-db.yaml           | CREATE_IN_PROGRESS | 2015-08-30T03:59:16Z 
+| product-service      | 605abef9-0001-4649-9a39-bfda3654f7a5 | file:///home/stack/templates/lib/product-service.yaml      | CREATE_IN_PROGRESS | 2015-08-30T03:59:16Z 
+| sales-db             | cf49eed9-5e47-47db-95fb-e50baad04954 | file:///home/stack/templates/lib/sales-db.yaml             | CREATE_IN_PROGRESS | 2015-08-30T03:59:16Z 
+| sales-service        | 14b0a0e0-8322-4548-9dd7-d52a29e7ebfa | file:///home/stack/templates/lib/sales-service.yaml        | CREATE_IN_PROGRESS | 2015-08-30T03:59:16Z 
+| security_group       | f429d022-9608-4fd5-87b5-da7584f5b806 | OS::Neutron::SecurityGroup                                 | CREATE_COMPLETE    | 2015-08-30T03:59:16Z 
++----------------------+--------------------------------------+------------------------------------------------------------+--------------------+----------------------
+----
+. View *nova list* after Heat creates the stack successfully.
++
+[source, shell]
+----
+$ nova list
++--------------------------------------+----------------------+--------+------------+-------------+-------------------------------------+
+| ID                                   | Name                 | Status | Task State | Power State | Networks                            |
++--------------------------------------+----------------------+--------+------------+-------------+-------------------------------------+
+| 068faab6-1c38-48ce-bd02-969d50d09cfd | billing-service      | ACTIVE | -          | Running     | demo-net=172.16.5.14, 10.19.137.141 |
+| 5ac2e612-2fc6-4a73-ae14-1e84f0800a16 | presentation-service | ACTIVE | -          | Running     | demo-net=172.16.5.12, 10.19.137.145 |
+| d7ad112d-3492-435d-b868-8d636b11f61e | product-db           | ACTIVE | -          | Running     | demo-net=172.16.5.11, 10.19.137.146 |
+| bac8d576-7292-4be9-a9f3-6bf23387bfcc | product-service      | ACTIVE | -          | Running     | demo-net=172.16.5.13, 10.19.137.144 |
+| 68975044-158d-40f4-8e16-1b0ec82fbd21 | sales-db             | ACTIVE | -          | Running     | demo-net=172.16.5.10, 10.19.137.143 |
+| 9c29d20c-606a-4e19-a8de-e2638df9880b | sales-service        | ACTIVE | -          | Running     | demo-net=172.16.5.15, 10.19.137.142 |
++--------------------------------------+----------------------+--------+------------+-------------+-------------------------------------+
+----
+. The _cloud-init_ service performs post-boot customizations on the
+  instances. The _user-data_ section of the nested templates includes
+  the commands performed by _cloud-init_ for each microservice
+  instance. *ssh* to _presentation-service_ to view
+  _/var/log/cloud-init.log_. 
++
+[source, shell]
+----
 
 
-== Deploy instances
-Create the MSA by calling the heat stack-create command
-
-Watch progress with *heat resource-list*.
-
+----
+NOTE: At the conclusion of _cloud-init_ the Java application
+*standalone.sh* should be running. The entire stack creation and
+post-creation configuration can take up to 30 minutes depending on
+network conditions.
 
 
 == Test EAP server
