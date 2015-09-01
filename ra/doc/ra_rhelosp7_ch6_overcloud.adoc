@@ -294,7 +294,7 @@ This configuration defines:
   storage servers, and the remainder as compute nodes. 
 +
 NOTE: Servers are matched to profiles by the order they are listed in this file.
-6. This loop creates a hardware profile for each node type degined in
+6. This loop creates a hardware profile for each node type defined in
    the state file.
 +
 [source, shell]
@@ -349,8 +349,8 @@ $ neutron subnet-show $(neutron subnet-list | awk ' /192.0.2/ { print $2 } ') | 
 ----
 
 === Configure network isolation
-This section describes how to configure network isolation.
-configuration for the reference architecture. Configure network
+This section describes how to configure network isolation for the
+reference architecture. Configure network
 isolation by defining networks in environment files. Pass the
 environment files to Heat.
 
@@ -542,7 +542,7 @@ Deploying templates in the directory /home/stack/templates/openstack-tripleo-hea
 This lengthy command does the following:
 +
 * Specifies the location of _network-environment.yaml_ to customize
-  the network conigurations.
+  the network configurations.
 * Specifies which flavors and how many control, compute, and
   ceph-storage nodes to instantiate.
 * Specifies the location of the _storage-environment.yaml_ for Ceph
@@ -582,7 +582,7 @@ $ nova list
 +--------------------------------------+-------------------------+--------+------------+-------------+---------------------+
 ----
 +
-5. Source the overcloudrc file to set environment variables for the overcloud.
+5. Source the _overcloudrc_ file to set environment variables for the overcloud.
 6. Verify all Nova services and enabled and up.
 +
 [source, shell]

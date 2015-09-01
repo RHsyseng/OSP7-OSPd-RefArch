@@ -18,9 +18,9 @@ image::images/DIRECTOR.png[align="center", scaledwidth="50%"]
 
 The first section of this reference architecture introduces the principal
 components: Red Hat Enterprise Linux OpenStack Platform 7, OpenStack
-Plaform director, and a microservices architecture built with Red Hat JBOSS
+Platform director, and a microservices architecture built with Red Hat JBOSS
 Enterprise Application Platform 6. It also describes Red Hat's
-approach to making OpenStack highly availabile. The second section of
+approach to making OpenStack highly available. The second section of
 the paper describes the lab environment, hardware, and software used to
 implement and test the reference architecture. The third section
 documents the installation and configuration procedure as performed by the

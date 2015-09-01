@@ -116,7 +116,7 @@ isolating communication streams in their own physical or virtual
 networks generally provides better performance and scalability.
 
 OSP director supports isolating network traffic by type. One or more
-network traffic types can be flexibily assigned to a physical,
+network traffic types can be flexibility assigned to a physical,
 virtual, or bonded interface. Multiple traffic types can be combine
 across the same physical interfaces or switches.
 
@@ -134,7 +134,7 @@ types:
 *External*::
     This network provides overcloud nodes with external connectivity.
     Controller nodes connect the external network to an Open vSwitch
-    bridge and forward traffic originating from hyperviso instances through it.
+    bridge and forward traffic originating from hypervisor instances through it.
 *Internal API*::
     This network exposes internal OpenStack API endpoints for the
     overcloud nodes. It handles inter-service communication between
@@ -144,7 +144,7 @@ types:
     three modes of operation: VXLAN, GRE, and VLAN.
 *Storage*::
     This network carries storage communication including Ceph, Cinder,
-    and Swift traffic. Data-internsive OpenStack deployments should
+    and Swift traffic. Data-intensive OpenStack deployments should
     isolate Storage traffic on a dedicated high bandwidth interface.
 *Storage Management*::
     Storage management communication can generate large amounts of
@@ -155,7 +155,6 @@ Network traffic types are assigned to network interfaces through Heat
 customization before deploying the overcloud. OSP director supports
 several network interface types including physical interfaces, bonded
 interfaces, and either tagged or native 802.1Q VLANs.
-interfaces
 
 ==== Network Types by Server Role
 The previous section discussed <<server-roles, server roles>>. Each
@@ -163,7 +162,7 @@ server role requires access to specific types of network traffic. By
 default OSP director collapses all network traffic to the provisioning
 interface. This configuration is suitable for evaluation, proof of
 concept, and development environments. It is not recommended for
-production environments where scaling and performance are primaty
+production environments where scaling and performance are primary
 concerns.
 
 The network isolation feature allows OSP director to segment network
@@ -250,7 +249,7 @@ Cluster managers offer the following benefits:
 . Deterministic recovery of a complex, multi-machine application stack
 . State awareness of other cluster machines to co-ordinate service
    startup and failover.
-. Shared quourm calculation to determine majority/
+. Shared quorum calculation to determine majority/
 . Data integrity through fencing. Machines running a non-responsive
    process are isolated to ensure they are not still responding to
    remote requests. Machines are typically fenced via a remotely
@@ -349,7 +348,7 @@ Each clustered service operates in one of the following modes:
   online when the primary node fails.
 * *Hot Standby*: Connections are only routed to one of several active
   service endpoints. New connections are routed to a standby
-  endpointif the primary service endpoint fails.
+  endpoint if the primary service endpoint fails.
 * *Mixed*: Mixed has one of two meanings: services within a group run
   in different modes, or the service runs active/active but is used as
   active/passive. Mixed services are explained individually.
@@ -361,7 +360,7 @@ cluster into two or more partitions. In this situation the majority
 fences the minority to ensure both sides are not running the same 
 services -- a so-called "split brain" situation. *Fencing* is the
 process of isolating a failed machine -- typically via remote power
-control or networked switches -- by powering it off. Tjis is necessary
+control or networked switches -- by powering it off. This is necessary
 to ensure data integrity.
 
 NOTE: Although OSP director supports up to 16 cluster nodes, Red Hat
@@ -399,7 +398,7 @@ in HTTPD.
 networks on demand.
 |*Neutron agents*|Active/active/Support Layer 2 and 3 communication
 plus  numerous virtual networking technologies including ML2 and Open vSwitch.
-|*Nova*|Active/active|Provides compute capabilties to deploy and run
+|*Nova*|Active/active|Provides compute capabilities to deploy and run
 virtual machine instances.
 |*Swift proxy server*|Active/active|Routes data requests to the
 appropriate Swift ACO server.
@@ -459,14 +458,14 @@ an integrated Ceph cluster in the overcloud. The integrated Ceph
 cluster acts as a storage virtualization layer for Glance images,
 Cinder volumes, and Nova ephemeral storage. The
 <<ceph-integration,Ceph integration graphic>> depicts OSP 7 director
-Ceph clusterintegration from a high level.
+Ceph cluster integration from a high level.
 
 The Ceph cluster consists of two types of daemons: Ceph OSD and Ceph
 Monitor. The *Ceph OSD Daemon* stores data in pools striped across one
 or more disks. Ceph OSDs also replicate, rebalance, and recover data,
 and report data usage.
 
-The *Ceph Monitor* mainatins a master copy of the Ceph storage map and
+The *Ceph Monitor* maintains a master copy of the Ceph storage map and
 the current state of the storage cluster. Ceph clients consult the
 Ceph monitor to receive the latest copy of the storage map then
 communicate directly with the primary data-owning OSD.

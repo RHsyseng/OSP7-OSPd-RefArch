@@ -23,7 +23,7 @@ Microservices. The services in the application do not communicate
 directly with one another. A web application aggregates and
 coordinates communication between the services. Its acts as a
 perimeter between the application and the clients. By employing this
-presentation layer, the microservices remain indepdent from each other.
+presentation layer, the microservices remain independent from each other.
 They can be developed, scaled, and maintained independently, which avoids
 many of the complexities inherent to other MSA approaches.
 
@@ -34,7 +34,7 @@ image::images/EAP6_MSA.png[align="center", scaledwidth="80%"]
 OpenStack Platform 7 provides a comprehensive platform for implementing, 
 maintaining, and scaling a MSA. Because microservices are independent,
 scalable services, they require a scalable platform to reach their
-potential. OpenStack provides a robust underlying toolset for automating service
+potential. OpenStack provides a robust underlying tool set for automating service
 implementation, deployment, discovery, and scaling. This reference
 architecture demonstrates how to deploy and orchestrate an EAP6 MSA
 using nested Heat templates. Directions for future work might include
@@ -49,10 +49,10 @@ https://access.redhat.com/articles/1452603[ Microservice Architecture:
 Building Microservices with JBOSS EAP 6]. 
 
 === Create the test environment
-The MSA application does not exist in a vaccuumm. This section
+The MSA application does not exist in a vacuum. This section
 describes the steps for installing the supporting infrastructure
 around the MSA including a public Neutron network and subnet, a demo
-tenant and user, a RHEL 7.1 Glance image, and a keypair for accessing
+tenant and user, a RHEL 7.1 Glance image, and a key pair for accessing
 the MSA application servers via *ssh*.
 
 . Source *overcloudrc*.
@@ -151,7 +151,7 @@ $ openstack role add --user demo --project demo-tenant _member_
 | name  | _member_                         |
 +-------+----------------------------------+
 ----
-. Create and source a keystonerc file for the demo user.
+. Create and source a _keystonerc_ file for the demo user.
 +
 [source, shell]
 ----
@@ -210,7 +210,7 @@ $ openstack image list
 | c5bfc6bd-2b3e-4a2b-ac29-985ec45c8092 | rhel-server7.1 |
 +--------------------------------------+----------------+
 ----
-. Create a keypair for accessing the MSA application servers via
+. Create a key pair for accessing the MSA application servers via
   *ssh*.
 +
 [source, shell]

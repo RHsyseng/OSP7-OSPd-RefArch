@@ -99,7 +99,7 @@ detail.
 
 Each server has two Gigabit interfaces (nic1:2) and two 10-Gigabit
 interfaces (nic3:4). This reference architecture network isolation to
-segment openstack communication by type.
+segment OpenStack communication by type.
 
 The following network traffic types are isolated:
 
