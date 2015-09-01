@@ -57,7 +57,7 @@ the MSA application servers via *ssh*.
 
 . Source *overcloudrc*.
 +
-[source, shell]
+[source%autofit, shell]
 ----
 $source overcloudrc
 
@@ -72,7 +72,7 @@ OS_CLOUDNAME=overcloud
 . Create an external network and subnet. This will be the public
   network for the MSA application. Export the external network ID.
 +
-[source, shell]
+[source%autofit, shell]
 ----
 $ neutron net-create ext-net -- --router:external=True --shared=True
 Created a new network:
@@ -120,7 +120,7 @@ b1f27b52-6229-41e7-a597-02a070320ab4
 ----
 . Create a demo user and tenant.
 +
-[source, shell]
+[source%autofit, shell]
 ----
 $ openstack user create --password redhat demo
 +----------+----------------------------------+
@@ -153,7 +153,7 @@ $ openstack role add --user demo --project demo-tenant _member_
 ----
 . Create and source a _keystonerc_ file for the demo user.
 +
-[source, shell]
+[source%autofit, shell]
 ----
 $ cat > ~/demorc << EOF
 export OS_USERNAME=demo
@@ -176,7 +176,7 @@ OS_CLOUDNAME=overcloud
 ----
 . Upload a RHEL 7.1 image for the MSA application servers.
 +
-[source, shell]
+[source%autofit, shell]
 ----
 $ openstack image create --disk-format qcow2  --container-format bare
 --file /pub/rhel-guest-image-7.1-20150224.0.x86_64.qcow2 rhel-server7.1
@@ -213,7 +213,7 @@ $ openstack image list
 . Create a key pair for accessing the MSA application servers via
   *ssh*.
 +
-[source, shell]
+[source%autofit, shell]
 ----
 $ openstack keypair create demokp > ~/demokp.pem
 
@@ -243,13 +243,13 @@ They are too lengthy to document.
 
 . Create the _templates/lib_ directory.
 +
-[source, shell]
+[source%autofit, shell]
 ----
 $ mkdir ~/templates/lib
 ----
 . Extract the nested example templates to _templates/lib_.
 +
-[source, shell]
+[source%autofit, shell]
 ----
 $ ls templates/
 eapws5_nested.yaml  lib  openstack-tripleo-heat-templates
@@ -260,7 +260,7 @@ presentation-service.yaml  product-db.yaml       sales-db.yaml
 ----
 . Deploy the MSA application with Heat.
 +
-[source, shell]
+[source%autofit, shell]
 ----
 $ heat stack-create --template-file templates/eapws5_nested.yaml eap5 --parameters="public_net_id=$ext_net_id"
 +--------------------------------------+------------+--------------------+----------------------+
@@ -271,7 +271,7 @@ $ heat stack-create --template-file templates/eapws5_nested.yaml eap5 --paramete
 ----
 . Watch progress with *heat resource-list*.
 +
-[source, shell]
+[source%autofit, shell]
 ----
 $ heat resource-list eap5
 +----------------------+--------------------------------------+------------------------------------------------------------+--------------------+----------------------
@@ -289,7 +289,7 @@ $ heat resource-list eap5
 ----
 . View *nova list* after Heat creates the stack successfully.
 +
-[source, shell]
+[source%autofit, shell]
 ----
 $ nova list
 +--------------------------------------+----------------------+--------+------------+-------------+-------------------------------------+
@@ -309,7 +309,7 @@ $ nova list
   instance. *ssh* to _presentation-service_ to view
   _/var/log/cloud-init.log_. 
 +
-[source, shell]
+[source%autofit, shell]
 ----
 
 

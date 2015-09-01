@@ -9,7 +9,7 @@ This section describes steps for deploying the overcloud.
 +
 NOTE: Download the images from: https://access.redhat.com/downloads/content/191/ver=7.0/rhel---7/7.0/x86_64/product-downloads 
 +
-[source, shell]
+[source%autofit, shell]
 ----
 $ mkdir images
 $ cd images
@@ -20,7 +20,7 @@ overcloud-full-7.0.0-32.tar discovery-ramdisk-7.0.0-32.tar deploy-ramdisk-ironic
 +
 2. Extract the images from the tar archives.
 +
-[source, shell]
+[source%autofit, shell]
 ----
 $ tar xf deploy-ramdisk-ironic-7.0.0-32.tar 
 $ tar xf discovery-ramdisk-7.0.0-32.tar 
@@ -33,14 +33,14 @@ deploy-ramdisk-ironic.kernel        discovery-ramdisk.kernel overcloud-full.qcow
 +
 3. Upload the images
 +
-[source, shell]
+[source%autofit, shell]
 ----
 $ openstack overcloud image upload
 ----
 +
 4. List the images.
 +
-[source, shell]
+[source%autofit, shell]
 ----
 $ openstack image list
 +--------------------------------------+------------------------+
@@ -60,12 +60,7 @@ $ openstack image list
   uses this file to discover nodes and populate the Ironic
   database.
 +
-*mac* is the MAC address of the provisioning interface. The *pm_*
-entries refer to the hardware management interface.
-+
-NOTE: The example below is truncated for brevity. Appendix
-<<Appendix-instackenv.json>> contains the full file.
-[source,ruby,numbered]
+[source%autofit,ruby,numbered]
 ----
 {
   "nodes": [
@@ -82,25 +77,32 @@ NOTE: The example below is truncated for brevity. Appendix
       "pm_user": "root",
       "pm_addr": "10.19.143.153"
     },
-    {
-      "pm_password": "PASSWORD",
-      "pm_type": "pxe_ipmitool",
-      "mac": [
-        "54:9F:35:F6:70:70"
-      ],
-      "cpu": "32",
-      "memory": "98304",
-      "disk": "130",
-      "arch": "x86_64",
-      "pm_user": "root",
-      "pm_addr": "10.19.143.37"
-     }
-  ]
-}
+    ...
 ----
+//     {
+//      "pm_password": "PASSWORD",
+//      "pm_type": "pxe_ipmitool",
+//      "mac": [
+//        "54:9F:35:F6:70:70"
+//      ],
+//      "cpu": "32",
+//      "memory": "98304",
+//      "disk": "130",
+//      "arch": "x86_64",
+//      "pm_user": "root",
+//      "pm_addr": "10.19.143.37"
+//     }
+//  ]
+//}
++
+*mac* is the MAC address of the provisioning interface. The *pm_*
+entries refer to the hardware management interface.
++
+NOTE: The example below is truncated for brevity. 
 +
 2. Import the node definitions to the Ironic database.
-[source, shell]
++
+[source%autofit, shell]
 ----
 $ openstack baremetal import --json ~/instackenv.json
 
@@ -122,15 +124,15 @@ $ openstack baremetal list
 | 5f52affb-cfe2-49dc-aa89-b57d99e5372a | None | None          | power off   | available       | False       |
 +--------------------------------------+------+---------------+-------------+-----------------+-------------+
 ----
-+
 3. Assign a kernel and ramdisk to the nodes
-[source, shell]
++
+[source%autofit, shell]
 ----
 $ openstack baremetal configure boot
 ----
-+
 4. Introspect the nodes to discover their hardware attributes.
-[source, shell]
++
+[source%autofit, shell]
 ----
 $ openstack baremetal introspection bulk start
 ...
@@ -139,10 +141,10 @@ $ openstack baremetal introspection bulk start
 NOTE: Bulk introspection time will vary based on node count and boot
 time. For this reference architecture bulk introspection lasted
 approximately 3 minutes per node.
-+
 5. Use *journalctl* to view introspection progress in a separate
-  terminal.
-[source, shell]
+   terminal.
++
+[source%autofit, shell]
 ----
 $ sudo journalctl -l -u openstack-ironic-discoverd -u openstack-ironic-discoverd-dnsmasq -u openstack-ironic-conductor | grep -i finished
 Aug 28 09:23:46 rhos0.osplocal ironic-discoverd[22863]:
@@ -150,9 +152,9 @@ INFO:ironic_discoverd.process:Introspection finished successfully for node 1adc6
 Aug 28 09:24:53 rhos0.osplocal ironic-discoverd[22863]:
 INFO:ironic_discoverd.process:Introspection finished successfully for node 84efb518-15e6-45c7-8f6a-56a5097c0b85
 ----
-+
 6. Verify nodes completed introspection without errors.
-[source, shell]
++
+[source%autofit, shell]
 ----
 $ openstack baremetal introspection bulk status
 +--------------------------------------+----------+-------+
@@ -177,7 +179,7 @@ $ openstack baremetal introspection bulk status
 
 1. Create the default flavor for baremetal deployments.
 +
-[source, shell]
+[source%autofit, shell]
 ----
 [stack@rhos0 ~]$ openstack flavor create --id auto --ram 4096 --disk 40 --vcpus 1 baremetal
 +----------------------------+--------------------------------------+
@@ -197,7 +199,7 @@ $ openstack baremetal introspection bulk status
 ----
 2. Set properties for the baremetal flavor.
 +
-[source, shell]
+[source%autofit, shell]
 ----
 $ openstack flavor set --property "cpu_arch"="x86_64" --property "capabilities:boot_option"="local" baremetal
 +----------------------------+-----------------------------------------------------+
@@ -218,7 +220,7 @@ $ openstack flavor set --property "cpu_arch"="x86_64" --property "capabilities:b
 ----
 3. Install _ahc-tools_.
 +
-[source, shell]
+[source%autofit, shell]
 ----
 $ sudo yum install -y -q ahc-tools
 
@@ -227,7 +229,7 @@ ahc-tools-0.1.1-5.el7ost.noarch
 ----
 4. Create the AHC configuration file.
 +
-[source, shell]
+[source%autofit, shell]
 ----
 $ sudo cp /etc/ironic-discoverd/discoverd.conf
 /etc/ahc-tools/ahc-tools.conf
@@ -263,7 +265,7 @@ os_auth_url = http://192.0.2.1:5000/v2.0
 ----
 5. Create the AHC spec files.
 +
-[source, shell]
+[source%autofit, shell]
 ----
 [stack@rhos0 ~]$ for i in $(ls /etc/ahc-tools/edeploy/{*.specs,state}); do echo $i && cat $i; done
 /etc/ahc-tools/edeploy/ceph.specs
@@ -297,7 +299,7 @@ NOTE: Servers are matched to profiles by the order they are listed in this file.
 6. This loop creates a hardware profile for each node type defined in
    the state file.
 +
-[source, shell]
+[source%autofit, shell]
 ----
 $ for i in ceph control compute; do openstack flavor create --id auto --ram 4096 --disk 40 --vcpus 1 $i; openstack flavor set --property "cpu_arch"="x86_64" --property
 "capabilities:boot_option"="local" --property "capabilities:profile"="$i" $i; done
@@ -314,7 +316,7 @@ $ openstack flavor list
 ----
 7. Assign Ironic nodes to profiles and view the results.
 +
-[source, shell]
+[source%autofit, shell]
 ----
 $ sudo ahc-match
 
@@ -339,7 +341,7 @@ compute.
 8. Set the provisioning network nameserver. The overcloud servers
    users this nameserver for DNS resolution.
 +
-[source, shell]
+[source%autofit, shell]
 ----
 $ neutron subnet-update $(neutron subnet-list | awk ' /192.0.2/ { print $2 } ') --dns-nameserver 10.19.143.247
 
@@ -359,7 +361,7 @@ the network described in <<reference-architecture-diagram>>.
 
 1. Define isolated networks in  _network-environment.yaml_.
 +
-[source, ruby, numbered]
+[source%autofit, ruby, numbered]
 ----
 resource_registry:
   OS::TripleO::BlockStorage::Net::SoftwareConfig:/home/stack/nic-configs/cinder-storage.yaml
@@ -423,7 +425,7 @@ by the installer.
 +
 3. Set the provisioning network nameserver. The overcloud servers use
 +
-[source, shell]
+[source%autofit, shell]
 ----
 $ neutron subnet-update $(neutron subnet-list | awk ' /192.0.2/ { print $2 } ') --dns-nameserver 10.19.143.247
 ----
@@ -444,7 +446,7 @@ configuration for Ceph OSDs when SSD drives are not used.
 2. Initialize the virtual disks to remove all partition and MBR data.
 3. Create a _templates_ directory for Heat template customization.
 +
-[source, shell]
+[source%autofit, shell]
 ----
 $ mkdir ~/templates
 
@@ -454,7 +456,7 @@ $ cp -rp /usr/share/openstack-tripleo-heat-templates/ ~/templates
    _~/templates/openstack-tripleo-heat-templates/puppet/hieradata/ceph.yaml_
    to include the Ceph custiomizations. This example includes the
    additional OSDs accepting the Puppet defaults for logging.
-[source, ruby, numbered]
+[source%autofit, ruby, numbered]
 ----
 ceph::profile::params::osd_journal_size: 1024
 ceph::profile::params::osd_pool_default_pg_num: 128
@@ -507,7 +509,7 @@ the previous section.
 1. Use *ironic node-list* to verify all Ironic nodes are powered off,
    available for provisioning, and not in maintenance mode.
 +
-[source, shell]
+[source%autofit, shell]
 ----
 $ ironic node-list
 +--------------------------------------+------+---------------+-------------+-----------------+-------------+
@@ -529,7 +531,7 @@ $ ironic node-list
 ----
 2. Deploy the overcloud.
 +
-[source, shell]
+[source%autofit, shell]
 ----
 $ openstack overcloud deploy -e /usr/share/openstack-tripleo-heat-templates/environments/network-isolation.yaml 
 -e /home/stack/network-environment.yaml --control-flavor control --compute-flavor compute --ceph-storage-flavor ceph 
@@ -551,7 +553,7 @@ This lengthy command does the following:
   pre-defined activation key.
 3. Watch deployment progress in a separate console window.
 +
-[source, shell]
+[source%autofit, shell]
 ----
 $ heat resource-list overcloud | grep CREATE_COMPLETE
 | BlockStorage                      | 8565b42e-0b24-41ec-88d3-7d0d6bc18834 | OS::Heat::ResourceGroup | CREATE_COMPLETE | 2015-08-28T16:25:53Z |
@@ -562,7 +564,7 @@ $ heat resource-list overcloud | grep CREATE_COMPLETE
 ----
 4. Run *nova-list* to view IP addresses for the overcloud servers.
 +
-[source, shell]
+[source%autofit, shell]
 ----
 $ nova list
 +--------------------------------------+-------------------------+--------+------------+-------------+---------------------+
@@ -585,7 +587,7 @@ $ nova list
 5. Source the _overcloudrc_ file to set environment variables for the overcloud.
 6. Verify all Nova services and enabled and up.
 +
-[source, shell]
+[source%autofit, shell]
 ----
 $ nova service-list
 +-----+------------------+------------------------------------+----------+---------+-------+----------------------------+-----------------+
@@ -608,7 +610,7 @@ $ nova service-list
 ----
 7. Verify all Neutron agents are alive and up.
 +
-[source, shell]
+[source%autofit, shell]
 ----
 $ neutron agent-list
 +--------------------------------------+--------------------+------------------------------------+-------+----------------+---------------------------+
@@ -634,7 +636,7 @@ $ neutron agent-list
 ----
 8. *ssh* to a controller node and switch to root user. 
 +
-[source, shell]
+[source%autofit, shell]
 ----
 $ ssh -l heat-admin 192.0.2.9
 The authenticity of host '192.0.2.9 (192.0.2.9)' can't be established.
@@ -649,7 +651,7 @@ $ sudo -i
 NOTE: Run *pcs resource cleanup* if any of the services are not fully
 started.
 +
-[source, shell]
+[source%autofit, shell]
 ----
 pcs status
 Cluster name: tripleo_cluster
@@ -693,7 +695,7 @@ to Ceph recommendations.
 
 1. *ssh* to a ceph node and switch to root user. 
 +
-[source, shell]
+[source%autofit, shell]
 ----
 $ ssh -l heat-admin 192.0.2.20
 Last login: Fri Aug 28 17:58:30 2015 from 192.0.2.1
@@ -703,7 +705,7 @@ $ sudo -i
 2. Run *ceph -s* to verify all OSDs are up and in, pool count, and
    total free space.
 +
-[source, shell]
+[source%autofit, shell]
 ----
 # ceph -s
  cluster 7ced0d2a-4db6-11e5-86a4-90b11c56332a
@@ -720,7 +722,7 @@ $ sudo -i
    object storage, images, block storage, and ephemeral storage. There
    are 256 PGs total, 64 per pool.
 +
-[source, shell]
+[source%autofit, shell]
 ----
 # ceph osd lspools
 0 rbd,1 images,2 volumes,3 vms,
@@ -731,14 +733,14 @@ v120: 256 pgs: 256 active+clean; 0 bytes data, 201 GB used, 37020 GB /
 ----
 4. View overall Ceph health.
 +
-[source, shell]
+[source%autofit, shell]
 ----
 # ceph health
 HEALTH_WARN too few PGs per OSD (19 < min 30)
 ----
 5. Increase per-pool _pg_num_ and _pgp_num_ to 256.
 +
-[source, shell]
+[source%autofit, shell]
 ----
 # for i in rbd images volume vms; do 
  ceph osd pool set $i pg_num 256; 
@@ -755,7 +757,7 @@ set pool 3 pgp_num to 256
 ----
 6. Re-run *ceph health* and *ceph pg stat*.
 +
-[source, shell]
+[source%autofit, shell]
 ----
 # ceph health
 HEALTH_OK
@@ -783,7 +785,7 @@ devices.
 
 1. Run *configure_fence.sh*.
 +
-[source, shell]
+[source%autofit, shell]
 ----
 $ sh 4_oc_fence.sh enable
 Cluster Properties:
@@ -796,7 +798,7 @@ Cluster Properties:
 ----
 2. Verify fence devices are configured with *pcs status*.
 +
-[source, shell]
+[source%autofit, shell]
 ----
 $ ssh -l heat-admin 192.0.2.9 sudo pcs status | grep -i fence
  overcloud-controller-0-ipmi  (stonith:fence_ipmilan):  Started overcloud-controller-1 

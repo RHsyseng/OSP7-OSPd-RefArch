@@ -7,7 +7,7 @@ configure OSP 7 with OSP-d in the Red Hat Systems Engineering lab.
 
 1. Install the operating system.
 +
-[source, shell]
+[source%autofit, shell]
 ----
 # cat /etc/redhat-release
 Red Hat Enterprise Linux Server release 7.1 (Maipo)
@@ -15,7 +15,7 @@ Red Hat Enterprise Linux Server release 7.1 (Maipo)
 +
 2. Set the hostname
 +
-[source, shell]
+[source%autofit, shell]
 ----
 # hostnamectl set-hostname rhos0.osplocal
 # hostnamectl set-hostname --transient rhos0.osplocal
@@ -26,7 +26,7 @@ rhos0.osplocal
 +
 3. Register the system with *subscription-manager*.
 +
-[source, shell]
+[source%autofit, shell]
 ----
 # subscription-manager register --org syseng --activationkey OSP7-undercloud
 The system has been registered with ID:
@@ -38,7 +38,7 @@ Status:       Subscribed
 +
 4. List active repositories.
 +
-[source, shell]
+[source%autofit, shell]
 ----
 # yum repolist
 Loaded plugins: langpacks, product-id, rhnplugin, subscription-manager
@@ -57,7 +57,7 @@ repolist: 21,076
 +
 5. Create the stack user
 +
-[source, shell]
+[source%autofit, shell]
 ----
 # useradd stack
 # echo 'stack:password' | chpasswd
@@ -72,7 +72,7 @@ uid=1000(stack) gid=1000(stack) groups=1000(stack)
 === Deploy the Control Plane
 1. Switch to the stack user account.
 +
-[source, shell]
+[source%autofit, shell]
 ----
 # su - stack
 $ id
@@ -81,7 +81,7 @@ uid=1000(stack) gid=1000(stack) groups=1000(stack) context=unconfined_u:unconfin
 +
 2. Install the OpenStack director plugin.
 +
-[source, shell]
+[source%autofit, shell]
 ----
 $ sudo yum install -y -q python-rdomanager-oscplugin
 $ sudo rpm -q python-rdomanager-oscplugin
@@ -91,7 +91,7 @@ python-rdomanager-oscplugin-0.0.8-44.el7ost.noarch
 3. Create the _undercloud.conf_. This file contains
   configuration data for the undercloud installation.
 +
-[source, ruby, numbered]
+[source%autofit, ruby, numbered]
 ----
   [DEFAULT]
 
@@ -141,7 +141,7 @@ reference architecture.
 +
 4. Install the undercloud.
 +
-[source, shell]
+[source%autofit, shell]
 ----
 $ openstack undercloud install | tee uc.out 2>&1
 ...
@@ -160,7 +160,7 @@ secured.
 +
 5. Source _stackrc_ to set environment variables for interacting with the undercloud.
 +
-[source, shell]
+[source%autofit, shell]
 ----
 $ source stackrc 
 $ env | grep OS_
@@ -173,7 +173,7 @@ OS_NO_CACHE=True
 +
 6. Verify all services are active.
 +
-[source, shell]
+[source%autofit, shell]
 ----
 $ openstack-service status
 neutron-dhcp-agent (pid 16458) is active
@@ -219,7 +219,7 @@ openstack-tuskar-api (pid 19994) is active
 +
 7. Increase the maximum database connections.
 +
-[source, shell]
+[source%autofit, shell]
 ----
 $ sudo sed -i 's/max_connections =.*$/max_connections = 4096/' /etc/my.cnf.d/server.cnf
 $ sudo grep max_connections /etc/my.cnf.d/server.cnf max_connections = 4096
@@ -234,7 +234,7 @@ $ sudo mysql -e "SHOW GLOBAL VARIABLES LIKE 'max_connections'"
 +
 8. Increase or disable Neutron port quotas.
 +
-[source, shell]
+[source%autofit, shell]
 ----
 $ neutron quota-update --port -1
 +---------------------+-------+
@@ -261,7 +261,7 @@ $ neutron quota-show
 9. Increase the RPC response timeout for Ironic and Neutron to 600 if
   they are not already set.
 +
-[source, shell]
+[source%autofit, shell]
 ----
 $ sudo openstack-config --set /etc/nova/nova.conf DEFAULT rpc_response_timeout 600
 $ sudo openstack-config --set /etc/ironic/ironic.conf DEFAULT rpc_response_timeout 600
