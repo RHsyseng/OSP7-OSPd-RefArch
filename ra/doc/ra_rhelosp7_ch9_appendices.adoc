@@ -1,0 +1,89 @@
+[appendix]
+== Revision History
+
+[appendix]
+== References
+
+. http://ceph.com/docs/master/rados/operations/placement-groups/[Ceph
+  Placement Groups]
+. https://access.redhat.com/solutions/1320133[How can I execute the
+  JBoss EAP 6 using Systemctl?]
+. https://wiki.ceph.com/Guides/How_To/Benchmark_Ceph_Cluster_Performance[Benchmark
+Ceph Cluster Performance]
+. https://access.redhat.com/articles/1321163[2015 - RHEL OSP 5: Cinder Volume Performance on Inktank Ceph
+Enterprise 1.2.2]
+. https://access.redhat.com/articles/1507893[2015 - Guidelines and
+Considerations for Performance and Scaling your Red Hat Openstack 6
+Cloud]
+. https://access.redhat.com/articles/1273073[Performance Tuning for
+RabbitMQ in Red Hat Enterprise Linux OpenStack Platform]
+. https://access.redhat.com/articles/1432053[Performance tuning the
+backend database for Red Hat Enterprise Linux OpenStack Platform]
+. https://access.redhat.com/documentation/en-US/Red_Hat_Enterprise_Linux/6/html-single/Virtualization_Tuning_and_Optimization_Guide/index.html[Red Hat Enterprise Linux 6 Virtualization Tuning and Optimization Guide]
+. http://people.redhat.com/berrange/kvm-forum-2014/kvm-forum-2014-openstack-perf.pdf[OpenStack
+Performance Optimization]
+. https://access.redhat.com/documentation/en-US/Red_Hat_Enterprise_Linux_OpenStack_Platform/7/html/Director_Installation_and_Usage/[Red
+Hat Enterprise Linux OpenStack Platform 7 Director Installation and
+Usage]
+. http://hardysteven.blogspot.com/2015/04/debugging-tripleo-heat-templates.html[Debugging
+TripleO Heat templates]
+. https://github.com/redhat-cip/edeploy/blob/master/docs/AHC.rst[
+Automatic Health Check (AHC) - User Guide]
+. https://access.redhat.com/articles/973163[Certified Guest Operating
+Systems in Red Hat Enterprise Linux OpenStack Platform and Red Hat
+Enterprise Virtualization]
+https://access.redhat.com/articles/1436373[Deployment Limits for Red
+Hat OpenStack Platform]
+. https://access.redhat.com/documentation/en/red-hat-ceph-storage/version-1.3/red-hat-ceph-storage-13-red-hat-ceph-architecture/red-hat-ceph-architecture[
+Red Hat Ceph Architecture Guide]
+. https://access.redhat.com/articles/1370143[2015 - Deploying Highly
+  Available Red Hat Enterprise Linux OpenStack Platform 6 with Ceph
+  Storage]
+. https://access.redhat.com/articles/1452603[2015 - Microservice
+  Architecture: Building microservices with JBoss EAP 6]
+. http://docs.openstack.org/developer/heat/template_guide/hot_spec.html[Heat
+  Orchestration Template (HOT) specification]
+. http://docs.openstack.org/developer/heat/template_guide/[Heat
+  Orchestration Template (HOT) Guide]
+
+[appendix]
+[[hardware-specifications]]
+== Hardware specifications
+
+.Hardware specifications
+[options="header,footer"]
+|====
+|Count|Model|Description
+|8|Dell PowerEdge M520|2x Intel Xeon CPU E5-2450 0 @ 2.10GHz, Broadcom 5720 1Gb Dual Port LOMs, Broadcom 57810S-k
+Dual Port 10Gb NIC, 6x DDR3 8192 MB @1333 MHZ DIMMs, 2 x 146GB SAS
+internal disk drives
+|4|Dell PowerEdge R520|2x Intel(R) Xeon(R) CPU X5650 @ 2.67 GHz (6
+core), 2 x Broadcom NetXtreme II BCM5709S Gb Ethernet, 2x  Emulex
+Corporation OneConnect 10Gb NIC, 6 x DDR3 8192 MB @1333 MHZ DIMMs, 12x
+146GB SAS internal disk drives
+|1|Dell PowerEdge M720|2x Intel(R) Xeon(R) CPU X5650 @ 2.67 GHz (6
+core), 2 x Broadcom NetXtreme II BCM5709S Gb Ethernet, 2x  Emulex
+Corporation OneConnect 10Gb NIC, 6 x DDR3 8192 MB @1333 MHZ DIMMs, 12x
+146GB SAS internal disk drives
+|====
+
+[appendix]
+== Required channels
+Red Hat Enterprise Linux OpenStack Platform is available via Red Hat
+Network Certificate Server repositories.
+
+.Required channels
+[options="header,footer"]
+|====
+|Channel|Source
+|rhel-x86_64-server-7|RHN Classic
+|rhel-x86_64-server-7-ost-6|RHN Classic
+|rhel-7-server-rpms|RHN Certificate
+|rhel-7-server-openstack-6.0-rpms|RHN Certificate
+|rhel-7-server-rh-common-rpms|RHN Certificate
+|====
+
+NOTE: This reference architecture uses a local satellite server for
+deployments and updates.
+
+// vim: set syntax=asciidoc:

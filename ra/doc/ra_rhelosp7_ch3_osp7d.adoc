@@ -1,0 +1,499 @@
+[chapter 3]
+== OpenStack Platform 7 director
+
+Red Hat Enterprise Linux OpenStack Platform (RHEL OSP) delivers an integrated 
+foundation to create, deploy, and scale a secure and reliable public or private 
+OpenStack cloud. RHEL OSP starts with the proven foundation of Red Hat
+Enterprise Linux and integrates Red Hat's OpenStack Platform
+technology to provide a production-ready cloud platform backed by an ecosystem 
+of more than 350 certified partners.
+
+RHEL OSP 7 is based on the community Kilo OpenStack release. This
+release is Red Hat's fifth iteration of RHEL OSP which has been
+successfully deployed by Red Hat customers worldwide across diverse
+vertical industries including financial, telecommunications, and
+education.
+
+RHEL OSP 7 introduces OpenStack Platform director, a cloud installation and
+lifecycle management toolchain. OSP director is the first
+Red Hat OpenStack Platform installer to deploy OpenStack on and with
+OpenStack. This section of the paper introduces RHEL OSP director's architecture
+and describes the following features:
+
+* Simplified deployment through ready-state provisioning of bare metal resources.
+* Flexible network definitions
+* High availability via tight integration with the RHEL Server High
+  Availability Add-on
+* Integrated setup and installation of Red Hat Ceph Storage 1.3
+* Content management via the Red Hat Content Delivery
+  Network (CDN) or Red Hat Satellite server
+
+=== Ready State Provisioning and Server Roles
+OSP director is a converged installer. It combines mature upstream
+OpenStack deployment projects (TripleO and Ironic) with
+components from Red Hat's past OpenStack Platform installers.
+
+*TripleO* stands for "OpenStack on OpenStack." TripleO is an upstream
+OpenStack project that uses an existing OpenStack environment to install 
+a production OpenStack environment. The deployment environment is called 
+the undercloud. The production environment is called the overcloud. 
+
+The *undercloud* is TripleO's control plane. It uses native OpenStack APIs 
+and services to deploy, configure, and manage the production OpenStack 
+deployment. The undercloud defines the overcloud with Heat templates
+then deploys it via the Ironic baremetal provisioning service. OSP director 
+includes Heat predefined templates for the basic server roles that comprise 
+the overcloud. Customized templates allow OSP director to deploy,
+redeploy, and scale complex overclouds in a repeatable fashion.
+
+*Ironic* is a community bare-metal provisioning project. OSP 
+director uses Ironic to deploy the overcloud servers. Ironic
+gathers information about baremetal servers via a discovery mechanism
+known as introspection. Ironic pairs the servers with bootable disk
+image and then installs them via PXE and remote power management. 
+
+OSP director deploys all servers with the same generic image. During 
+installation OSP director injects *Puppet modules* into the generic 
+disk image to tailor it for specific server roles. OSP director also 
+applies host-specific customizations via Puppet including network and 
+storage configuration.
+
+While the undercloud is primarily used to deploy OpenStack, the
+*overcloud* is a functional cloud available to run virtual machines
+and workloads. Servers in the following roles comprise the overcloud:
+
+[[server-roles]]
+[glossary]
+*Control*::
+    This role provides the endpoint for REST-based API queries to the
+    majority of the OpenStack services. These include Compute, Image,
+    Identity, Block, Network, and Data processing.  The controller can
+    run as a standalone server or as a 3-16 node high availability
+    (HA) cluster.
+*Compute*::
+    These servers provide the processing, memory, storage, and
+    networking resources to run virtual machine instances. They run
+    the KVM hypervisor by default. New instances are spawned across
+    compute nodes in a round-robin fashion. 
+*Block storage*::
+    This role provides external block storage for HA controller nodes
+    via the OpenStack Block Storage service (Cinder).
+*Ceph storage*::
+    Ceph is a distributed object store and file system. This role
+    deploys Object Storage Daemon (OSD) nodes for Ceph clusters. It
+    also installs the Ceph Monitor service on the controller.
+*Object storage*::
+    These servers provide external Account, Container, and Object
+    (ACO) storage for the OpenStack Object Storage service (Swift.) It
+    also installs a Swift proxy server on the controller nodes.
+
+NOTE: The overcloud requires at least one controller and one compute
+node. It runs independently from the undercloud once it is
+installed. This reference architecture uses the Control, Compute, and Ceph
+storage roles.
+
+OSP director also includes *advanced hardware configuration* tools
+from the eNovance SpinalStack installer. These tools validate server
+hardware prior to installation. *Profile matching* lets administrators
+specify hardware requirements for each server role. OSP director only
+matches servers that meet minimum hardware requirements for each role.
+Profile to matching is performed after introspection but prior to deployment.
+
+OSP director also supports pre-installation *benchmark collection*.
+Servers boot to a customized RAMdisk and run a series of benchmarks.
+The benchmarks report performance outliers to identify underperforming
+nodes prior to installation.
+
+NOTE: RHEL OSP 7 requires Red Hat Enterprise Linux 7 Server on all servers.
+Supported guest operating systems can be found at
+https://access.redhat.com/articles/973163. Deployment limitations are
+listed at https://access.redhat.com/articles/1436373.
+
+=== Network Isolation
+OpenStack requires multiple network functions. While it is possible to
+collapse all network functions onto a single network interface,
+isolating communication streams in their own physical or virtual
+networks generally provides better performance and scalability.
+
+OSP director supports isolating network traffic by type. One or more
+network traffic types can be flexibily assigned to a physical,
+virtual, or bonded interface. Multiple traffic types can be combine
+across the same physical interfaces or switches.
+
+OPS director supports network isolation for the following traffic
+types:
+
+[[traffic-types]]
+[glossary]
+*Provisioning*::
+    The control plane installs the overcloud via this network. All cluster
+    nodes must have a physical interface attached to the provisioning network.
+    This network must carry PXE traffic so it should be on a native
+    VLAN. The provisioning interface can act as a default gateway for
+    the overcloud if there is no other gateway on the network.
+*External*::
+    This network provides overcloud nodes with external connectivity.
+    Controller nodes connect the external network to an Open vSwitch
+    bridge and forward traffic originating from hyperviso instances through it.
+*Internal API*::
+    This network exposes internal OpenStack API endpoints for the
+    overcloud nodes. It handles inter-service communication between
+    both core OpenStack services and the supporting services.
+*Tenant*::
+    Virtual machines communicate over the tenant network. It supports
+    three modes of operation: VXLAN, GRE, and VLAN.
+*Storage*::
+    This network carries storage communication including Ceph, Cinder,
+    and Swift traffic. Data-internsive OpenStack deployments should
+    isolate Storage traffic on a dedicated high bandwidth interface.
+*Storage Management*::
+    Storage management communication can generate large amounts of
+    network traffic. This network carries storage management traffic
+    to reduce overhead on the other networks.
+
+Network traffic types are assigned to network interfaces through Heat
+customization before deploying the overcloud. OSP director supports
+several network interface types including physical interfaces, bonded
+interfaces, and either tagged or native 802.1Q VLANs.
+interfaces
+
+==== Network Types by Server Role
+The previous section discussed <<server-roles, server roles>>. Each
+server role requires access to specific types of network traffic. By
+default OSP director collapses all network traffic to the provisioning
+interface. This configuration is suitable for evaluation, proof of
+concept, and development environments. It is not recommended for
+production environments where scaling and performance are primaty
+concerns.
+
+The network isolation feature allows OSP director to segment network
+traffic ti particular networks by type. When using network isolation,
+each server role must have access to its required network traffic
+types. <<network-topology-table>> summarizes the required network
+types by server role.
+
+[[network-topology-diagram]]
+.Network topology
+image::images/NETWORK.png[align="center", scaledwidth="80%"]
+
+<<network-topology>> depicts the network roles by server type used in
+this reference architecture.
+
+[[network-topology-table]]
+.Network type by server role
+[options="header, footer"]
+|====
+|Role|Network
+.2+^.^|Undercloud|External
+|Provisioning
+.6+^.^|Control|External
+|Provisioning
+|Storage Mgmt
+|Tenant
+|Internal API
+|Storage
+.4+^.^|Compute|Provisioning
+|Tenant
+|Internal API
+|Storage
+.4+^.^|Ceph/Block/Object Storage|Provisioning
+|Storage Mgmt
+|Internal API
+|Storage
+|====
+
+==== Tenant Network Types
+OpenStack Platform 7 supports  tenant network communication through
+the OpenStack Networking (Neutron) service. OpenStack Networking supports
+overlapping IP address ranges across tenants via the Linux kernel's
+network namespace capability. It also supports three default
+networking types:
+
+. *VLAN segmentation mode*: Each tenant is assigned a network subnet
+  mapped to a 802.1q VLAN on the physical network. This tenant
+  networking type requires VLAN-assignment to the appropriate switch
+  ports on the physical network.
+. *GRE overlay mode*: This mode isolates tenant traffic in virtual
+  tunnels to provide Layer 2 network connectivity between virtual
+  machine instances on different hypervisors. GRE does not require
+  changes to the network switches and supports more unique network IDs
+  than VLAN segmentation.
+. *VXLAN* is an overlay method similar to GRE. VXLAN combines the ease
+  and scalability of GRE with superior performance. It is the default 
+  tenant network type used in OSP director deployments.
+
+Although Red Hat certifies third-party network plug-ins, OSP director 
+uses the ML2 network plugin with the Open vSwitch driver by default. 
+
+NOTE: OSP director does not deploy Nova networking.
+
+=== High Availability
+OSP director's approach to high availability OpenStack leverages Red Hat's
+internal expertise with distributed cluster systems. Most of
+the technologies discussed in this section are available through the
+Red Hat Enterprise Linux Server High Availability Add On. These
+technologies are bundled with RHEL OSP 7 to provide cluster services
+for production OSP 7 deployments.
+
+==== Cluster Manager and Proxy Server
+Two components drive HA for all core and non-core OpenStack
+services: the *cluster manager* and the *proxy server*.
+
+The cluster manager is responsible for the startup and recovery of an
+inter-related services across a set of physical machines. It tracks
+the cluster's internal state across multiple machines. State changes
+trigger appropriate responses from the cluster manager to ensure
+service availability and data integrity.
+
+Cluster managers offer the following benefits:
+
+. Deterministic recovery of a complex, multi-machine application stack
+. State awareness of other cluster machines to co-ordinate service
+   startup and failover.
+. Shared quourm calculation to determine majority/
+. Data integrity through fencing. Machines running a non-responsive
+   process are isolated to ensure they are not still responding to
+   remote requests. Machines are typically fenced via a remotely
+   accessible power switch or IPMI controller.
+. Automated recovery of failed instances to prevent additional
+   load-induced failures.
+
+In OSP's HA model, clients do not directly connect to service
+endpoints. Connection requests are routed to service endpoints by a
+proxy server.
+
+Benefits of using a proxy server include:
+
+. Connections are load balanced across service endpoints
+. Service requests can be monitored in a central location
+. Cluster nodes can be added or removed without interrupting service
+
+OSP director uses *HAproxy* and *Pacemaker* to manage HA services and load
+balance connection requests. With the exception of RabbitMQ and
+Galera, HAproxy distributes connection requests to active nodes in a
+round-robin fashion. Galera and RabbitMQ use persistent options to
+ensure requests go only to active and/or synched nodes. Pacemaker
+checks service health at 1 second intervals. Timeout settings vary by
+service. 
+
+The combination of Pacemaker and HAproxy:
+
+* Detects and recovers machine and application failures
+* Starts and stops OpenStack services in the correct order
+* Responds to cluster failures with appropriate actions including
+  resource failover and machine restart and fencing
+* Provides a thoroughly tested code base that has been used in
+  production clusters across a variety of use cases
+
+The following services deployed by OSP director do not use the proxy
+server:
+
+. RabbitMQ
+. memcached
+. mongodb
+
+Individual cluster services are discussed in the following section.
+
+NOTE: OSP director uses Pacemaker and HAproxy for clustering. Red Hat
+also supports manually deployed OSP 7 clustered with keepalived and
+HAproxy. Manual installation is beyond the scope of this document.
+
+==== Cluster models: Segregated versus Collapsed
+
+Cluster services can be deployed across cluster nodes in
+different combinations. The two primary approaches are _segregated_ and 
+_collapsed_.
+
+*Segregated* clusters run each service on dedicated clusters of three
+or more nodes. Components are isolated and can be scaled individually.
+Each service has its own virtual IP address. Segregating services
+offers flexibility in service placement. Multiple services can be run
+on the same physical nodes, or, in an extreme case, each service can
+run on its own dedicated hardware.
+
+<<segregated-cluster,This diagram>> depicts OpenStack service deployed
+in a segregated cluster model. Red Hat supports OSP 7 services
+deployed in a segregated model but it is beyond the scope of this
+document.
+
+*Collapsed* clusters run every service and component on the same set of
+three or more nodes. Cluster services share the same virtual IP
+address set. Collapsed services require fewer physical machines and
+are simpler to implement and manage. 
+
+Previous Red Hat OpenStack Platform installers deployed segregated
+clusters. OSPd deploys overclouds as collapsed clusters. All
+controller nodes run the same services. Service endpoints are bound to 
+the same set of virtual IP addresses. The undercloud is not clustered.
+
+<<collapsed-cluster, This diagram>> depicts OSP director's default
+approach to deploying collapsed HA OpenStack services.
+
+NOTE: Segregated and collapsed are the dominant approaches to
+implementing HA clusters but hybrid approaches are also possible.
+Segregate one or more components expected to cause a bottleneck into
+individual clusters. Collapse the remainder. Deploying a mixed cluster
+is beyond the scope of this document.
+
+[[segregated-cluster]]
+.Segregated cluster
+image::images/HA_SEGREGATED.png[align="center", scaledwidth="80%"]
+
+==== Cluster Services and Quorum
+Each clustered service operates in one of the following modes:
+
+* *Active/active*: Requests are load balanced between multiple
+  cluster nodes running the same services. Traffic intended for failed
+  nodes is sent to the remaining nodes.
+* *Active/passive*: A redundant copy of a running service is brought
+  online when the primary node fails.
+* *Hot Standby*: Connections are only routed to one of several active
+  service endpoints. New connections are routed to a standby
+  endpointif the primary service endpoint fails.
+* *Mixed*: Mixed has one of two meanings: services within a group run
+  in different modes, or the service runs active/active but is used as
+  active/passive. Mixed services are explained individually.
+* *Single*: Each node runs an independent cluster manager that only
+  monitors its local service. 
+
+A cluster *quorum* is the majority node set when a failure splits the
+cluster into two or more partitions. In this situation the majority 
+fences the minority to ensure both sides are not running the same 
+services -- a so-called "split brain" situation. *Fencing* is the
+process of isolating a failed machine -- typically via remote power
+control or networked switches -- by powering it off. Tjis is necessary
+to ensure data integrity.
+
+NOTE: Although OSP director supports up to 16 cluster nodes, Red Hat
+recommends an odd number of cluster members to help ensure quorum during
+cluster communication failure. OSP director requires a minimum of three
+active cluster members to achieve quorum.
+
+==== Cluster Modes for Core Services
+This section of the paper describes OSP director's default cluster mode for each
+OpenStack service.
+
+[[collapsed-cluster]]
+.Collapsed cluster
+image::images/HA_COLLAPSED.png[align="center", scaledwidth="80%"]
+
+The following table lists service mode by service.
+
+.Service description
+[options="header, footer"]
+|====
+|Service|Mode|Description
+|*Ceilometer*|Active/active|Measures usage of core OpenStack
+components. Used with Heat to trigger application autoscaling.
+|*Cinder*|Mixed|Provides persistent block storage to virtual
+machines. All services are active/active except _cinder-volume_ runs
+active/passive to prevent a potential
+https://bugzilla.redhat.com/show_bug.cgi?id=1193229[race condition].
+|*Glance*|Active/active|Discovers, catalogs, and retrieves virtual
+machine images.
+|*Horizon*|Active/active|Web management interface runs via HTTPD in
+active/active mode.
+|*Keystone*|Active/active|Common OpenStack authentication system runs
+in HTTPD.
+|*Neutron server*|Active/active|Neutron allows users to define and join
+networks on demand.
+|*Neutron agents*|Active/active/Support Layer 2 and 3 communication
+plus  numerous virtual networking technologies including ML2 and Open vSwitch.
+|*Nova*|Active/active|Provides compute capabilties to deploy and run
+virtual machine instances.
+|*Swift proxy server*|Active/active|Routes data requests to the
+appropriate Swift ACO server.
+|====
+
+==== Cluster Modes for Supporting Services
+
+The following tables lists the cluster mode for the non-core OpenStack
+services.
+
+.Supporting service description
+[options="header, footer"]
+|====
+|Service|Mode|Description
+|*Replicated state database*|Active/passive|Galera replicates databases
+to decrease client latency and prevent lost transactions. Galera runs
+in active/active mode but connections are only sent to one active node
+at a time to avoid lock contention.
+|*Database cache*|Hot standby|Memory caching system. HAproxy does not
+manage memcached connections because replicated access is still
+experimental.
+|*Message bus*|Active/active|AMQP message bus coordinates job
+execution and ensures reliable delivery. Not handled by HAproxy.
+Clients have a full list of RabbitMQ hosts.
+|*NoSQL database*|Active/active|NoSQL database mongodb supports
+Ceilometer and Heat. Not managed by HAproxy. Ceilometer servers have a
+full list of MongoDB hosts.
+|====
+
+==== Compute Node and Swift ACO Clustering
+Red Hat OpenStack Platform director installs compute nodes and Swift
+storage servers as single-node clusters in order to monitor their
+health and that of the services running on them.
+
+In the event that a compute node fails, Pacemaker restarts compute
+node services in the following order:
+
+1. neutron-ovs-agent
+2. ceilometer-compute
+3. nova-compute
+
+In the event that a Swift ACO node fails, Pacemaker restarts Swift
+services in the following order:
+
+1. swift-fs
+2. swift-object
+3. swift-container
+4. swift-account
+
+If a service fails to start the node where the service is running
+will be fenced in order to guarantee data integrity.
+
+=== Ceph Storage Integration
+Red Hat Ceph is a distributed data object store designed for
+performance, reliability, and scalability. OSP 7 director can deploy
+an integrated Ceph cluster in the overcloud. The integrated Ceph
+cluster acts as a storage virtualization layer for Glance images,
+Cinder volumes, and Nova ephemeral storage. The
+<<ceph-integration,Ceph integration graphic>> depicts OSP 7 director
+Ceph clusterintegration from a high level.
+
+The Ceph cluster consists of two types of daemons: Ceph OSD and Ceph
+Monitor. The *Ceph OSD Daemon* stores data in pools striped across one
+or more disks. Ceph OSDs also replicate, rebalance, and recover data,
+and report data usage.
+
+The *Ceph Monitor* mainatins a master copy of the Ceph storage map and
+the current state of the storage cluster. Ceph clients consult the
+Ceph monitor to receive the latest copy of the storage map then
+communicate directly with the primary data-owning OSD.
+
+[[ceph-integration]]
+.Ceph Integration
+image::images/CEPH.png[align="center", scaledwidth="80%"]
+
+OSP director can install a Ceph cluster with one or more OSD servers.
+By default the OSD server will use free space on its primary disk for
+the OSD storage device. Additional OSDs can be configured through
+Puppet customization prior to deploying the overcloud. Ceph
+performance scales with the number of OSD disks. The Ceph monitor is
+installed on the controller nodes whenever a Ceph storage role is
+deployed in the overcloud.
+
+This reference architecture includes a 4-node Ceph cluster. Each node
+has 10 OSD disks (40 total). The OSDs in the reference architecture
+store Glance images, host Cinder volumes, and provide ephemeral
+storage for the deployed instances.
+
+Consult
+https://access.redhat.com/documentation/en/red-hat-ceph-storage/version-1.3/red-hat-ceph-storage-13-red-hat-ceph-architecture/red-hat-ceph-architecture[Ceph
+documentation] for more information on Ceph 1.3.
+
+Consult this https://access.redhat.com/articles/1370143[reference
+architecture] for more information about running Ceph with OpenStack
+Platform.
+
+<<<

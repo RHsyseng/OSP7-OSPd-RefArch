@@ -1,0 +1,807 @@
+[chapter 6]
+== Deploy the overcloud
+This section describes steps for deploying the overcloud.
+
+=== Create the images
+
+1. Download and extract the RHEL OSP 7 discovery, deployment, and
+  overcloud images. 
++
+NOTE: Download the images from: https://access.redhat.com/downloads/content/191/ver=7.0/rhel---7/7.0/x86_64/product-downloads 
++
+[source, shell]
+----
+$ mkdir images
+$ cd images
+$ cp ../*.tar .
+$ ls
+overcloud-full-7.0.0-32.tar discovery-ramdisk-7.0.0-32.tar deploy-ramdisk-ironic-7.0.0-32.tar
+----
++
+2. Extract the images from the tar archives.
++
+[source, shell]
+----
+$ tar xf deploy-ramdisk-ironic-7.0.0-32.tar 
+$ tar xf discovery-ramdisk-7.0.0-32.tar 
+$ tar xf overcloud-full-7.0.0-32.tar 
+$ ls
+deploy-ramdisk-ironic-7.0.0-32.tar  discovery-ramdisk-7.0.0-32.tar overcloud-full-7.0.0-32.tar  overcloud-full.vmlinuz
+deploy-ramdisk-ironic.initramfs     discovery-ramdisk.initramfs overcloud-full.initrd
+deploy-ramdisk-ironic.kernel        discovery-ramdisk.kernel overcloud-full.qcow2
+----
++
+3. Upload the images
++
+[source, shell]
+----
+$ openstack overcloud image upload
+----
++
+4. List the images.
++
+[source, shell]
+----
+$ openstack image list
++--------------------------------------+------------------------+
+| ID                                   | Name                   |
++--------------------------------------+------------------------+
+| 179a49cb-cda8-410f-b78d-0b8d31df59bf | bm-deploy-ramdisk      |
+| 4266cce9-92f7-4c4f-85b0-908271b95241 | bm-deploy-kernel       |
+| 841ba92b-2183-45c7-8779-f0105471323c | overcloud-full         |
+| b17decc0-72f5-48ef-9ad1-85d371a3e0f8 | overcloud-full-initrd  |
+| c55c1359-c9a7-40a7-983f-d4d7610954bb | overcloud-full-vmlinuz |
++--------------------------------------+------------------------+
+----
+
+=== Register and introspect the nodes.
+
+1. Create the host definition file. _openstack-ironic-discoverd_
+  uses this file to discover nodes and populate the Ironic
+  database.
++
+*mac* is the MAC address of the provisioning interface. The *pm_*
+entries refer to the hardware management interface.
++
+NOTE: The example below is truncated for brevity. Appendix
+<<Appendix-instackenv.json>> contains the full file.
+[source,ruby,numbered]
+----
+{
+  "nodes": [
+    {
+      "pm_password": "PASSWORD",
+      "pm_type": "pxe_ipmitool",
+      "mac": [
+        "d4:ae:52:b2:20:d2"
+      ],
+      "cpu": "24",
+      "memory": "49152",
+      "disk": "500",
+      "arch": "x86_64",
+      "pm_user": "root",
+      "pm_addr": "10.19.143.153"
+    },
+    {
+      "pm_password": "PASSWORD",
+      "pm_type": "pxe_ipmitool",
+      "mac": [
+        "54:9F:35:F6:70:70"
+      ],
+      "cpu": "32",
+      "memory": "98304",
+      "disk": "130",
+      "arch": "x86_64",
+      "pm_user": "root",
+      "pm_addr": "10.19.143.37"
+     }
+  ]
+}
+----
++
+2. Import the node definitions to the Ironic database.
+[source, shell]
+----
+$ openstack baremetal import --json ~/instackenv.json
+
+$ openstack baremetal list
++--------------------------------------+------+---------------+-------------+-----------------+-------------+
+| UUID                                 | Name | Instance UUID | Power State | Provision State | Maintenance |
++--------------------------------------+------+---------------+-------------+-----------------+-------------+
+| 1adc6792-0bd6-4bd2-b8fc-4d9867d74597 | None | None          | power off   | available       | False       |
+| 382ab2a5-b5c0-4017-b59f-82eee0fb9864 | None | None          | power off   | available       | False       |
+| 84efb518-15e6-45c7-8f6a-56a5097c0b85 | None | None          | power off   | available       | False       |
+| 15ca1ded-0914-469f-af63-3340f91bc56a | None | None          | power off   | available       | False       |
+| 8e6c96ad-c039-498d-8bd2-61a489bbae87 | None | None          | power off   | available       | False       |
+| 84e34eb3-2352-49c8-8748-8bc6b6185587 | None | None          | power off   | available       | False       |
+| abb19869-b92f-42b3-9db1-f69f6ee00f2e | None | None          | power off   | available       | False       |
+| db878d37-5b7a-4140-8809-1b50d4ddbec4 | None | None          | power off   | available       | False       |
+| d472af62-5547-4f9a-8fbb-fc8556eb4110 | None | None          | power off   | available       | False       |
+| c8400dc0-4246-44ee-a406-9362381d7ce1 | None | None          | power off   | available       | False       |
+| 0c7af223-1a7d-43cd-a0ff-19226872e09c | None | None          | power off   | available       | False       |
+| 5f52affb-cfe2-49dc-aa89-b57d99e5372a | None | None          | power off   | available       | False       |
++--------------------------------------+------+---------------+-------------+-----------------+-------------+
+----
++
+3. Assign a kernel and ramdisk to the nodes
+[source, shell]
+----
+$ openstack baremetal configure boot
+----
++
+4. Introspect the nodes to discover their hardware attributes.
+[source, shell]
+----
+$ openstack baremetal introspection bulk start
+...
+----
++
+NOTE: Bulk introspection time will vary based on node count and boot
+time. For this reference architecture bulk introspection lasted
+approximately 3 minutes per node.
++
+5. Use *journalctl* to view introspection progress in a separate
+  terminal.
+[source, shell]
+----
+$ sudo journalctl -l -u openstack-ironic-discoverd -u openstack-ironic-discoverd-dnsmasq -u openstack-ironic-conductor | grep -i finished
+Aug 28 09:23:46 rhos0.osplocal ironic-discoverd[22863]:
+INFO:ironic_discoverd.process:Introspection finished successfully for node 1adc6792-0bd6-4bd2-b8fc-4d9867d74597
+Aug 28 09:24:53 rhos0.osplocal ironic-discoverd[22863]:
+INFO:ironic_discoverd.process:Introspection finished successfully for node 84efb518-15e6-45c7-8f6a-56a5097c0b85
+----
++
+6. Verify nodes completed introspection without errors.
+[source, shell]
+----
+$ openstack baremetal introspection bulk status
++--------------------------------------+----------+-------+
+| Node UUID                            | Finished | Error |
++--------------------------------------+----------+-------+
+| 1adc6792-0bd6-4bd2-b8fc-4d9867d74597 | True     | None  |
+| 382ab2a5-b5c0-4017-b59f-82eee0fb9864 | True     | None  |
+| 84efb518-15e6-45c7-8f6a-56a5097c0b85 | True     | None  |
+| 15ca1ded-0914-469f-af63-3340f91bc56a | True     | None  |
+| 8e6c96ad-c039-498d-8bd2-61a489bbae87 | True     | None  |
+| 84e34eb3-2352-49c8-8748-8bc6b6185587 | True     | None  |
+| abb19869-b92f-42b3-9db1-f69f6ee00f2e | True     | None  |
+| db878d37-5b7a-4140-8809-1b50d4ddbec4 | True     | None  |
+| d472af62-5547-4f9a-8fbb-fc8556eb4110 | True     | None  |
+| c8400dc0-4246-44ee-a406-9362381d7ce1 | True     | None  |
+| 0c7af223-1a7d-43cd-a0ff-19226872e09c | True     | None  |
+| 5f52affb-cfe2-49dc-aa89-b57d99e5372a | True     | None  |
++--------------------------------------+----------+-------+-
+----
+
+=== Configure hardware profiles
+
+1. Create the default flavor for baremetal deployments.
++
+[source, shell]
+----
+[stack@rhos0 ~]$ openstack flavor create --id auto --ram 4096 --disk 40 --vcpus 1 baremetal
++----------------------------+--------------------------------------+
+| Field                      | Value                                |
++----------------------------+--------------------------------------+
+| OS-FLV-DISABLED:disabled   | False                                |
+| OS-FLV-EXT-DATA:ephemeral  | 0                                    |
+| disk                       | 40                                   |
+| id                         | e3f8358d-983f-4383-8379-50cbbf5bf970 |
+| name                       | baremetal                            |
+| os-flavor-access:is_public | True                                 |
+| ram                        | 4096                                 |
+| rxtx_factor                | 1.0                                  |
+| swap                       |                                      |
+| vcpus                      | 1                                    |
++----------------------------+--------------------------------------+
+----
+2. Set properties for the baremetal flavor.
++
+[source, shell]
+----
+$ openstack flavor set --property "cpu_arch"="x86_64" --property "capabilities:boot_option"="local" baremetal
++----------------------------+-----------------------------------------------------+
+| Field                      | Value
++----------------------------+-----------------------------------------------------+
+| OS-FLV-DISABLED:disabled   | False
+| OS-FLV-EXT-DATA:ephemeral  | 0
+| disk                       | 40
+| id                         | e3f8358d-983f-4383-8379-50cbbf5bf970
+| name                       | baremetal
+| os-flavor-access:is_public | True
+| properties                 | capabilities:boot_option='local', cpu_arch='x86_64' |
+| ram                        | 4096
+| rxtx_factor                | 1.0
+| swap                       |
+| vcpus                      | 1
++----------------------------+-----------------------------------------------------+
+----
+3. Install _ahc-tools_.
++
+[source, shell]
+----
+$ sudo yum install -y -q ahc-tools
+
+$ sudo rpm -qa | grep ahc-tools
+ahc-tools-0.1.1-5.el7ost.noarch
+----
+4. Create the AHC configuration file.
++
+[source, shell]
+----
+$ sudo cp /etc/ironic-discoverd/discoverd.conf
+/etc/ahc-tools/ahc-tools.conf
+
+$ sudo sed -i 's/\[discoverd/\[ironic/'
+/etc/ahc-tools/ahc-tools.conf
+
+$ sudo chmod 0600 /etc/ahc-tools/ahc-tools.conf
+
+$ sudo cat /etc/ahc-tools/ahc-tools.conf
+[ironic]
+debug = false
+os_auth_url = http://192.0.2.1:5000/v2.0
+identity_uri = http://192.0.2.1:35357
+os_username = ironic
+os_password = d5ba7515326d740725ea74bf0aec65fb079c0e19
+os_tenant_name = service
+dnsmasq_interface = br-ctlplane
+database = /var/lib/ironic-discoverd/discoverd.sqlite
+ramdisk_logs_dir = /var/log/ironic-discoverd/ramdisk/
+processing_hooks =
+ramdisk_error,root_device_hint,scheduler,validate_interfaces,edeploy
+enable_setting_ipmi_credentials = true
+keep_ports = added
+ironic_retry_attempts = 6
+ironic_retry_period = 10
+
+[swift]
+username = ironic
+password = d5ba7515326d740725ea74bf0aec65fb079c0e19
+tenant_name = service
+os_auth_url = http://192.0.2.1:5000/v2.0
+----
+5. Create the AHC spec files.
++
+[source, shell]
+----
+[stack@rhos0 ~]$ for i in $(ls /etc/ahc-tools/edeploy/{*.specs,state}); do echo $i && cat $i; done
+/etc/ahc-tools/edeploy/ceph.specs
+[
+  ('disk', '$disk', 'size', 'gt(400)'),
+]
+/etc/ahc-tools/edeploy/compute.specs
+[
+ ('cpu', '$cpu', 'cores', '8'),
+  ('memory', 'total', 'size', 'ge(64000000000)'),
+]
+/etc/ahc-tools/edeploy/control.specs
+[
+ ('cpu', '$cpu', 'cores', '8'),
+('disk', '$disk', 'size', 'gt(100)'),
+ ('memory', 'total', 'size', 'ge(64000000000)'),
+ ]
+/etc/ahc-tools/edeploy/state
+[('control', '3'), ('ceph', '4'), ('compute', '*')]
+----
+This configuration defines:
++
+* Minimum disk size of 400 GB for Ceph servers
+* 8 cores per CPU and 64 GB RAM for compute nodes
+* 8 cores per CPU, minimum 100 GB disk size and 64 GB RAM for
+  controllers
+* The state file specifies that AHC should match 3 controllers, 4 Ceph
+  storage servers, and the remainder as compute nodes. 
++
+NOTE: Servers are matched to profiles by the order they are listed in this file.
+6. This loop creates a hardware profile for each node type degined in
+   the state file.
++
+[source, shell]
+----
+$ for i in ceph control compute; do openstack flavor create --id auto --ram 4096 --disk 40 --vcpus 1 $i; openstack flavor set --property "cpu_arch"="x86_64" --property
+"capabilities:boot_option"="local" --property "capabilities:profile"="$i" $i; done
+...
+$ openstack flavor list
++--------------------------------------+-----------+------+------+-----------+-------+-----------+
+| ID                                   | Name      |  RAM | Disk | Ephemeral | VCPUs | Is Public |
++--------------------------------------+-----------+------+------+-----------+-------+-----------+
+| 3bd3c59f-16c4-4090-94b5-0d90e1f951fa | compute   | 4096 |   40 | 0         |     1 | True      |
+| 9a9c0a68-550a-4736-9b6d-f4aa1cc68a1f | ceph      | 4096 |   40 | 0         |     1 | True      |
+| a3d47c7e-04dc-47e3-8fca-b19ea31d0ed2 | control   | 4096 |   40 | 0         |     1 | True      |
+| e3f8358d-983f-4383-8379-50cbbf5bf970 | baremetal | 4096 |   40 | 0         |     1 | True      |
++--------------------------------------+-----------+------+------+-----------+-------+-----------+
+----
+7. Assign Ironic nodes to profiles and view the results.
++
+[source, shell]
+----
+$ sudo ahc-match
+
+$ for i in $(ironic node-list | awk ' /available/ { print $2 } '); do ironic node-show $i | grep capabilities; done
+|                        | u'cpus': u'24', u'capabilities':u'profile:ceph,boot_option:local'}   |
+|                        | u'cpus': u'24', u'capabilities':u'profile:ceph,boot_option:local'}   |
+|                        | u'cpus': u'24', u'capabilities':u'profile:ceph,boot_option:local'}   |
+|                        | u'cpus': u'24', u'capabilities':u'profile:ceph,boot_option:local'}   |
+|                        | u'cpus': u'32', u'capabilities':u'profile:control,boot_option:local'}  |
+|                        | u'cpus': u'32', u'capabilities':u'profile:control,boot_option:local'}  |
+|                        | u'cpus': u'32', u'capabilities':u'profile:control,boot_option:local'}  |
+|                        | u'cpus': u'32', u'capabilities':u'profile:compute,boot_option:local'}  |
+|                        | u'cpus': u'32', u'capabilities':u'profile:compute,boot_option:local'}  |
+|                        | u'cpus': u'32', u'capabilities':u'profile:compute,boot_option:local'}  |
+|                        | u'cpus': u'32', u'capabilities':u'profile:compute,boot_option:local'}  |
+|                        | u'cpus': u'32', u'capabilities':u'profile:compute,boot_option:local'}  |
+----
++
+In this example, the 4 R510 servers are assigned to ceph, 3 M520
+servers are assigned to control, and the remained are assigned to
+compute.
+8. Set the provisioning network nameserver. The overcloud servers
+   users this nameserver for DNS resolution.
++
+[source, shell]
+----
+$ neutron subnet-update $(neutron subnet-list | awk ' /192.0.2/ { print $2 } ') --dns-nameserver 10.19.143.247
+
+$ neutron subnet-show $(neutron subnet-list | awk ' /192.0.2/ { print $2 } ') | grep -B 1 nameserver
+| cidr              | 192.0.2.0/24
+| dns_nameservers   | 10.19.143.247 
+----
+
+=== Configure network isolation
+This section describes how to configure network isolation.
+configuration for the reference architecture. Configure network
+isolation by defining networks in environment files. Pass the
+environment files to Heat.
+
+The network isolation environment files used in this section produce
+the network described in <<reference-architecture-diagram>>.
+
+1. Define isolated networks in  _network-environment.yaml_.
++
+[source, ruby, numbered]
+----
+resource_registry:
+  OS::TripleO::BlockStorage::Net::SoftwareConfig:/home/stack/nic-configs/cinder-storage.yaml
+  OS::TripleO::Compute::Net::SoftwareConfig:/home/stack/nic-configs/compute.yaml
+  OS::TripleO::Controller::Net::SoftwareConfig:/home/stack/nic-configs/controller.yaml
+  OS::TripleO::ObjectStorage::Net::SoftwareConfig:/home/stack/nic-configs/swift-storage.yaml
+  OS::TripleO::CephStorage::Net::SoftwareConfig:/home/stack/nic-configs/ceph-storage.yaml
+
+parameters:
+  NeutronExternalNetworkBridge: "br-ex"
+
+parameter_defaults:
+  InternalApiNetCidr: 172.16.1.0/24
+  StorageNetCidr: 172.16.2.0/24
+  StorageMgmtNetCidr: 172.16.3.0/24
+  TenantNetCidr: 172.16.4.0/24
+  ExternalNetCidr: 10.19.136.0/21
+  InternalApiAllocationPools: [{'start':'172.16.1.10', 'end': '172.16.1.100'}]
+  StorageAllocationPools: [{'start':'172.16.2.10', 'end': '172.16.2.200'}]
+  StorageMgmtAllocationPools: [{'start':'172.16.3.10', 'end': '172.16.3.200'}]
+  TenantAllocationPools: [{'start':'172.16.4.10', 'end': '172.16.4.200'}]
+  ExternalAllocationPools: [{'start':'10.19.137.121', 'end':'10.19.137.151'}]
+  InternalApiNetworkVlanID: 4041
+  StorageNetworkVlanID: 4042
+  StorageMgmtNetworkVlanID: 4043
+  TenantNetworkVlanID: 4044
+  ExternalNetworkVlanID: 168
+  ExternalInterfaceDefaultRoute: "10.19.143.254"
+  BondInterfaceOvsOptions:
+    "bond_mode=balance-tcp lacp=active other-config:lacp-fallback-ab=true"
+----
++
+The _resource_registery_ section defines role-specific configuration.
+These files are created in subsequent steps.
++
+The _parameters_ section names the external network bridge created by
+Open vSwitch.
++
+The _parameter_defaults_ section defines default parameters used
+across the resource registry. These include CIDRs, VLAN IDs, and IP
+allocation pools for each network.
++
+The parameters defined in this file match the network configuration
+used in the reference architecture.
++
+2. Create the _nic-configs_ files to define network configuration for
+   each interface by server role.
++
+----
+$ mkdir ~/nic-configs
+
+$ ls ~/nic-configs
+ceph-storage.yaml  cinder-storage.yaml  compute.yaml  controller.yaml swift-storage.yaml
+----
+Complete examples of each network configuration file are in
+<<Appendix-nic-configs>>.
++
+NOTE: Swift and Cinder servers are not used in this reference
+architecture. Their files are included for completeness but not called
+by the installer.
++
+3. Set the provisioning network nameserver. The overcloud servers use
++
+[source, shell]
+----
+$ neutron subnet-update $(neutron subnet-list | awk ' /192.0.2/ { print $2 } ') --dns-nameserver 10.19.143.247
+----
+
+=== Customize Ceph Storage
+Like network isolation, Ceph is customized by passing Heat additional
+environment files. The customization produce the Ceph cluster depicted
+in the <<ceph-integration,Ceph integration graphic>>.
+
+In this reference architecture ten SAS disks in each R510 are
+configured as OSD drives. The log file for each OSD is created as a
+separate partition on the OSD drive. This is the recommended log
+configuration for Ceph OSDs when SSD drives are not used.
+
+1. Configure Ceph OSD disks as single-drive RAID 0 virtual disks for
+   best performance. Ceph data is protected through replication across
+   OSDs so RAID is not recommended.
+2. Initialize the virtual disks to remove all partition and MBR data.
+3. Create a _templates_ directory for Heat template customization.
++
+[source, shell]
+----
+$ mkdir ~/templates
+
+$ cp -rp /usr/share/openstack-tripleo-heat-templates/ ~/templates
+----
+4. Edit
+   _~/templates/openstack-tripleo-heat-templates/puppet/hieradata/ceph.yaml_
+   to include the Ceph custiomizations. This example includes the
+   additional OSDs accepting the Puppet defaults for logging.
+[source, ruby, numbered]
+----
+ceph::profile::params::osd_journal_size: 1024
+ceph::profile::params::osd_pool_default_pg_num: 128
+ceph::profile::params::osd_pool_default_pgp_num: 128
+ceph::profile::params::osd_pool_default_size: 3
+ceph::profile::params::osd_pool_default_min_size: 1
+ceph::profile::params::osds: 
+  '/dev/sdb':
+    journal: {}
+  '/dev/sdc':
+    journal: {}
+  '/dev/sdd':
+    journal: {}
+  '/dev/sde':
+    journal: {}
+  '/dev/sdf':
+    journal: {}
+  '/dev/sdg':
+    journal: {}
+  '/dev/sdh':
+    journal: {}
+  '/dev/sdi':
+    journal: {}
+  '/dev/sdj':
+    journal: {}
+  '/dev/sdk':
+    journal: {}
+ceph::profile::params::manage_repo: false
+ceph::profile::params::authentication_type: cephx
+
+ceph_pools:
+- volumes
+- vms
+- images
+
+ceph_osd_selinux_permissive: true
+----
+
+NOTE: By default Ceph creates one OSD per storage server using the remaining
+free space on the operating system disk. The OSD log file is
+configured as a 5 GB file on the disk. This configuration is only
+suitable for evaluation and proof of concept.
+
+<<<
+== Deploy and Test the overcloud
+This section describes how to deploy and test the overcloud defined in
+the previous section.
+
+=== Deploy the Overcloud servers
+1. Use *ironic node-list* to verify all Ironic nodes are powered off,
+   available for provisioning, and not in maintenance mode.
++
+[source, shell]
+----
+$ ironic node-list
++--------------------------------------+------+---------------+-------------+-----------------+-------------+
+| UUID                                 | Name | Instance UUID | Power State | Provision State | Maintenance |
++--------------------------------------+------+---------------+-------------+-----------------+-------------+
+| 1adc6792-0bd6-4bd2-b8fc-4d9867d74597 | None | None          | power off   | available       | False       |
+| 382ab2a5-b5c0-4017-b59f-82eee0fb9864 | None | None          | power off   | available       | False       |
+| 84efb518-15e6-45c7-8f6a-56a5097c0b85 | None | None          | power off   | available       | False       |
+| 15ca1ded-0914-469f-af63-3340f91bc56a | None | None          | power off   | available       | False       |
+| 8e6c96ad-c039-498d-8bd2-61a489bbae87 | None | None          | power off   | available       | False       |
+| 84e34eb3-2352-49c8-8748-8bc6b6185587 | None | None          | power off   | available       | False       |
+| abb19869-b92f-42b3-9db1-f69f6ee00f2e | None | None          | power off   | available       | False       |
+| db878d37-5b7a-4140-8809-1b50d4ddbec4 | None | None          | power off   | available       | False       |
+| d472af62-5547-4f9a-8fbb-fc8556eb4110 | None | None          | power off   | available       | False       |
+| c8400dc0-4246-44ee-a406-9362381d7ce1 | None | None          | power off   | available       | False       |
+| 0c7af223-1a7d-43cd-a0ff-19226872e09c | None | None          | power off   | available       | False       |
+| 5f52affb-cfe2-49dc-aa89-b57d99e5372a | None | None          | power off   | available       | False       |
++--------------------------------------+------+---------------+-------------+-----------------+-------------+
+----
+2. Deploy the overcloud.
++
+[source, shell]
+----
+$ openstack overcloud deploy -e /usr/share/openstack-tripleo-heat-templates/environments/network-isolation.yaml 
+-e /home/stack/network-environment.yaml --control-flavor control --compute-flavor compute --ceph-storage-flavor ceph 
+--ntp-server 10.16.255.2 --control-scale 3 --compute-scale 4 --ceph-storage-scale 4 --block-storage-scale 0 --swift-storage-scale 0 
+-t 90 --templates /home/stack/templates/openstack-tripleo-heat-templates/ 
+-e /usr/share/openstack-tripleo-heat-templates/environments/storage-environment.yaml 
+--rhel-reg --reg-method satellite --reg-sat-url http://se-sat6.syseng.bos.redhat.com --reg-org syseng --reg-activation-key OSP-Overcloud
+Deploying templates in the directory /home/stack/templates/openstack-tripleo-heat-templates
+----
+This lengthy command does the following:
++
+* Specifies the location of _network-environment.yaml_ to customize
+  the network conigurations.
+* Specifies which flavors and how many control, compute, and
+  ceph-storage nodes to instantiate.
+* Specifies the location of the _storage-environment.yaml_ for Ceph
+  customization.
+* Registers the overcloud servers with the lab satellite server using a
+  pre-defined activation key.
+3. Watch deployment progress in a separate console window.
++
+[source, shell]
+----
+$ heat resource-list overcloud | grep CREATE_COMPLETE
+| BlockStorage                      | 8565b42e-0b24-41ec-88d3-7d0d6bc18834 | OS::Heat::ResourceGroup | CREATE_COMPLETE | 2015-08-28T16:25:53Z |
+| ControlVirtualIP                  | c4926ff9-2ea7-40f1-9677-d7f26e3517db | OS::Neutron::Port | CREATE_COMPLETE    | 2015-08-28T16:25:53Z |
+| HeatAuthEncryptionKey             | overcloud-HeatAuthEncryptionKey-paa5lxc3ubon  | OS::Heat::RandomString | CREATE_COMPLETE    | 2015-08-28T16:25:53Z |
+| HorizonSecret                     | overcloud-HorizonSecret-mpgdt65yqsud          | OS::Heat::RandomString | CREATE_COMPLETE    | 2015-08-28T16:25:53Z |
+...
+----
+4. Run *nova-list* to view IP addresses for the overcloud servers.
++
+[source, shell]
+----
+$ nova list
++--------------------------------------+-------------------------+--------+------------+-------------+---------------------+
+| ID                                   | Name                    | Status | Task State | Power State | Networks            |
++--------------------------------------+-------------------------+--------+------------+-------------+---------------------+
+| e50a67fa-ed75-4f39-a58f-47b51371f61d | overcloud-cephstorage-0 | ACTIVE | -          | Running     | ctlplane=192.0.2.20 |
+| e36b2f28-463c-4e01-91e0-8ed762a1c057 | overcloud-cephstorage-1 | ACTIVE | -          | Running     | ctlplane=192.0.2.21 |
+| 37c67128-8432-4330-afe7-ab3b01bdcb6e | overcloud-cephstorage-2 | ACTIVE | -          | Running     | ctlplane=192.0.2.19 |
+| 3ee07cc2-9adf-457f-94e6-705657ac3767 | overcloud-cephstorage-3 | ACTIVE | -          | Running     | ctlplane=192.0.2.22 |
+| e1f2801b-cb6e-4c55-a82a-476d0090f1d6 | overcloud-compute-0     | ACTIVE | -          | Running     | ctlplane=192.0.2.8  |
+| 17be9669-247b-434f-9ad2-8ab59740c1e9 | overcloud-compute-1     | ACTIVE | -          | Running     | ctlplane=192.0.2.23 |
+| be30827b-e3b4-4504-8afb-fe5ea42fda54 | overcloud-compute-2     | ACTIVE | -          | Running     | ctlplane=192.0.2.7  |
+| 6a2ee7e1-31b8-48da-b56b-0834ac6bf3b4 | overcloud-compute-3     | ACTIVE | -          | Running     | ctlplane=192.0.2.24 |
+| 520c5af6-fc91-4b93-bb95-93f947a7cc71 | overcloud-controller-0  | ACTIVE | -          | Running     | ctlplane=192.0.2.9  |
+| 23a2de54-e3c9-4c1d-aaff-75ef5993b7af | overcloud-controller-1  | ACTIVE | -          | Running     | ctlplane=192.0.2.6  |
+| 2afb18d3-3494-41da-951a-b72d68b4bf88 | overcloud-controller-2  | ACTIVE | -          | Running     | ctlplane=192.0.2.10 |
++--------------------------------------+-------------------------+--------+------------+-------------+---------------------+
+----
++
+5. Source the overcloudrc file to set environment variables for the overcloud.
+6. Verify all Nova services and enabled and up.
++
+[source, shell]
+----
+$ nova service-list
++-----+------------------+------------------------------------+----------+---------+-------+----------------------------+-----------------+
+| Id  | Binary           | Host                               | Zone     | Status  | State | Updated_at                 | Disabled Reason |
++-----+------------------+------------------------------------+----------+---------+-------+----------------------------+-----------------+
+| 3   | nova-scheduler   | overcloud-controller-0.localdomain | internal | enabled | up    | 2015-08-28T21:56:01.000000 | -               |
+| 6   | nova-scheduler   | overcloud-controller-2.localdomain | internal | enabled | up    | 2015-08-28T21:56:03.000000 | -               |
+| 9   | nova-scheduler   | overcloud-controller-1.localdomain | internal | enabled | up    | 2015-08-28T21:56:04.000000 | -               |
+| 12  | nova-consoleauth | overcloud-controller-1.localdomain | internal | enabled | up    | 2015-08-28T21:56:03.000000 | -               |
+| 15  | nova-consoleauth | overcloud-controller-2.localdomain | internal | enabled | up    | 2015-08-28T21:56:03.000000 | -               |
+| 18  | nova-consoleauth | overcloud-controller-0.localdomain | internal | enabled | up    | 2015-08-28T21:56:04.000000 | -               |
+| 21  | nova-conductor   | overcloud-controller-2.localdomain | internal | enabled | up    | 2015-08-28T21:55:57.000000 | -               |
+| 57  | nova-conductor   | overcloud-controller-0.localdomain | internal | enabled | up    | 2015-08-28T21:55:57.000000 | -               |
+| 105 | nova-conductor   | overcloud-controller-1.localdomain | internal | enabled | up    | 2015-08-28T21:55:58.000000 | -               |
+| 123 | nova-compute     | overcloud-compute-1.localdomain    | nova     | enabled | up    | 2015-08-28T21:55:59.000000 | -               |
+| 126 | nova-compute     | overcloud-compute-0.localdomain    | nova     | enabled | up    | 2015-08-28T21:55:59.000000 | -               |
+| 129 | nova-compute     | overcloud-compute-2.localdomain    | nova     | enabled | up    | 2015-08-28T21:55:57.000000 | -               |
+| 132 | nova-compute     | overcloud-compute-3.localdomain    | nova     | enabled | up    | 2015-08-28T21:55:57.000000 | -               |
++-----+------------------+------------------------------------+----------+---------+-------+----------------------------+-----------------+
+----
+7. Verify all Neutron agents are alive and up.
++
+[source, shell]
+----
+$ neutron agent-list
++--------------------------------------+--------------------+------------------------------------+-------+----------------+---------------------------+
+| id                                   | agent_type         | host                               | alive | admin_state_up | binary                    |
++--------------------------------------+--------------------+------------------------------------+-------+----------------+---------------------------+
+| 2034c620-e2be-4fc3-8c7e-878125cccb46 | Open vSwitch agent | overcloud-compute-3.localdomain    | :-)   | True           | neutron-openvswitch-agent |
+| 290a09bb-9878-4661-9c55-dee4c53f103c | Metadata agent     | overcloud-controller-2.localdomain | :-)   | True           | neutron-metadata-agent    |
+| 369ef1fd-992a-462a-8569-128c329cf7b1 | Open vSwitch agent | overcloud-compute-2.localdomain    | :-)   | True           | neutron-openvswitch-agent |
+| 42b35c58-dda0-4e55-b53f-5f7466acdac5 | Open vSwitch agent | overcloud-compute-0.localdomain    | :-)   | True           | neutron-openvswitch-agent |
+| 45b4e429-1ad7-4678-aa8b-bc8afa8761ea | DHCP agent         | overcloud-controller-1.localdomain | :-)   | True           | neutron-dhcp-agent        |
+| 91ff4990-6080-4fd2-98c2-b69cb5ea3d79 | L3 agent           | overcloud-controller-0.localdomain | :-)   | True           | neutron-l3-agent          |
+| 92ba4b2e-452f-49bb-9ec5-06a95c0b62b5 | DHCP agent         | overcloud-controller-0.localdomain | :-)   | True           | neutron-dhcp-agent        |
+| 9697e2eb-edd3-4b84-8621-b1564208db5b | Open vSwitch agent | overcloud-controller-1.localdomain | :-)   | True           | neutron-openvswitch-agent |
+| 9ca0d604-4341-4c5f-be01-d03d870412d5 | Metadata agent     | overcloud-controller-1.localdomain | :-)   | True           | neutron-metadata-agent    |
+| a2055a30-8f81-4ec3-9e91-354837a9b1d2 | Open vSwitch agent | overcloud-controller-0.localdomain | :-)   | True           | neutron-openvswitch-agent |
+| b2548f09-a200-4f35-bc57-c8b0abe4e540 | Open vSwitch agent | overcloud-controller-2.localdomain | :-)   | True           | neutron-openvswitch-agent |
+| cd30d121-d2c2-4f1e-95ba-653624713735 | Metadata agent     | overcloud-controller-0.localdomain | :-)   | True           | neutron-metadata-agent    |
+| d0aae869-e091-471a-a3cb-9890b1fac770 | Open vSwitch agent | overcloud-compute-1.localdomain    | :-)   | True           | neutron-openvswitch-agent |
+| e683f35d-b49a-465d-a2db-276fa45f6550 | DHCP agent         | overcloud-controller-2.localdomain | :-)   | True           | neutron-dhcp-agent        |
+| f16a2429-6ff7-4435-8ea0-cb52ae1f96fa | L3 agent           | overcloud-controller-2.localdomain | :-)   | True           | neutron-l3-agent          |
+| f5d5d3f5-7f06-4917-84f2-7dca96577e91 | L3 agent           | overcloud-controller-1.localdomain | :-)   | True           | neutron-l3-agent          |
++--------------------------------------+--------------------+------------------------------------+-------+----------------+---------------------------+
+----
+8. *ssh* to a controller node and switch to root user. 
++
+[source, shell]
+----
+$ ssh -l heat-admin 192.0.2.9
+The authenticity of host '192.0.2.9 (192.0.2.9)' can't be established.
+ECDSA key fingerprint is fe:a3:da:94:36:37:de:76:68:71:e0:70:cb:3a:00:aa.
+Are you sure you want to continue connecting (yes/no)? yes
+Warning: Permanently added '192.0.2.9' (ECDSA) to the list of known hosts.
+
+$ sudo -i
+----
+9. Run *pcs status* to verify OpenStack services started correctly.
++
+NOTE: Run *pcs resource cleanup* if any of the services are not fully
+started.
++
+[source, shell]
+----
+pcs status
+Cluster name: tripleo_cluster
+Last updated: Fri Aug 28 17:47:31 2015
+Last change: Fri Aug 28 15:28:39 2015
+Stack: corosync
+Current DC: overcloud-controller-1 (2) - partition with quorum
+Version: 1.1.12-a14efad
+3 Nodes configured
+112 Resources configured
+
+Online: [ overcloud-controller-0 overcloud-controller-1 overcloud-controller-2 ]
+
+Full list of resources:
+
+ Clone Set: haproxy-clone [haproxy]
+     Started: [ overcloud-controller-0 overcloud-controller-1 overcloud-controller-2 ]
+ip-172.16.1.11 (ocf::heartbeat:IPaddr2): Started overcloud-controller-0 
+ip-10.19.137.121  (ocf::heartbeat:IPaddr2): Started overcloud-controller-1 
+...
+----
+NOTE: Appendix ?? contains a complete list of pacemaker resources.
+
+=== Tune Ceph storage
+This section includes steps for increasing the number of Placement
+Groups (PGs) per pool.
+http://ceph.com/docs/master/rados/operations/placement-groups/[Ceph
+Placement Groups (PGs)] aggregate objects 
+within pools. PGs within a pool are distributed across OSDs for data 
+durability and performance. By default OSP director creates 4 pools 
+with 64 PGs and 3 replicas per pool. There are 40 OSDs which leaves 
+19.2 PGs per OSD. Ceph recommends at least 30 PGs per OSD.
+
+Each pool has two properties that dictate its number of placement groups: 
+_pg_num_ (number of placement groups) and _pgp_num_ (number of PGs for
+placement on OSD.)  At the time of writing, customizing _pg_num_ 
+in _ceph.yaml_ prior to deployment was not working. See
+https://bugzilla.redhat.com/show_bug.cgi?id=1252546[BZ1252546] for details.
+Therefore, this reference architecture manually inceases _pg_num_ and _pgp_num_
+to Ceph recommendations.
+
+1. *ssh* to a ceph node and switch to root user. 
++
+[source, shell]
+----
+$ ssh -l heat-admin 192.0.2.20
+Last login: Fri Aug 28 17:58:30 2015 from 192.0.2.1
+
+$ sudo -i
+----
+2. Run *ceph -s* to verify all OSDs are up and in, pool count, and
+   total free space.
++
+[source, shell]
+----
+# ceph -s
+ cluster 7ced0d2a-4db6-11e5-86a4-90b11c56332a
+ health HEALTH_WARN too few PGs per OSD (19 < min 30)
+ monmap e2: 3 mons at {overcloud-controller-0=172.16.2.16:6789/0,overcloud-controller-1=172.16.2.15:6789/0,overcloud-controller-2=172.16.2.21:6789/0}
+        
+        election epoch 6, quorum 0,1,2 overcloud-controller-1,overcloud-controller-0,overcloud-controller-2
+ osdmap e82: 40 osds: 40 up, 40 in
+  pgmap v120: 256 pgs, 4 pools, 0 bytes data, 0 objects
+        201 GB used, 37020 GB / 37221 GB avail
+        256 active+clean
+----
+3. List the pools and pool stats. There are four pools configured for
+   object storage, images, block storage, and ephemeral storage. There
+   are 256 PGs total, 64 per pool.
++
+[source, shell]
+----
+# ceph osd lspools
+0 rbd,1 images,2 volumes,3 vms,
+
+# ceph pg stat
+v120: 256 pgs: 256 active+clean; 0 bytes data, 201 GB used, 37020 GB /
+37221 GB avail
+----
+4. View overall Ceph health.
++
+[source, shell]
+----
+# ceph health
+HEALTH_WARN too few PGs per OSD (19 < min 30)
+----
+5. Increase per-pool _pg_num_ and _pgp_num_ to 256.
++
+[source, shell]
+----
+# for i in rbd images volume vms; do 
+ ceph osd pool set $i pg_num 256; 
+ ceph osd pool set $i pgp_num 256;
+done
+set pool 0 pg_num to 256
+set pool 0 pgp_num to 256
+set pool 1 pg_num to 256
+set pool 1 pgp_num to 256
+set pool 2 pg_num to 256
+set pool 2 pgp_num to 256
+set pool 3 pg_num to 256
+set pool 3 pgp_num to 256
+----
+6. Re-run *ceph health* and *ceph pg stat*.
++
+[source, shell]
+----
+# ceph health
+HEALTH_OK
+
+# ceph pg stat
+v180: 1024 pgs: 1024 active+clean; 0 bytes data, 201 GB used, 37020 GB
+/ 37221 GB avail
+----
+
+NOTE: Increase the PGs on only one Ceph node in the cluster.
+
+=== Configure controller fencing
+_Fencing_ is an important concept for HA clusters. It is a method for
+bringing the cluster into a known state by removing members that are
+in an unknown state. In this reference architecture the controller
+IPMI interfaces act as fence devices. However, OSP director does not
+configure fencing. This section describes how the controller nodes were
+manually configured for fencing in this reference architecture.
+
+<<Appendix-contoller_fencing_script>> shows an example script used to
+configure fencing in this reference architecture. This script
+configures each controller nodes IPMI as a fence device, constrains it
+so a controller cannot fence itself, and then enables all fence
+devices.
+
+1. Run *configure_fence.sh*.
++
+[source, shell]
+----
+$ sh 4_oc_fence.sh enable
+Cluster Properties:
+ cluster-infrastructure: corosync
+ cluster-name: tripleo_cluster
+ dc-version: 1.1.12-a14efad
+ have-watchdog: false
+ redis_REPL_INFO: overcloud-controller-1
+ stonith-enabled: true
+----
+2. Verify fence devices are configured with *pcs status*.
++
+[source, shell]
+----
+$ ssh -l heat-admin 192.0.2.9 sudo pcs status | grep -i fence
+ overcloud-controller-0-ipmi  (stonith:fence_ipmilan):  Started overcloud-controller-1 
+ overcloud-controller-1-ipmi (stonith:fence_ipmilan):  Started overcloud-controller-2 
+ overcloud-controller-2-ipmi  (stonith:fence_ipmilan):  Started overcloud-controller-0 
+----
+
+<<<
