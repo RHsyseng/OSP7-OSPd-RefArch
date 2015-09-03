@@ -1,7 +1,4 @@
 [appendix]
-== Revision History
-
-[appendix]
 == References
 
 . http://ceph.com/docs/master/rados/operations/placement-groups/[Ceph
