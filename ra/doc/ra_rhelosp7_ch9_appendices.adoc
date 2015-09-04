@@ -4,6 +4,7 @@
 2. Babak Mozaffari - technical content review (JBOSS EAP)
 3. Dan Sneddon - technical content review (Network isolation)
 4. Keith Schincke - technical content review (Ceph)
+5. Andrew Beekhoff - technical content review (HA)
 
 [appendix]
 == References
