@@ -5,13 +5,8 @@ resource_registry:
   OS::TripleO::ObjectStorage::Net::SoftwareConfig: /home/stack/nic-configs/swift-storage.yaml
   OS::TripleO::CephStorage::Net::SoftwareConfig: /home/stack/nic-configs/ceph-storage.yaml
 
-parameters:
-  # plan based
-  #Controller-1::NeutronExternalNetworkBridge: "br-ex"
-  # template based
-  NeutronExternalNetworkBridge: "br-ex"
-
 parameter_defaults:
+  NeutronExternalNetworkBridge: "br-ex"
   InternalApiNetCidr: 172.16.1.0/24
   StorageNetCidr: 172.16.2.0/24
   StorageMgmtNetCidr: 172.16.3.0/24
