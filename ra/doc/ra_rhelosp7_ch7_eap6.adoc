@@ -59,7 +59,6 @@ the MSA application servers via *ssh*.
 [source%autofit, shell]
 ----
 $ source overcloudrc
-
 $ env | grep OS_
 OS_PASSWORD=009fe566ba853020923a06c67c5c6a05fe7f9877
 OS_AUTH_URL=http://10.19.137.121:5000/v2.0/
@@ -97,9 +96,7 @@ Created a new network:
 +
 [source%autofit, shell]
 ----
-
 $ export ext_net_id=$(neutron net-show ext-net | awk ' / id/ { print $4 } ')
-
 $ echo $ext_net_id
 b1f27b52-6229-41e7-a597-02a070320ab4
 ----
@@ -182,7 +179,6 @@ export OS_CLOUDNAME=overcloud
 export OS_AUTH_URL=${OS_AUTH_URL}
 export PS1='[\u@\h \W(demo_member)]\$ '
 EOF
-
 $ source ~/demorc
 ----
 . Upload a RHEL 7.1 image for the MSA application servers.
@@ -230,9 +226,7 @@ $ openstack image list
 [source%autofit, shell]
 ----
 $ openstack keypair create demokp > ~/demokp.pem
-
 $ chmod 600 ~/demokp.pem
-
 $ openstack keypair list
 +--------+-------------------------------------------------+
 | Name   | Fingerprint                                     |
@@ -267,7 +261,6 @@ $ mkdir ~/templates/lib
 ----
 $ ls templates/
 eapws5_nested.yaml  lib  openstack-tripleo-heat-templates
-
 $ ls templates/lib/
 billing-service.yaml       private_network.yaml  product-service.yaml sales-service.yaml
 presentation-service.yaml  product-db.yaml       sales-db.yaml
@@ -326,9 +319,7 @@ $ nova list
 [source%autofit, shell]
 ----
 $ ssh -l cloud-user -i ~/demokp.pem 10.19.137.146
-
 $ sudo -i
-
 # tail /var/log/cloud-init.log
 Sep  2 23:55:21 localhost cloud-init: 03:55:21,588 INFO [org.jboss.as.server] (ServerService Thread Pool -- 39) JBAS015859:
 Deployed "presentation.war" (runtime-name : "presentation.war")
@@ -344,7 +335,6 @@ NOTE: At the conclusion of _cloud-init_ the Java application
 post-creation configuration can take up to 30 minutes depending on
 network conditions.
 
-
 === Test EAP server
 This section describes a test procedure for the application.
 
@@ -353,9 +343,7 @@ This section describes a test procedure for the application.
 [source%autofit, shell]
 ----
 $ ssh -l cloud-user -i ~/demokp.pem 10.19.137.144
-
 $ sudo -i
-
 # curl http://172.16.5.13:8080/product/products/?featured=true
 [{"sku":10001,"name":"ABC HD32CS5002 32-inch LED TV","description":"HD
 LED Picture Quality<p/>ConnectShare Movie<p/>Wide Color Enhancement<p/>Clear Motion Rate
@@ -370,9 +358,7 @@ Motion Rate 60","length":37,"width":2,"height":22,"weight":20,"featured":true,"a
 [source%autofit, shell]
 ----
 $ ssh -l cloud-user -i ~/demokp.pem 10.19.137.142
-
 $ sudo -i
-
 # mysql -e 'SHOW TABLES' product
 +-------------------+
 | Tables_in_product |
@@ -381,7 +367,6 @@ $ sudo -i
 | PRODUCT_KEYWORD   |
 | Product           |
 +-------------------+
-
 # mount -v | grep mysql
 /dev/vdb on /var/lib/mysql type ext4
 (rw,relatime,seclabel,data=ordered)

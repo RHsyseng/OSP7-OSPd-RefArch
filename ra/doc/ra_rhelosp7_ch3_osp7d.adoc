@@ -251,7 +251,8 @@ Cluster managers offer the following benefits:
 . Deterministic recovery of a complex, multi-machine application stack
 . State awareness of other cluster machines to co-ordinate service
    startup and failover.
-. Shared quorum calculation to determine majority/ TODO: Missing info here?
+. Shared quorum calculation to determine majority set of surviving
+  cluster nodes after a failure.
 . Data integrity through fencing. Machines running a non-responsive
    process are isolated to ensure they are not still responding to
    remote requests. Machines are typically fenced via a remotely
@@ -380,7 +381,8 @@ image::images/HA_COLLAPSED.png[align="center", scaledwidth="80%"]
 
 The following table lists service mode by service.
 
-.Service description
+[[core-cluster-modes]]
+.Core Service Cluster Modes and Description
 [options="header, footer"]
 |====
 |Service|Mode|Description
@@ -398,24 +400,28 @@ active/active mode.
 in `httpd`.
 |*Neutron server*|Active/active|Neutron allows users to define and join
 networks on demand.
-|*Neutron agents*|Active/active/Support Layer 2 and 3 communication
+|*Neutron agents*|Active/active|Support Layer 2 and 3 communication
 plus  numerous virtual networking technologies including `ml2` and `open vswitch`.
 |*Nova*|Active/active|Provides compute capabilities to deploy and run
 virtual machine instances.
 |*Swift proxy server*|Active/active|Routes data requests to the
-appropriate `swift` ACO server.
+appropriate `Swift` ACO server.
 |====
 
 ==== Cluster Modes for Supporting Services
 
-The following tables lists the cluster mode for the non-core OpenStack
+The majority of the core OpenStack services run in active/active mode.
+The same is true for the supporting servicesr, although several of
+them field connection requests directly from clients rather than
+`HAProxy`. The following tables lists the cluster mode for the non-core OpenStack
 services.
 
-.Supporting service description
+[[supporting-cluster-modes]]
+.Supporting Service Cluster Modes and Description
 [options="header, footer"]
 |====
 |Service|Mode|Description
-|*Replicated state database*|Active/passive|`Galera` replicates databases
+|*Replicated state database*|Active/active|`Galera` replicates databases
 to decrease client latency and prevent lost transactions. `Galera` runs
 in active/active mode but connections are only sent to one active node
 at a time to avoid lock contention.
@@ -493,8 +499,8 @@ Consult
 https://access.redhat.com/documentation/en/red-hat-ceph-storage/version-1.3/red-hat-ceph-storage-13-red-hat-ceph-architecture/red-hat-ceph-architecture[Ceph
 documentation] for more information on Ceph 1.3.
 
-Consult this https://access.redhat.com/articles/1370143[reference
-architecture] for more information about running Ceph with OpenStack
-Platform.
+This https://access.redhat.com/articles/1370143[reference
+architecture] details how to install and run Ceph with standalone
+versions of OpenStack Platform.
 
 <<<

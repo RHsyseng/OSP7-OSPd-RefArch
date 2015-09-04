@@ -105,7 +105,6 @@ NOTE: The example below is truncated for brevity.
 [source%autofit, shell]
 ----
 $ openstack baremetal import --json ~/instackenv.json
-
 $ openstack baremetal list
 +--------------------------------------+------+---------------+-------------+-----------------+-------------+
 | UUID                                 | Name | Instance UUID | Power State | Provision State | Maintenance |
@@ -223,7 +222,6 @@ $ openstack flavor set --property "cpu_arch"="x86_64" --property "capabilities:b
 [source%autofit, shell]
 ----
 $ sudo yum install -y -q ahc-tools
-
 $ sudo rpm -qa | grep ahc-tools
 ahc-tools-0.1.1-5.el7ost.noarch
 ----
@@ -319,7 +317,6 @@ $ openstack flavor list
 [source%autofit, shell]
 ----
 $ sudo ahc-match
-
 $ for i in $(ironic node-list | awk ' /available/ { print $2 } '); do ironic node-show $i | grep capabilities; done
 |                        | u'cpus': u'24', u'capabilities':u'profile:ceph,boot_option:local'}   |
 |                        | u'cpus': u'24', u'capabilities':u'profile:ceph,boot_option:local'}   |
@@ -335,7 +332,7 @@ $ for i in $(ironic node-list | awk ' /available/ { print $2 } '); do ironic nod
 |                        | u'cpus': u'32', u'capabilities':u'profile:compute,boot_option:local'}  |
 ----
 +
-In this example, the 4 R510 servers are assigned to ceph, 3 M520
+In this example, the 4 R510 servers are assigned to Ceph, 3 M520
 servers are assigned to control, and the remained are assigned to
 compute.
 8. Set the provisioning network nameserver. The overcloud servers
@@ -370,10 +367,8 @@ resource_registry:
   OS::TripleO::ObjectStorage::Net::SoftwareConfig:/home/stack/nic-configs/swift-storage.yaml
   OS::TripleO::CephStorage::Net::SoftwareConfig:/home/stack/nic-configs/ceph-storage.yaml
 
-parameters:
-  NeutronExternalNetworkBridge: "br-ex"
-
 parameter_defaults:
+  NeutronExternalNetworkBridge: "br-ex"
   InternalApiNetCidr: 172.16.1.0/24
   StorageNetCidr: 172.16.2.0/24
   StorageMgmtNetCidr: 172.16.3.0/24
@@ -407,6 +402,11 @@ allocation pools for each network.
 The parameters defined in this file match the network configuration
 used in the reference architecture.
 +
+NOTE: In most cases NeutronExternalNetworkBridge would be set to "''"
+in order to support multiple floating IP VLANs or physical interfaces. In
+this case there was only one floating IP network on the native VLAN of
+bridge "br-ex", so the bridge was specified directly for performance
+reasons.
 2. Create the _nic-configs_ files to define network configuration for
    each interface by server role.
 +
@@ -699,7 +699,6 @@ to Ceph recommendations.
 ----
 $ ssh -l heat-admin 192.0.2.20
 Last login: Fri Aug 28 17:58:30 2015 from 192.0.2.1
-
 $ sudo -i
 ----
 2. Run *ceph -s* to verify all OSDs are up and in, pool count, and
@@ -726,7 +725,6 @@ $ sudo -i
 ----
 # ceph osd lspools
 0 rbd,1 images,2 volumes,3 vms,
-
 # ceph pg stat
 v120: 256 pgs: 256 active+clean; 0 bytes data, 201 GB used, 37020 GB /
 37221 GB avail
@@ -767,7 +765,6 @@ increase is needed increase  _pg_num_ in stages.
 ----
 # ceph health
 HEALTH_OK
-
 # ceph pg stat
 v180: 1024 pgs: 1024 active+clean; 0 bytes data, 201 GB used, 37020 GB
 / 37221 GB avail
