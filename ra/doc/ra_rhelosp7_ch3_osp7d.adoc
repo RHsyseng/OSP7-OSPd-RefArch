@@ -221,8 +221,7 @@ networking types:
   changes to the network switches and supports more unique network IDs
   than VLAN segmentation.
 . *VXLAN* is an overlay method similar to GRE. VXLAN combines the ease
-  and scalability of GRE with superior performance. It is the default 
-  tenant network type used in OSP director deployments.
+  and scalability of GRE with superior performance. 
 
 Although Red Hat certifies third-party network plug-ins, OSP director 
 uses the ML2 network plugin with the Open vSwitch driver by default. 
