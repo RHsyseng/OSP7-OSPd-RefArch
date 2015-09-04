@@ -202,19 +202,19 @@ $ openstack baremetal introspection bulk status
 ----
 $ openstack flavor set --property "cpu_arch"="x86_64" --property "capabilities:boot_option"="local" baremetal
 +----------------------------+-----------------------------------------------------+
-| Field                      | Value
+| Field                      | Value                                               |
 +----------------------------+-----------------------------------------------------+
-| OS-FLV-DISABLED:disabled   | False
-| OS-FLV-EXT-DATA:ephemeral  | 0
-| disk                       | 40
-| id                         | e3f8358d-983f-4383-8379-50cbbf5bf970
-| name                       | baremetal
-| os-flavor-access:is_public | True
+| OS-FLV-DISABLED:disabled   | False                                               |
+| OS-FLV-EXT-DATA:ephemeral  | 0                                                   |
+| disk                       | 40                                                  |
+| id                         | e3f8358d-983f-4383-8379-50cbbf5bf970                |
+| name                       | baremetal                                           |
+| os-flavor-access:is_public | True                                                |
 | properties                 | capabilities:boot_option='local', cpu_arch='x86_64' |
-| ram                        | 4096
-| rxtx_factor                | 1.0
-| swap                       |
-| vcpus                      | 1
+| ram                        | 4096                                                |
+| rxtx_factor                | 1.0                                                 |
+| swap                       |                                                     |
+| vcpus                      | 1                                                   |
 +----------------------------+-----------------------------------------------------+
 ----
 3. Install _ahc-tools_.
@@ -231,12 +231,14 @@ ahc-tools-0.1.1-5.el7ost.noarch
 ----
 $ sudo cp /etc/ironic-discoverd/discoverd.conf
 /etc/ahc-tools/ahc-tools.conf
-
 $ sudo sed -i 's/\[discoverd/\[ironic/'
 /etc/ahc-tools/ahc-tools.conf
-
 $ sudo chmod 0600 /etc/ahc-tools/ahc-tools.conf
-
+----
+5. View _/etc/ahc-tools/ahc-tools.conf_.
++
+[source%autofit, shell]
+----
 $ sudo cat /etc/ahc-tools/ahc-tools.conf
 [ironic]
 debug = false
@@ -261,7 +263,7 @@ password = d5ba7515326d740725ea74bf0aec65fb079c0e19
 tenant_name = service
 os_auth_url = http://192.0.2.1:5000/v2.0
 ----
-5. Create the AHC spec files.
+6. Create the AHC spec files.
 +
 [source%autofit, shell]
 ----
@@ -294,7 +296,7 @@ This configuration defines:
   storage servers, and the remainder as compute nodes. 
 +
 NOTE: Servers are matched to profiles by the order they are listed in this file.
-6. This loop creates a hardware profile for each node type defined in
+7. This loop creates a hardware profile for each node type defined in
    the state file.
 +
 [source%autofit, shell]
@@ -312,7 +314,7 @@ $ openstack flavor list
 | e3f8358d-983f-4383-8379-50cbbf5bf970 | baremetal | 4096 |   40 | 0         |     1 | True      |
 +--------------------------------------+-----------+------+------+-----------+-------+-----------+
 ----
-7. Assign Ironic nodes to profiles and view the results.
+8. Assign Ironic nodes to profiles and view the results.
 +
 [source%autofit, shell]
 ----
@@ -341,7 +343,6 @@ compute.
 [source%autofit, shell]
 ----
 $ neutron subnet-update $(neutron subnet-list | awk ' /192.0.2/ { print $2 } ') --dns-nameserver 10.19.143.247
-
 $ neutron subnet-show $(neutron subnet-list | awk ' /192.0.2/ { print $2 } ') | grep -B 1 nameserver
 | cidr              | 192.0.2.0/24
 | dns_nameservers   | 10.19.143.247 
@@ -412,7 +413,6 @@ reasons.
 +
 ----
 $ mkdir ~/nic-configs
-
 $ ls ~/nic-configs
 ceph-storage.yaml  cinder-storage.yaml  compute.yaml  controller.yaml swift-storage.yaml
 ----
@@ -449,7 +449,6 @@ configuration for Ceph OSDs when SSD drives are not used.
 [source%autofit, shell]
 ----
 $ mkdir ~/templates
-
 $ cp -rp /usr/share/openstack-tripleo-heat-templates/ ~/templates
 ----
 4. Edit
@@ -643,7 +642,6 @@ The authenticity of host '192.0.2.9 (192.0.2.9)' can't be established.
 ECDSA key fingerprint is fe:a3:da:94:36:37:de:76:68:71:e0:70:cb:3a:00:aa.
 Are you sure you want to continue connecting (yes/no)? yes
 Warning: Permanently added '192.0.2.9' (ECDSA) to the list of known hosts.
-
 $ sudo -i
 ----
 9. Run *pcs status* to verify OpenStack services started correctly.
@@ -653,7 +651,7 @@ started.
 +
 [source%autofit, shell]
 ----
-pcs status
+# pcs status
 Cluster name: tripleo_cluster
 Last updated: Fri Aug 28 17:47:31 2015
 Last change: Fri Aug 28 15:28:39 2015
