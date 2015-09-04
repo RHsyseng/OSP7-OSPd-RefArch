@@ -436,8 +436,8 @@ environment files. The customization produce the Ceph cluster depicted
 in the <<ceph-integration,Ceph integration graphic>>.
 
 In this reference architecture ten SAS disks in each R510 are
-configured as OSD drives. The log file for each OSD is created as a
-separate partition on the OSD drive. This is the recommended log
+configured as OSD drives. The journal for each OSD is created as a
+separate partition on the OSD drive. This is the recommended journal
 configuration for Ceph OSDs when SSD drives are not used.
 
 1. Configure Ceph OSD disks as single-drive RAID 0 virtual disks for
@@ -455,7 +455,7 @@ $ cp -rp /usr/share/openstack-tripleo-heat-templates/ ~/templates
 4. Edit
    _~/templates/openstack-tripleo-heat-templates/puppet/hieradata/ceph.yaml_
    to include the Ceph custiomizations. This example includes the
-   additional OSDs accepting the Puppet defaults for logging.
+   additional OSDs accepting the Puppet defaults for journalling.
 [source%autofit, ruby, numbered]
 ----
 ceph::profile::params::osd_journal_size: 1024
@@ -496,7 +496,7 @@ ceph_osd_selinux_permissive: true
 ----
 
 NOTE: By default Ceph creates one OSD per storage server using the remaining
-free space on the operating system disk. The OSD log file is
+free space on the operating system disk. The OSD journal is
 configured as a 5 GB file on the disk. This configuration is only
 suitable for evaluation and proof of concept.
 
@@ -693,7 +693,7 @@ https://bugzilla.redhat.com/show_bug.cgi?id=1252546[BZ1252546] for details.
 Therefore, this reference architecture manually inceases _pg_num_ and _pgp_num_
 to Ceph recommendations.
 
-1. *ssh* to a ceph node and switch to root user. 
+1. *ssh* to a Ceph OSD node and switch to root user. 
 +
 [source%autofit, shell]
 ----
@@ -744,7 +744,9 @@ HEALTH_WARN too few PGs per OSD (19 < min 30)
 ----
 # for i in rbd images volume vms; do 
  ceph osd pool set $i pg_num 256; 
+ sleep 10
  ceph osd pool set $i pgp_num 256;
+ sleep 10
 done
 set pool 0 pg_num to 256
 set pool 0 pgp_num to 256
@@ -755,6 +757,10 @@ set pool 2 pgp_num to 256
 set pool 3 pg_num to 256
 set pool 3 pgp_num to 256
 ----
++
+NOTE: The *sleep* statements are intended to ensure the cluster has
+time to complete the previous action before proceeding. If a large
+increase is needed increase  _pg_num_ in stages.
 6. Re-run *ceph health* and *ceph pg stat*.
 +
 [source%autofit, shell]
