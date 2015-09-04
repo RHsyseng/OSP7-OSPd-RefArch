@@ -44,12 +44,12 @@ Status:       Subscribed
 Loaded plugins: langpacks, product-id, rhnplugin, subscription-manager
 This system is receiving updates from RHN Classic or Red Hat
 Satellite.
-repo id                                                         repo name status
-!rhel-7-server-extras-rpms/x86_64                               Red Hat Enterprise Linux 7 Server - Extras (RPMs) 89
-!rhel-7-server-openstack-7.0-rpms/7Server/x86_64                Red Hat OpenStack 7.0 for RHEL 7 (RPMs) 497
-!rhel-7-server-optional-rpms/7Server/x86_64                     Red Hat Enterprise Linux 7 Server - Optional (RPMs) 5,674
-!rhel-7-server-rpms/7Server/x86_64                              Red Hat Enterprise Linux 7 Server (RPMs) 7,392
-rhel-x86_64-server-7                                            Red Hat Enterprise Linux Server (v. 7 for 64-bit x86_64) 7,424
+repo id                                                        repo name status
+rhel-7-server-extras-rpms/x86_64                               Red Hat Enterprise Linux 7 Server - Extras (RPMs) 89
+rhel-7-server-openstack-7.0-rpms/7Server/x86_64                Red Hat OpenStack 7.0 for RHEL 7 (RPMs) 497
+rhel-7-server-optional-rpms/7Server/x86_64                     Red Hat Enterprise Linux 7 Server - Optional (RPMs) 5,674
+rhel-7-server-rpms/7Server/x86_64                              Red Hat Enterprise Linux 7 Server (RPMs) 7,392
+rhel-x86_64-server-7                                           Red Hat Enterprise Linux Server (v. 7 for 64-bit x86_64) 7,424
 repolist: 21,076
 ----
 +
@@ -265,8 +265,18 @@ $ neutron quota-show
 ----
 $ sudo openstack-config --set /etc/nova/nova.conf DEFAULT rpc_response_timeout 600
 $ sudo openstack-config --set /etc/ironic/ironic.conf DEFAULT rpc_response_timeout 600
+----
+10. Restart `nova` and `ironic` for the changes to take effect.
++
+[source%autofit, shell]
+----
 $ sudo openstack-service restart nova
 $ sudo openstack-service restart ironic
+----
+11. Verify the services started successfully.
++
+[source%autofit, shell]
+----
 $ sudo openstack-service status | grep -E 'ironic|nova'
 openstack-ironic-api (pid 22864) is active
 openstack-ironic-conductor (pid 22873) is active
@@ -277,6 +287,11 @@ openstack-nova-compute (pid 22586) is active
 openstack-nova-conductor (pid 22601) is active
 openstack-nova-consoleauth (pid 22605) is active
 openstack-nova-scheduler (pid 22600) is active
+----
+12. Verify the timeout values are set correctly.
++
+[source%autofit, shell]
+----
 $ sudo openstack-config --get /etc/nova/nova.conf DEFAULT rpc_response_timeout
 600
 $ sudo openstack-config --get /etc/ironic/ironic.conf DEFAULT rpc_response_timeout

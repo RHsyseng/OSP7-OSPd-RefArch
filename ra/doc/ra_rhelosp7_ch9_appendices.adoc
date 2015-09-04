@@ -1,4 +1,11 @@
 [appendix]
+== Contributors
+1. Roger Lopez - Content review, technical content review (OSP)
+2. Babak Mozaffari - technical content review (JBOSS EAP)
+3. Dan Sneddon - technical content review (Network isolation)
+4. Keith Schincke - technical content review (Ceph)
+
+[appendix]
 == References
 
 . http://ceph.com/docs/master/rados/operations/placement-groups/[Ceph
@@ -66,18 +73,17 @@ Corporation OneConnect 10Gb NIC, 6 x DDR3 8192 MB @1333 MHZ DIMMs, 12x
 
 [appendix]
 == Required channels
-Red Hat Enterprise Linux OpenStack Platform is available via Red Hat
-Network Certificate Server repositories.
+Red Hat Enterprise Linux OpenStack Platform is available via the red
+Hat Content Delivery Network or Satellite Server.
 
 .Required channels
 [options="header,footer"]
 |====
-|Channel|Source
-|rhel-x86_64-server-7|RHN Classic
-|rhel-x86_64-server-7-ost-6|RHN Classic
-|rhel-7-server-rpms|RHN Certificate
-|rhel-7-server-openstack-6.0-rpms|RHN Certificate
-|rhel-7-server-rh-common-rpms|RHN Certificate
+|Name|Description
+|rhel-7-server-extras-rpms|Red Hat Enterprise Linux 7 Server - Extras
+|rhel-7-server-openstack-7.0-rpms|Red Hat OpenStack 7.0 for RHEL 7 (RPMs)
+|rhel-7-server-optional-rpms|Red Hat Enterprise Linux 7 Server - Optional (RPMs)
+|rhel-7-server-rpms|Red Hat Enterprise Linux 7 Server (RPMs)
 |====
 
 NOTE: This reference architecture uses a local satellite server for
