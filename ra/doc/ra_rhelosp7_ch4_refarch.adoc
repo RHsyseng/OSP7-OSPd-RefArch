@@ -8,14 +8,14 @@ case in the Red Hat Systems Engineering lab.
 === Objective
 This use case provides a comprehensive example for deploying an EAP 6
 microservices architecture on a high availability OpenStack Platform 7
-cloud using OSP 7 director. The Red Hat Systems Engineering team
+cloud using RHEL OpenStack 7 director. The Red Hat Systems Engineering team
 validated all commands on bare metal servers using generally available
 software. The use case highlights many of OSP director's features
 including:
 
-* high availability
-* network isolation
-* advanced profile matching
+* High Availability
+* Network isolation
+* Advanced Profile Matching
 * Ceph integration
 * Ceph customization
 * Satellite subscription
@@ -24,7 +24,7 @@ The use case concludes with instructions for installing the EAP 6
 microservices architecture via Heat. The microservices architecture
 demonstrates OpenStack's ability to deploy and run a complex
 application typical to a production cloud. The microservices
-architecture used in this example is a multi-tier shopping cart that
+architecture in this example is a multi-tier shopping cart that
 includes a web presentation layer, product and customer databases, and
 sales, billing, and product microservices.
 
@@ -39,7 +39,7 @@ image::images/WORKFLOW.png[align="center", scaledwidth="60%"]
 The use case is divided into the following steps:
 
 . *Install the undercloud*:
-.. Get the software.
+.. Download the software.
 .. Deploy the undercloud baremetal server.
 . *Prepare the overcloud*:
 .. Import overcloud disk images.
@@ -93,12 +93,11 @@ model.
 
 [[network-topology-section]]
 ==== Network Topology
-<<reference-architecture-diagram>> shows the network topology of this
-reference architecture. This section describes the graphic in greater
-detail.
+<<reference-architecture-diagram>> details and describes the network topology of this
+reference architecture. 
 
 Each server has two Gigabit interfaces (nic1:2) and two 10-Gigabit
-interfaces (nic3:4). This reference architecture network isolation to
+interfaces (nic3:4) for network isolation to
 segment OpenStack communication by type.
 
 The following network traffic types are isolated:
@@ -114,7 +113,7 @@ There are six isolated networks but only four physical interfaces.
 Two networks are isolated on each physical 10 Gb interface using a
 combination of tagged and native VLANs.
 
-NOTE: The OSP 7 network isolation feature supports bonded interfaces.
+NOTE: The Red Hat OpenStack Platform 7 network isolation feature supports bonded interfaces.
 Limitations in the Systems Engineering lab precluded the use of bonded
 interfaces in this reference architecture. Bonded interfaces are
 recommended for production deployments.
@@ -142,15 +141,13 @@ recommended for production deployments.
 |nic4|4042|Storage|Native|172.16.2.0/24
 |====
 
-NOTE: All switch ports must be added to their respective VLANs before
+NOTE: All switch ports must be added to their respective VLANs prior to
 deploying the overcloud.
 
 Deciding how to isolate networks is a crucial decision when
 designing for performance and scalability. There is
 no one-size-fits-all approach. Hardware constraints and workload
-characteristics must dictate this design decision. The design used in
-in this reference architecture is suitable for this use case when
-tested at a small scale.
+characteristics must dictate this design decision.
 
 https://access.redhat.com/articles/1507893[This paper] shares an approach
-to using cloud benchmarks to guide OSP 7 design decisions.
+to using cloud benchmarks to guide Red Hat OpenStack Platform 7 design decisions.
