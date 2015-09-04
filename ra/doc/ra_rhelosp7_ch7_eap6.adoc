@@ -382,5 +382,4 @@ image::images/EAP6_WEB.png[align="center", scaledwidth="80%"]
 
 NOTE: Complete steps are described in  Section 4.6 of
 this reference architecture:
-https://access.redhat.com/articles/1452603[2015 - Microservice
-  Architecture: Building microservices with JBoss EAP 6]
+https://access.redhat.com/articles/1452603[2015 - Microservice Architecture: Building microservices with JBoss EAP 6]
