@@ -128,7 +128,9 @@ types:
     nodes must have a physical interface attached to the provisioning network.
     This network must carry PXE traffic and must reside on a native
     VLAN. The provisioning interface can act as a default gateway for
-    the overcloud if there is no other gateway on the network.
+    the overcloud if there is no other gateway on the network. Disable
+    PXE on the remaining interfaces to ensure the servers boot from
+    this network.
 *External*::
     This network provides overcloud nodes with external connectivity.
     Controller nodes connect the external network to an Open vSwitch
@@ -153,6 +155,9 @@ Network traffic types are assigned to network interfaces through Heat template
 customizations prior to deploying the overcloud. OSP director supports
 several network interface types including physical interfaces, bonded
 interfaces, and either tagged or native 802.1Q VLANs.
+
+NOTE: Disable DHCP on unused interfaces to avoid unwanted routes and network
+loops.
 
 ==== Network Types by Server Role
 The previous section discussed <<server-roles, server roles>>. Each
