@@ -374,7 +374,7 @@ $ sudo -i
 
 3. From a client browser, access _presentation_ via the floating IP
    address to make a test purchase:
-   'http://10.19.137.142:8080/presentation''
+   'http://10.19.137.142:8080/presentation'
 
 [[EAP6-web]]
 .EAP6 Web Interface
