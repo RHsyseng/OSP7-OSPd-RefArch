@@ -7,51 +7,50 @@ a multi-tier web application with a shopping cart.
 Red Hat® JBoss® Enterprise Application Platform (EAP) is a fully certified 
 Java™ EE platform for developing and deploying enterprise
 applications. This reference architecture documents the steps to
-deploy an EAP 6 Microservices Architecture (MSA) on OSP 7. MSA is
+deploy an EAP 6 application demonstrating Microservices Architecture (MSA) on OSP 7. MSA is
 software architectural style that increases modularity to decrease
-complexity. Applications are developed from suites of small services
-running as an independent process in its own container or
+complexity. Applications are developed from suites of small services,
+each running as an independent process in its own container or
 virtual machine. Each service has a single responsibility. The
 services communicate with standard lightweight protocols and APIs,
-such as REST of HTTP.
+such as REST over HTTP.
 
 More information about Red Hat JBOSS EAP can be found at
 https://access.redhat.com/products/red-hat-jboss-enterprise-application-platform[http://red.ht/1NZrW0A].
 
-The MSA used in this reference architecture is an example of Business-Driven 
+The MSA application used in this reference architecture is an example of Business-Driven 
 Microservices. The services in the application do not communicate
 directly with one another. A web application aggregates and
-coordinates communication between the services. Its acts as a
+coordinates communication between the services. It acts as a
 perimeter between the application and the clients. By employing this
 presentation layer, the microservices remain independent from each other.
-They can be developed, scaled, and maintained independently, which avoids
-many of the complexities inherent to other MSA approaches.
+They can be developed, scaled, and maintained independently, without leading to a complex dependency graph and its many associated complexities that are inherent to other MSA approaches.
 
 [[EAP6-MSA]]
 .EAP6 Microservices Architecture
 image::images/EAP6_MSA.png[align="center", scaledwidth="50%"]
 
 OpenStack Platform 7 provides a comprehensive platform for implementing, 
-maintaining, and scaling a MSA. Because microservices are independent,
+maintaining, and scaling an MSA application. Because microservices are independent,
 scalable services, they require a scalable platform to reach their
-potential. OpenStack provides a robust underlying tool set for automating service
+potential. OpenStack provides a robust underlying toolset for automating service
 implementation, deployment, discovery, and scaling. This reference
-architecture demonstrates how to deploy and orchestrate an EAP6 MSA
+architecture demonstrates how to deploy and orchestrate an EAP6 MSA application
 using nested Heat templates. Directions for future work might include
-auto-scaling to multiple MSAs via Heat and Ceilometer and load
+auto-scaling to multiple MSA applications via Heat and Ceilometer and load
 balancing between them via LBaaS.
 
-<<EAP6-MSA>> depicts the MSQ application deployed in this reference
+<<EAP6-MSA>> depicts the MSA application deployed in this reference
 architecture. 
 
-More information on depoying a RHEL JBOSS EAP 6 MSA can be found at
+More information on deploying a RHEL JBOSS EAP 6 MSA application can be found at
 https://access.redhat.com/articles/1452603[ Microservice Architecture:
 Building Microservices with JBOSS EAP 6]. 
 
 === Create the test environment
 The MSA application does not exist in a vacuum. This section
 describes the steps for installing the supporting infrastructure
-around the MSA including a public Neutron network and subnet, a demo
+around the application including a public Neutron network and subnet, a demo
 tenant and user, a RHEL 7.1 Glance image, and a key pair for accessing
 the MSA application servers via *ssh*.
 
@@ -253,8 +252,8 @@ databases are defined in templates called by the master template. The
 private Neutron network, subnet, and router are also defined in a
 nested template.
 
-NOTE: The Heat templates used in this example are provided via ??.
-They are too lengthy to document.
+NOTE: The Heat templates used in this example are provided via the
+associated script archive. They are too lengthy to document.
 
 . Create the _templates/lib_ directory.
 +
@@ -277,18 +276,18 @@ presentation-service.yaml  product-db.yaml       sales-db.yaml
 +
 [source%autofit, shell]
 ----
-$ heat stack-create --template-file templates/eapws5_nested.yaml eap5 --parameters="public_net_id=$ext_net_id"
+$ heat stack-create --template-file templates/eapws5_nested.yaml eap6 --parameters="public_net_id=$ext_net_id"
 +--------------------------------------+------------+--------------------+----------------------+
 | id                                   | stack_name | stack_status       | creation_time        |
 +--------------------------------------+------------+--------------------+----------------------+
-| 91c16a0e-62a3-485a-a7ae-d999384fabf9 | eap5       | CREATE_IN_PROGRESS | 2015-08-30T03:59:15Z |
+| 91c16a0e-62a3-485a-a7ae-d999384fabf9 | eap6       | CREATE_IN_PROGRESS | 2015-08-30T03:59:15Z |
 +--------------------------------------+------------+--------------------+----------------------+
 ----
 . Watch progress with *heat resource-list*.
 +
 [source%autofit, shell]
 ----
-$ heat resource-list eap5
+$ heat resource-list eap6
 +----------------------+--------------------------------------+------------------------------------------------------------+--------------------+----------------------
 | resource_name        | physical_resource_id                 | resource_type                                              | resource_status    | updated_time         
 +----------------------+--------------------------------------+------------------------------------------------------------+--------------------+----------------------
@@ -388,7 +387,7 @@ $ sudo -i
 (rw,relatime,seclabel,data=ordered)
 ----
 
-3. From a client browser, access _product-service_ via the floating IP
+3. From a client browser, access _presentation_ via the floating IP
    address to make a test purchase:
    'http://10.19.137.142:8080/presentation''
 
