@@ -74,8 +74,7 @@ Corporation OneConnect 10Gb NIC, 6 x DDR3 8192 MB @1333 MHZ DIMMs, 12x
 
 [appendix]
 == Required channels
-Red Hat Enterprise Linux OpenStack Platform is available via the red
-Hat Content Delivery Network or Satellite Server.
+Red Hat Enterprise Linux OpenStack Platform is available via the Content Delivery Network or Satellite Server.
 
 .Required channels
 [options="header,footer"]
