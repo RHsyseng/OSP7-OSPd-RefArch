@@ -1,17 +1,17 @@
 [conclusion]
 == Conclusion
-OpenStack Platform 7 is Red Hat's 5th iteration of OpenStack Playform
+OpenStack Platform 7 is Red Hat's 5th iteration of OpenStack Platform
 based on the Kilo community OpenStack release. This reference
 architecture is a comprehensive example of deploying an EAP6
-microservices application on a RHEL 7 OSP cluster. It provides a
+microservices application on a RHEL 7 OpenStack cluster. It provides a
 comprehensive example for deploying an application end-to-end on
 realistic hardware using customer-available code. The use case
 provides a frame of reference for customizing the storage and
-networking. The reference architecture also introduces OSP director --
+networking. The reference architecture also introduces OpenStack director --
 Red Hat's intergrated management tool set -- and describes Red Hat's
-approach to OpenStack HA.
+approach to OpenStack high availability.
 
-Future extensions to this use case might include using keepalived
-instead of Pacemaker for HA, auto-scaling the EAP application with
-Heat and Ceilometer, and implementing Neutron LBaaS in front of a
+Future extensions to this use case might include using `keepalived`
+instead of `Pacemaker` for HA, auto-scaling the EAP application with
+`Heat` and `Ceilometer`, and implementing Neutron LBaaS in front of a
 scaled EAP 6 application.
