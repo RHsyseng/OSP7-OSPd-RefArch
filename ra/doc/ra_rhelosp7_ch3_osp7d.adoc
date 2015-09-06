@@ -116,7 +116,9 @@ networks provides better performance and scalability.
 OSP director supports isolating network traffic by type. One or more
 network traffic types can be assigned to a physical,
 virtual, or bonded interface. Multiple traffic types can be combined
-across the same physical interfaces or switches.
+across the same physical interfaces or switches. Each OpenStack
+service is bound to an IP on a particular network. A virtual IP is
+created on that network and shared among all of the HA controllers. 
 
 OPS director supports network isolation for the following traffic
 types:
@@ -126,30 +128,50 @@ types:
 *Provisioning*::
     The control plane installs the overcloud via this network. All cluster
     nodes must have a physical interface attached to the provisioning network.
-    This network must carry PXE traffic and must reside on a native
-    VLAN. The provisioning interface can act as a default gateway for
+    This network carries DHCP/PXE and TFTP traffic so it must be
+    provided on a native VLAN to the interfaces used for booting. The
+    provisioning interface can act as a default gateway for
     the overcloud if there is no other gateway on the network. Disable
     PXE on the remaining interfaces to ensure the servers boot from
     this network.
 *External*::
     This network provides overcloud nodes with external connectivity.
     Controller nodes connect the external network to an Open vSwitch
-    bridge and forward traffic originating from hypervisor instances through it.
+    bridge and forward traffic originating from hypervisor instances
+    through it. The Horizon service and OpenStack Public API endpoints
+    can share this network or they can be broken out to an optional
+    Public API network.
 *Internal API*::
     This network exposes internal OpenStack API endpoints for the
     overcloud nodes. It handles inter-service communication between
-    both core OpenStack services and the supporting services.
+    both core OpenStack services and the supporting services. By
+    default this network also hosts cluster management traffic used by
+    HA services to share data and track cluster state for automated
+    failover. It is common practice to break the cluster management
+    traffic out to a separate network if it affects performance or
+    scaling. Supporting service traffic from the state
+    database, message bus, and hostname resolution is also delivered
+    via this network.
 *Tenant*::
     Virtual machines communicate over the tenant network. It supports
-    three modes of operation: VXLAN, GRE, and VLAN.
+    three modes of operation: VXLAN, GRE, and VLAN. VXLAN and GRE
+    tenant traffic is delivered via software tunnels on a single VLAN.
+    Individual VLANs correspond to tenant networks in the case where
+    VLAN tenant networks are used.
 *Storage*::
     This network carries storage communication including `Ceph`, `Cinder`,
-    and `Swift` traffic. Data-intensive OpenStack deployments should
-    isolate storage traffic on a dedicated high bandwidth interface, i.e. 10 GB interface.
+    and `Swift` traffic. The virtual machine instances communicate
+    with the storage servers via this network. Data-intensive
+    OpenStack deployments should isolate storage traffic on a
+    dedicated high bandwidth interface, i.e. 10 GB interface. The
+    Glance API, Swift proxy, and Ceph Public interface services are
+    all delivered via this network.
 *Storage Management*::
     Storage management communication can generate large amounts of
-    network traffic. This network carries storage management traffic
-    to reduce overhead on the other networks.
+    network traffic. This network is shared between the front and back
+    end storage nodes. Storage controllers use this network to access
+    data storage nodes. This network is also used for storage clustering
+    and replication traffic.
 
 Network traffic types are assigned to network interfaces through Heat template
 customizations prior to deploying the overcloud. OSP director supports
@@ -219,12 +241,13 @@ networking types:
   tunnels to provide Layer 2 network connectivity between virtual
   machine instances on different hypervisors. GRE does not require
   changes to the network switches and supports more unique network IDs
-  than VLAN segmentation.
+  than VLAN segmentation. This is the default mode of operation for
+  OpenStack Platform 7 director.
 . *VXLAN* is an overlay method similar to GRE. VXLAN combines the ease
-  and scalability of GRE with superior performance. 
+  and scalability of GRE with superior performance.
 
-Although Red Hat certifies third-party network plug-ins, OSP director 
-uses the ML2 network plugin with the Open vSwitch driver by default. 
+Although Red Hat certifies third-party network plug-ins, OSP director
+uses the ML2 network plugin with the Open vSwitch driver by default.
 
 NOTE: OSP director does not deploy Nova networking.
 
