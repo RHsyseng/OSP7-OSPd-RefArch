@@ -136,9 +136,8 @@ recommended for production deployments.
 |nic3|4044|Tenant|Native|172.16.4.0/24
 |nic4|4041|Internal API|Tagged|172.16.1.0/24
 |nic4|4042|Storage|Native|172.16.2.0/24
-.4+^.^|Ceph storage|nic2|4040|Provisioning|Native|192.0.2.0/24
+.3+^.^|Ceph storage|nic2|4040|Provisioning|Native|192.0.2.0/24
 |nic3|4043|Storage Mgmt|Tagged|172.16.3.0/24
-|nic4|4041|Internal API|Tagged|172.16.1.0/24
 |nic4|4042|Storage|Native|172.16.2.0/24
 |====
 
