@@ -220,9 +220,8 @@ this reference architecture.
 |Tenant
 |Internal API
 |Storage
-.4+^.^|Ceph/Block/Object Storage|Provisioning
+.3+^.^|Ceph/Block/Object Storage|Provisioning
 |Storage Mgmt
-|Internal API
 |Storage
 |====
 
