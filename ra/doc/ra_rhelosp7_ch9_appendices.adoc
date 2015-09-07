@@ -81,6 +81,7 @@ Red Hat Enterprise Linux OpenStack Platform is available via the Content Deliver
 |====
 |Name|Description
 |rhel-7-server-extras-rpms|Red Hat Enterprise Linux 7 Server - Extras
+|rhel-7-server-openstack-7.0-director-rpms|Red Hat OpenStack 7.0 director for RHEL 7 (RPMs)
 |rhel-7-server-openstack-7.0-rpms|Red Hat OpenStack 7.0 for RHEL 7 (RPMs)
 |rhel-7-server-optional-rpms|Red Hat Enterprise Linux 7 Server - Optional (RPMs)
 |rhel-7-server-rpms|Red Hat Enterprise Linux 7 Server (RPMs)
