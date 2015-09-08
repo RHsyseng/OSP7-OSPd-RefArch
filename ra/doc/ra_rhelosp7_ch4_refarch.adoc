@@ -8,7 +8,7 @@ case in the Red Hat Systems Engineering lab.
 === Objective
 This use case provides a comprehensive example for deploying an EAP 6
 microservices architecture on a high availability OpenStack Platform 7
-cloud using RHEL OpenStack 7 director. The Red Hat Systems Engineering team
+cloud using Red Hat Enterprise Linux OpenStack Platform 7 director. The Red Hat Systems Engineering team
 validated all commands on bare metal servers using generally available
 software. The use case highlights many of OSP director's features
 including:
@@ -34,8 +34,7 @@ workflow.
 
 [[reference-workflow]]
 .Reference Architecture Workflow
-image::images/WORKFLOW.png[caption="Figure 4.1 ", title="Reference
-Architecture Workflow", align="center", scaledwidth="60%"]
+image::images/WORKFLOW.png[caption="Figure 4.1 " title="Reference Architecture Workflow" align="center", scaledwidth="60%"]
 
 The use case is divided into the following steps:
 
@@ -63,8 +62,7 @@ including, server roles, and service placement.
 
 [[reference-architecture-diagram]]
 .Reference Architecture
-image::images/REFARCH.png[caption="Figure 4.2: ", title="Reference
-Architecture Diagram", align="center", scaledwidth="60%"]
+image::images/REFARCH.png[caption="Figure 4.2: " title="Reference Architecture Diagram" align="center", scaledwidth="60%"]
 
 <<network-topology-section>> describes the networking components in detail.
 
@@ -72,7 +70,7 @@ Architecture Diagram", align="center", scaledwidth="60%"]
 As depicted in <<reference-architecture-diagram>>, the use case requires 12
 bare metal servers deployed with the following roles:
 
-* 1 undercoud server
+* 1 undercloud server
 * 3 cloud controllers
 * 4 compute nodes
 * 4 Ceph storage servers
@@ -90,7 +88,7 @@ Servers are assigned to roles based on their hardware characteristics.
 |Ceph storage server|4|Dell PowerEdge R520
 |====
 
-<<hardware-specifications>> lists hardware specifics for each server
+Appendix C <<Appendix-hardware-specifications>> lists hardware specifics for each server
 model.
 
 [[network-topology-section]]

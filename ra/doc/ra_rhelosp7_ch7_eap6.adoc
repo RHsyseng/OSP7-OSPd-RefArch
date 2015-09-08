@@ -28,13 +28,12 @@ They can be developed, scaled, and maintained independently, without leading to 
 
 [[EAP6-MSA]]
 .EAP6 Microservices Architecture
-image::images/EAP6_MSA.png[caption="Figure 7.1: ", title="EAP6
-Microservices Architecture", align="center", scaledwidth="50%"]
+image::images/EAP6_MSA.png[caption="Figure 7.1: " title="EAP6 Microservices Architecture" align="center", scaledwidth="40%"]
 
 OpenStack Platform 7 provides a comprehensive platform for implementing,
 maintaining, and scaling an MSA application. Because microservices are independent,
 scalable services, they require a scalable platform to reach their
-potential. OpenStack provides a robust underlying toolset for automating service
+potential. OpenStack provides a robust underlying tool set for automating service
 implementation, deployment, discovery, and scaling. This reference
 architecture demonstrates how to deploy and orchestrate an EAP6 MSA application
 using nested `Heat` templates. Directions for future work might include
@@ -97,8 +96,7 @@ Created a new network:
 +
 [subs=+quotes]
 ----
-$ *export ext_net_id=$(neutron net-show ext-net | awk ' / id/ { print
-$4 } ')*
+$ *export ext_net_id=$(neutron net-show ext-net | awk ' / id/ { print $4 } ')*
 $ *echo $ext_net_id*
 b1f27b52-6229-41e7-a597-02a070320ab4
 ----
@@ -106,9 +104,7 @@ b1f27b52-6229-41e7-a597-02a070320ab4
 +
 [subs=+quotes]
 ----
-$ *neutron subnet-create --name ext-net
---allocation-pool=start=10.19.137.137,end=10.19.137.150
---gateway_ip=10.19.143.254 ext-net 10.19.136.0/21*
+$ *neutron subnet-create --name ext-net --allocation-pool=start=10.19.137.137,end=10.19.137.150 --gateway_ip=10.19.143.254 ext-net 10.19.136.0/21*
 
 Created a new subnet:
 +-------------------+----------------------------------------------------+
@@ -189,9 +185,7 @@ $ *source ~/demorc*
 +
 [subs=+quotes]
 ----
-$ *openstack image create --disk-format qcow2  --container-format bare
---file /pub/rhel-guest-image-7.1-20150224.0.x86_64.qcow2
-rhel-server7.1*
+$ *openstack image create --disk-format qcow2  --container-format bare --file /pub/rhel-guest-image-7.1-20150224.0.x86_64.qcow2 rhel-server7.1*
 +------------------+--------------------------------------+
 | Field            | Value                                |
 +------------------+--------------------------------------+
@@ -275,8 +269,7 @@ presentation-service.yaml  product-db.yaml       sales-db.yaml
 +
 [subs=+quotes]
 ----
-$ *heat stack-create --template-file templates/eapws5_nested.yaml eap6
---parameters="public_net_id=$ext_net_id"*
+$ *heat stack-create --template-file templates/eapws5_nested.yaml eap6 --parameters="public_net_id=$ext_net_id"*
 +--------------------------------------+------------+--------------------+----------------------+
 | id                                   | stack_name | stack_status       | creation_time        |
 +--------------------------------------+------------+--------------------+----------------------+
@@ -288,11 +281,7 @@ $ *heat stack-create --template-file templates/eapws5_nested.yaml eap6
 [subs=+quotes]
 ----
 $ *heat resource-list eap6*
-+----------------------+--------------------------------------+------------------------------------------------------------+--------------------+----------------------
-| resource_name        | physical_resource_id                 |
-resource_type                                              |
-resource_status    | updated_time
-+----------------------+--------------------------------------+------------------------------------------------------------+--------------------+----------------------
+...
 | billing-service      | ca3dc55e-42a4-4501-a9ff-848856a4982d | file:///home/stack/templates/lib/billing-service.yaml      | CREATE_IN_PROGRESS | 2015-08-30T03:59:16Z
 | presentation-service | 5262f57a-846e-4ff5-8535-b66a049f0743 | file:///home/stack/templates/lib/presentation-service.yaml | CREATE_IN_PROGRESS | 2015-08-30T03:59:16Z
 | private_network      | aa0fda9e-dc55-4ec2-af62-1d184db5b409 | file:///home/stack/templates/lib/private_network.yaml      | CREATE_COMPLETE    | 2015-08-30T03:59:16Z
@@ -301,23 +290,19 @@ resource_status    | updated_time
 | sales-db             | cf49eed9-5e47-47db-95fb-e50baad04954 | file:///home/stack/templates/lib/sales-db.yaml             | CREATE_IN_PROGRESS | 2015-08-30T03:59:16Z
 | sales-service        | 14b0a0e0-8322-4548-9dd7-d52a29e7ebfa | file:///home/stack/templates/lib/sales-service.yaml        | CREATE_IN_PROGRESS | 2015-08-30T03:59:16Z
 | security_group       | f429d022-9608-4fd5-87b5-da7584f5b806 | OS::Neutron::SecurityGroup                                 | CREATE_COMPLETE    | 2015-08-30T03:59:16Z
-+----------------------+--------------------------------------+------------------------------------------------------------+--------------------+----------------------
 ----
 . View *nova list* after `Heat` creates the stack successfully.
 +
 [subs=+quotes]
 ----
 $ *nova list*
-+--------------------------------------+----------------------+--------+------------+-------------+-------------------------------------+
-| ID                                   | Name                 | Status | Task State | Power State | Networks                            |
-+--------------------------------------+----------------------+--------+------------+-------------+-------------------------------------+
+...
 | a003370e-f8b2-4d76-bdb6-7b6064e155b1 | billing-service      | ACTIVE | -          | Running     | demo-net=172.16.5.14, 10.19.137.145 |
 | 839347fc-cce9-4025-8c28-8879eddb9bc6 | presentation-service | ACTIVE | -          | Running     | demo-net=172.16.5.12, 10.19.137.146 |
 | e1d5c9a0-634f-4b00-9922-0e3a0bd5ba3e | product-db           | ACTIVE | -          | Running     | demo-net=172.16.5.11, 10.19.137.142 |
 | 190388cc-28fb-4956-bcdf-65d5fb0388b4 | product-service      | ACTIVE | -          | Running     | demo-net=172.16.5.13, 10.19.137.144 |
 | c95c0fbd-2a49-42c1-9346-6a955754f905 | sales-db             | ACTIVE | -          | Running     | demo-net=172.16.5.10, 10.19.137.143 |
 | ab46dd07-3cec-43a8-a2fa-530729541475 | sales-service        | ACTIVE | -          | Running     | demo-net=172.16.5.15, 10.19.137.141 |
-+--------------------------------------+----------------------+--------+------------+-------------+-------------------------------------+
 ----
 . The _cloud-init_ service customizes instances post-boot. The
   _user-data_ section of the nested templates includes
@@ -387,9 +372,7 @@ $ *sudo -i*
 
 [[EAP6-web]]
 .EAP6 Web Interface
-image::images/EAP6_WEB.png[caption="Figure 7.2: ", title="EAP6 Web
-Interface", align="center", scaledwidth="80%"]
+image::images/EAP6_WEB.png[caption="Figure 7.2: " title="EAP6 Web Interface" align="center", scaledwidth="80%"]
 
-NOTE: Complete steps are described in  Section 4.6 of
-this reference architecture:
+NOTE: Complete steps are described in Section 4.6 of this reference architecture:
 https://access.redhat.com/articles/1452603[2015 - Microservice Architecture: Building microservices with JBoss EAP 6]

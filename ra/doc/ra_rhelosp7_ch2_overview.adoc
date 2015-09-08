@@ -8,14 +8,13 @@ Server 6 is a fully-certified Java EE platform to quickly deploy and
 develop enterprise applications. This reference architecture describes
 a realistic use case for deploying an EAP 6 microservices architecture
 on a highly available RHEL OpenStack Platform 7 cluster. It provides a comprehensive,
-end-to-end example of depoying an Red Hat OpenStack Platform 7 cloud on baremetal using
-OpenStack director then implementing the microservice architecture via
+end-to-end example of deploying a Red Hat OpenStack Platform 7 cloud on baremetal using
+OpenStack director then implementing the microservices architecture via
 `Heat` templates.
 
 [[OSP-director]]
 .OpenStack Platform director
-image::images/DIRECTOR.png[caption="Figure 2.1: ", title="OpenStack
-Platform director", align="center", scaledwidth="50%"]
+image::images/DIRECTOR.png[caption="Figure 2.1: " title="OpenStack Platform director" align="center", scaledwidth="50%"]
 
 The first section of this reference architecture introduces the principal
 components: Red Hat Enterprise Linux OpenStack Platform 7, OpenStack

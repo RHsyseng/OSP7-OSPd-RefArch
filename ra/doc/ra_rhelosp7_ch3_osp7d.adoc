@@ -98,7 +98,7 @@ Profile to matching is performed after introspection but prior to deployment.
 
 OSP director also supports pre-installation *benchmark collection*.
 Servers boot to a customized RAMdisk and run a series of benchmarks.
-The benchmarks report performance outliers to identify underperforming
+The benchmarks report performance outliers to identify under performing
 nodes prior to installation.
 
 NOTE: RHEL OSP 7 requires Red Hat Enterprise Linux 7 Server on all servers.
@@ -198,8 +198,7 @@ types by server role.
 
 [[network-topology-diagram]]
 .Network topology
-image::images/NETWORK.png[caption="Figure 3.1 ", title="Network
-Topology", align="center", scaledwidth="80%"]
+image::images/NETWORK.png[caption="Figure 3.1 " title="Network Topology" align="center", scaledwidth="75%"]
 
 <<network-topology>> depicts the network roles by server type in
 this reference architecture.
@@ -233,17 +232,22 @@ overlapping IP address ranges across tenants via the Linux kernel's
 network namespace capability. It also supports three default
 networking types:
 
-. *VLAN segmentation mode*: Each tenant is assigned a network subnet
+[[tenant-network-types]]
+[glossary]
+*VLAN segmentation mode*::
+  Each tenant is assigned a network subnet
   mapped to a 802.1q VLAN on the physical network. This tenant
   networking type requires VLAN-assignment to the appropriate switch
   ports on the physical network.
-. *GRE overlay mode*: This mode isolates tenant traffic in virtual
+*GRE overlay mode*::
+  This mode isolates tenant traffic in virtual
   tunnels to provide Layer 2 network connectivity between virtual
   machine instances on different hypervisors. GRE does not require
   changes to the network switches and supports more unique network IDs
   than VLAN segmentation. This is the default mode of operation for
   OpenStack Platform 7 director.
-. *VXLAN* is an overlay method similar to GRE. VXLAN combines the ease
+*VXLAN*::
+  This overlay method similar to GRE. VXLAN combines the ease
   and scalability of GRE with superior performance.
 
 Although Red Hat certifies third-party network plug-ins, OSP director
@@ -295,9 +299,9 @@ Benefits of using a proxy server include:
 
 OSP director uses `HAproxy` and `Pacemaker` to manage HA services and load
 balance connection requests. With the exception of `RabbitMQ` and
-`Galera`, HAproxy distributes connection requests to active nodes in a
+`Galera`, `HAproxy` distributes connection requests to active nodes in a
 round-robin fashion. `Galera` and `RabbitMQ` use persistent options to
-ensure requests go only to active and/or synched nodes. `Pacemaker`
+ensure requests go only to active and/or synchronized nodes. `Pacemaker`
 checks service health at 1 second intervals. Timeout settings vary by
 service. 
 
@@ -362,24 +366,30 @@ is beyond the scope of this document.
 
 [[segregated-cluster]]
 .Segregated cluster
-image::images/HA_SEGREGATED.png[caption="Figure 3.2: ",
-title="Segregated Cluster Services", align="center", scaledwidth="80%"]
+image::images/HA_SEGREGATED.png[caption="Figure 3.2: " title="Segregated Cluster Services" align="center", scaledwidth="75%"]
 
 ==== Cluster Services and Quorum
 Each clustered service operates in one of the following modes:
 
-* *Active/active*: Requests are load balanced between multiple
+[[cluster-services-and-quorum]]
+[glossary]
+*Active/active*::
+  Requests are load balanced between multiple
   cluster nodes running the same services. Traffic intended for failed
   nodes is sent to the remaining nodes.
-* *Active/passive*: A redundant copy of a running service is brought
+*Active/passive*::
+  A redundant copy of a running service is brought
   online when the primary node fails.
-* *Hot Standby*: Connections are only routed to one of several active
+*Hot Standby*::
+  Connections are only routed to one of several active
   service endpoints. New connections are routed to a standby
   endpoint if the primary service endpoint fails.
-* *Mixed*: Mixed has one of two meanings: services within a group run
+*Mixed*::
+  Mixed has one of two meanings: services within a group run
   in different modes, or the service runs active/active but is used as
   active/passive. Mixed services are explained individually.
-* *Single*: Each node runs an independent cluster manager that only
+*Single*::
+  Each node runs an independent cluster manager that only
   monitors its local service.
 
 A cluster *quorum* is the majority node set when a failure splits the
@@ -401,8 +411,7 @@ OpenStack service.
 
 [[collapsed-cluster]]
 .Collapsed cluster
-image::images/HA_COLLAPSED.png[caption="Figure 3.3: ",
-title="Collapsed Cluter Services", align="center", scaledwidth="80%"]
+image::images/HA_COLLAPSED.png[caption="Figure 3.3: " title="Collapsed Cluter Services" align="center", scaledwidth="75%"]
 
 The following table lists service mode by service.
 
@@ -438,7 +447,7 @@ appropriate `Swift` ACO server.
 The majority of the core OpenStack services run in active/active mode.
 The same is true for the supporting services, although several of
 them field connection requests directly from clients rather than
-`HAProxy`. The following tables lists the cluster mode for the non-core OpenStack
+`HAproxy`. The following tables lists the cluster mode for the non-core OpenStack
 services.
 
 [[supporting-cluster-modes]]
@@ -505,8 +514,7 @@ communicate directly with the primary data-owning OSD.
 
 [[ceph-integration]]
 .Ceph Integration
-image::images/CEPH.png[caption="Figure 3.4: ", title="Ceph
-Integration", align="center", scaledwidth="80%"]
+image::images/CEPH.png[caption="Figure 3.4: " title="Ceph Integration" align="center", scaledwidth="75%"]
 
 OSP director can install a Ceph cluster with one or more OSD servers.
 By default the OSD server will use free space on its primary disk for
@@ -528,5 +536,3 @@ documentation] for more information on Ceph 1.3.
 This https://access.redhat.com/articles/1370143[reference
 architecture] details how to install and run Ceph with standalone
 versions of OpenStack Platform.
-
-<<<

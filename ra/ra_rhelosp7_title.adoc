@@ -15,7 +15,7 @@ ifdef::backend-pdf[]
 :pagenums:
 :pygments-style: bw
 :source-highlighter: pygments
-:autofit-opyion:
+:autofit-option:
 endif::[]
 
 [abstract]

@@ -1,4 +1,5 @@
 [appendix]
+[[Appendix-contributors]]
 == Contributors
 1. Roger Lopez - Content review, technical content review (OSP)
 2. Babak Mozaffari - technical content review (JBOSS EAP)
@@ -7,6 +8,7 @@
 5. Andrew Beekhoff - technical content review (HA)
 
 [appendix]
+[[Appendix-references]]
 == References
 
 === Ceph References
@@ -61,7 +63,7 @@ Hat OpenStack Platform]
 Red Hat Satellite 6.0 Provisioning Guide]
 
 [appendix]
-[[hardware-specifications]]
+[[Appendix-hardware-specifications]]
 == Hardware specifications
 
 .Hardware specifications
@@ -82,6 +84,7 @@ Corporation OneConnect 10Gb NIC, 6 x DDR3 8192 MB @1333 MHZ DIMMs, 12x
 |====
 
 [appendix]
+[[Appendix-required-channels]]
 == Required channels
 Red Hat Enterprise Linux OpenStack Platform is available via the Content Delivery Network or Satellite Server.
 
@@ -100,6 +103,7 @@ NOTE: This reference architecture uses a local satellite server for
 deployments and updates.
 
 [appendix]
+[[Appendix-undercloud-SSL]]
 == Deploying undercloud with SSL
 
 This appendix describes steps for deploying the undercloud with SSL
@@ -239,7 +243,8 @@ $ *openstack endpoint show glance*
 ----
 
 [appendix]
-== undercloud service list
+[[Appendix-undercloud-servce-list]]
+== Undercloud Service List
 
 [subs=+quotes]
 ----
@@ -282,6 +287,538 @@ openstack-swift-object-updater
 openstack-swift-object
 openstack-swift-proxy
 openstack-tuskar-api
+----
+
+[appendix]
+[[Appendix-overcloud-servce-list]]
+== Overcloud Service List
+
+[subs=+quotes]
+----
+Cluster name: tripleo_cluster
+Last updated: Tue Sep  8 12:41:33 2015
+Last change: Tue Sep  8 11:47:03 2015
+Stack: corosync
+Current DC: overcloud-controller-2 (3) - partition with quorum
+Version: 1.1.12-a14efad
+3 Nodes configured
+112 Resources configured
+
+Online: [ overcloud-controller-0 overcloud-controller-1 overcloud-controller-2 ]
+
+Full list of resources:
+
+ ip-192.0.2.6   (ocf::heartbeat:IPaddr2):       Started overcloud-controller-0 
+ Clone Set: haproxy-clone [haproxy]
+     Started: [ overcloud-controller-0 overcloud-controller-1 overcloud-controller-2 ]
+ ip-172.16.1.11 (ocf::heartbeat:IPaddr2):       Started overcloud-controller-1 
+ ip-10.19.137.121       (ocf::heartbeat:IPaddr2):       Started overcloud-controller-2 
+ ip-172.16.2.10 (ocf::heartbeat:IPaddr2):       Started overcloud-controller-0 
+ ip-172.16.1.10 (ocf::heartbeat:IPaddr2):       Started overcloud-controller-1 
+ Master/Slave Set: galera-master [galera]
+     Masters: [ overcloud-controller-0 overcloud-controller-1 overcloud-controller-2 ]
+ ip-172.16.3.10 (ocf::heartbeat:IPaddr2):       Started overcloud-controller-2 
+ Master/Slave Set: redis-master [redis]
+     Masters: [ overcloud-controller-2 ]
+     Slaves: [ overcloud-controller-0 overcloud-controller-1 ]
+ Clone Set: mongod-clone [mongod]
+     Started: [ overcloud-controller-0 overcloud-controller-1 overcloud-controller-2 ]
+ Clone Set: rabbitmq-clone [rabbitmq]
+     Started: [ overcloud-controller-0 overcloud-controller-1 overcloud-controller-2 ]
+ Clone Set: memcached-clone [memcached]
+     Started: [ overcloud-controller-0 overcloud-controller-1 overcloud-controller-2 ]
+ Clone Set: openstack-nova-scheduler-clone [openstack-nova-scheduler]
+     Started: [ overcloud-controller-0 overcloud-controller-1 overcloud-controller-2 ]
+ Clone Set: neutron-l3-agent-clone [neutron-l3-agent]
+     Started: [ overcloud-controller-0 overcloud-controller-1 overcloud-controller-2 ]
+ Clone Set: openstack-ceilometer-alarm-notifier-clone [openstack-ceilometer-alarm-notifier]
+     Started: [ overcloud-controller-0 overcloud-controller-1 overcloud-controller-2 ]
+ Clone Set: openstack-heat-engine-clone [openstack-heat-engine]
+     Started: [ overcloud-controller-0 overcloud-controller-1 overcloud-controller-2 ]
+ Clone Set: openstack-ceilometer-api-clone [openstack-ceilometer-api]
+     Started: [ overcloud-controller-0 overcloud-controller-1 overcloud-controller-2 ]
+ Clone Set: neutron-metadata-agent-clone [neutron-metadata-agent]
+     Started: [ overcloud-controller-0 overcloud-controller-1 overcloud-controller-2 ]
+ Clone Set: neutron-ovs-cleanup-clone [neutron-ovs-cleanup]
+     Started: [ overcloud-controller-0 overcloud-controller-1 overcloud-controller-2 ]
+ Clone Set: neutron-netns-cleanup-clone [neutron-netns-cleanup]
+     Started: [ overcloud-controller-0 overcloud-controller-1 overcloud-controller-2 ]
+ Clone Set: openstack-heat-api-clone [openstack-heat-api]
+     Started: [ overcloud-controller-0 overcloud-controller-1 overcloud-controller-2 ]
+ Clone Set: openstack-cinder-scheduler-clone [openstack-cinder-scheduler]
+     Started: [ overcloud-controller-0 overcloud-controller-1 overcloud-controller-2 ]
+ Clone Set: openstack-nova-api-clone [openstack-nova-api]
+     Started: [ overcloud-controller-0 overcloud-controller-1 overcloud-controller-2 ]
+ Clone Set: openstack-heat-api-cloudwatch-clone [openstack-heat-api-cloudwatch]
+     Started: [ overcloud-controller-0 overcloud-controller-1 overcloud-controller-2 ]
+ Clone Set: openstack-ceilometer-collector-clone [openstack-ceilometer-collector]
+     Started: [ overcloud-controller-0 overcloud-controller-1 overcloud-controller-2 ]
+ Clone Set: openstack-keystone-clone [openstack-keystone]
+     Started: [ overcloud-controller-0 overcloud-controller-1 overcloud-controller-2 ]
+ Clone Set: openstack-nova-consoleauth-clone [openstack-nova-consoleauth]
+     Started: [ overcloud-controller-0 overcloud-controller-1 overcloud-controller-2 ]
+ Clone Set: openstack-glance-registry-clone [openstack-glance-registry]
+     Started: [ overcloud-controller-0 overcloud-controller-1 overcloud-controller-2 ]
+ Clone Set: openstack-ceilometer-notification-clone [openstack-ceilometer-notification]
+     Started: [ overcloud-controller-0 overcloud-controller-1 overcloud-controller-2 ]
+ Clone Set: openstack-cinder-api-clone [openstack-cinder-api]
+     Started: [ overcloud-controller-0 overcloud-controller-1 overcloud-controller-2 ]
+ Clone Set: neutron-dhcp-agent-clone [neutron-dhcp-agent]
+     Started: [ overcloud-controller-0 overcloud-controller-1 overcloud-controller-2 ]
+ Clone Set: openstack-glance-api-clone [openstack-glance-api]
+     Started: [ overcloud-controller-0 overcloud-controller-1 overcloud-controller-2 ]
+ Clone Set: neutron-openvswitch-agent-clone [neutron-openvswitch-agent]
+     Started: [ overcloud-controller-0 overcloud-controller-1 overcloud-controller-2 ]
+ Clone Set: openstack-nova-novncproxy-clone [openstack-nova-novncproxy]
+     Started: [ overcloud-controller-0 overcloud-controller-1 overcloud-controller-2 ]
+ Clone Set: delay-clone [delay]
+     Started: [ overcloud-controller-0 overcloud-controller-1 overcloud-controller-2 ]
+ Clone Set: neutron-server-clone [neutron-server]
+     Started: [ overcloud-controller-0 overcloud-controller-1 overcloud-controller-2 ]
+ Clone Set: httpd-clone [httpd]
+     Started: [ overcloud-controller-0 overcloud-controller-1 overcloud-controller-2 ]
+ Clone Set: openstack-ceilometer-central-clone [openstack-ceilometer-central]
+     Started: [ overcloud-controller-0 overcloud-controller-1 overcloud-controller-2 ]
+ Clone Set: openstack-ceilometer-alarm-evaluator-clone [openstack-ceilometer-alarm-evaluator]
+     Started: [ overcloud-controller-0 overcloud-controller-1 overcloud-controller-2 ]
+ Clone Set: openstack-heat-api-cfn-clone [openstack-heat-api-cfn]
+     Started: [ overcloud-controller-0 overcloud-controller-1 overcloud-controller-2 ]
+ openstack-cinder-volume        (systemd:openstack-cinder-volume):      Started overcloud-controller-2 
+ Clone Set: openstack-nova-conductor-clone [openstack-nova-conductor]
+     Started: [ overcloud-controller-0 overcloud-controller-1 overcloud-controller-2 ]
+
+PCSD Status:
+  overcloud-controller-0: Online
+  overcloud-controller-1: Online
+  overcloud-controller-2: Online
+
+Daemon Status:
+  corosync: active/enabled
+  pacemaker: active/enabled
+  pcsd: active/enabled
+----
+
+[appendix]
+[[Appendix-controller_fencing_script]]
+=== Example fencing Script
+This script was used by the Red Hat Systems Engineering team to
+configure and test `Pacemaker` fencing. The script is not tested nor
+suitable for production use. It is included as a reference for
+manually configuring fencing or as an example for scripted
+configuration.
+
+[source%autofit, shell]
+----
+#!/bin/bash
+
+source ~/stackrc
+env | grep OS_
+SSH_CMD="ssh -l heat-admin"
+
+function usage {
+        echo "USAGE: $0 [enable|test]"
+        exit 1
+}
+
+function enable_stonith {
+        # for all controller nodes
+        for i in $(nova list | awk ' /controller/ { print $12 } ' | cut -f2 -d=)
+        do 
+                echo $i
+                # create the fence device
+                $SSH_CMD $i 'sudo pcs stonith create $(hostname -s)-ipmi fence_ipmilan pcmk_host_list=$(hostname -s) ipaddr=$(sudo ipmitool lan print 1 | awk " /IP Address  / { print \$4 } ") login=root passwd=PASSWORD lanplus=1 cipher=1 op monitor interval=60sr'
+                # avoid fencing yourself
+                $SSH_CMD $i 'sudo pcs constraint location $(hostname -s)-ipmi avoids $(hostname -s)'
+        done
+
+        # enable STONITH devices from any controller
+        $SSH_CMD $i 'sudo pcs property set stonith-enabled=true'
+        $SSH_CMD $i 'sudo pcs property show'
+}
+
+function test_fence {
+
+        for i in $(nova list | awk ' /controller/ { print $12 } ' | cut -f2 -d= | head -n 1)
+        do 
+                # get REDIS_IP
+                REDIS_IP=$($SSH_CMD $i 'sudo grep -ri redis_vip /etc/puppet/hieradata/' | awk '/vip_data.yaml/ { print $2 } ')
+        done
+        # for all controller nodes
+        for i in $(nova list | awk ' /controller/ { print $12 } ' | cut -f2 -d=)
+        do 
+                if $SSH_CMD $i "sudo ip a" | grep -q $REDIS_IP
+                then 
+                        FENCE_DEVICE=$($SSH_CMD $i 'sudo pcs stonith show $(hostname -s)-ipmi' | awk ' /Attributes/ { print $2 } ' | cut -f2 -d=)
+                        IUUID=$(nova list | awk " /$i/ { print \$2 } ")
+                        UUID=$(ironic node-list | awk " /$IUUID/ { print \$2 } ")
+                else
+                        FENCER=$i
+                fi
+        done 2>/dev/null
+
+        echo "REDIS_IP $REDIS_IP"
+        echo "FENCER $FENCER"
+        echo "FENCE_DEVICE $FENCE_DEVICE"
+        echo "UUID $UUID"
+        echo "IUUID $IUUID"
+
+        # stonith REDIS_IP owner
+        $SSH_CMD $FENCER sudo pcs stonith fence $FENCE_DEVICE
+
+        sleep 30
+
+        # fence REDIS_IP owner to keep ironic from powering it on
+        sudo ironic node-set-power-state $UUID off
+
+        sleep 60
+
+        # check REDIS_IP failover
+        $SSH_CMD $FENCER sudo pcs status | grep $REDIS_IP
+}
+
+if [ "$1" == "test" ]
+then
+        test_fence
+elif [ "$1" == "enable" ]
+then
+        enable_stonith
+else
+        usage
+fi
+----
+
+[appendix]
+[[Appendix-nic-configuration-files]]
+== NIC Confguration Files
+This appendix includes the full text of the network isolation
+environment files used in this use case.
+
+NOTE: The _swift-storage.yaml_ and _cinder-storage.yaml_ are not shown
+because they were not used.
+
+=== network-environment.yaml
+[source%autofit, shell]
+----
+resource_registry:
+  OS::TripleO::BlockStorage::Net::SoftwareConfig: /home/stack/nic-configs/cinder-storage.yaml
+  OS::TripleO::Compute::Net::SoftwareConfig: /home/stack/nic-configs/compute.yaml
+  OS::TripleO::Controller::Net::SoftwareConfig: /home/stack/nic-configs/controller.yaml
+  OS::TripleO::ObjectStorage::Net::SoftwareConfig: /home/stack/nic-configs/swift-storage.yaml
+  OS::TripleO::CephStorage::Net::SoftwareConfig: /home/stack/nic-configs/ceph-storage.yaml
+
+parameter_defaults:
+  NeutronExternalNetworkBridge: "br-ex"
+  InternalApiNetCidr: 172.16.1.0/24
+  StorageNetCidr: 172.16.2.0/24
+  StorageMgmtNetCidr: 172.16.3.0/24
+  TenantNetCidr: 172.16.4.0/24
+  ExternalNetCidr: 10.19.136.0/21
+  InternalApiAllocationPools: [{'start': '172.16.1.10', 'end': '172.16.1.100'}]
+  StorageAllocationPools: [{'start': '172.16.2.10', 'end': '172.16.2.200'}]
+  StorageMgmtAllocationPools: [{'start': '172.16.3.10', 'end': '172.16.3.200'}]
+  TenantAllocationPools: [{'start': '172.16.4.10', 'end': '172.16.4.200'}]
+  ExternalAllocationPools: [{'start': '10.19.137.121', 'end': '10.19.137.151'}]
+  InternalApiNetworkVlanID: 4041
+  StorageNetworkVlanID: 4042
+  StorageMgmtNetworkVlanID: 4043
+  TenantNetworkVlanID: 4044
+  ExternalNetworkVlanID: 168
+  ExternalInterfaceDefaultRoute: "10.19.143.254"
+  BondInterfaceOvsOptions:
+      "bond_mode=balance-tcp lacp=active other-config:lacp-fallback-ab=true"
+----
+=== controller.yaml
+[source%autofit, shell]
+----
+heat_template_version: 2015-04-30
+
+description: >
+  Software Config to drive os-net-config to configure VLANs for the
+  controller role.
+
+parameters:
+  ExternalIpSubnet:
+    default: ''
+    description: IP address/subnet on the external network
+    type: string
+  InternalApiIpSubnet:
+    default: ''
+    description: IP address/subnet on the internal API network
+    type: string
+  StorageIpSubnet:
+    default: ''
+    description: IP address/subnet on the storage network
+    type: string
+  StorageMgmtIpSubnet:
+    default: ''
+    description: IP address/subnet on the storage mgmt network
+    type: string
+  TenantIpSubnet:
+    default: ''
+    description: IP address/subnet on the tenant network
+    type: string
+  ExternalNetworkVlanID:
+    default: 168
+    description: Vlan ID for the external network traffic.
+    type: number
+  InternalApiNetworkVlanID:
+    default: 4041
+    description: Vlan ID for the internal_api network traffic.
+    type: number
+  StorageNetworkVlanID:
+    default: 4042
+    description: Vlan ID for the storage network traffic.
+    type: number
+  StorageMgmtNetworkVlanID:
+    default: 4043
+    description: Vlan ID for the storage mgmt network traffic.
+    type: number
+  TenantNetworkVlanID:
+    default: 4044
+    description: Vlan ID for the tenant network traffic.
+    type: number
+  ExternalInterfaceDefaultRoute:
+    default: '10.19.143.254'
+    description: Default route for the external network.
+    type: string
+
+resources:
+  OsNetConfigImpl:
+    type: OS::Heat::StructuredConfig
+    properties:
+      group: os-apply-config
+      config:
+        os_net_config:
+          network_config:
+            -
+              type: ovs_bridge
+              name: br-ex
+              use_dhcp: false
+              addresses:
+              -
+                ip_netmask: {get_param: ExternalIpSubnet}
+              routes:
+                -
+                  ip_netmask: 0.0.0.0/0
+                  next_hop: {get_param: ExternalInterfaceDefaultRoute}
+              members:
+                -
+                  type: interface
+                  name: nic1
+                  primary: true
+            -
+              type: ovs_bridge
+              name: br-nic3
+              use_dhcp: false
+              addresses:
+                -
+                  ip_netmask: {get_param: TenantIpSubnet}
+              members:
+                -
+                  type: interface
+                  name: nic3
+                  primary: true
+                -
+                  type: vlan
+                  vlan_id: {get_param: StorageMgmtNetworkVlanID}
+                  addresses:
+                  -
+                    ip_netmask: {get_param: StorageMgmtIpSubnet}
+            -
+              type: ovs_bridge
+              name: br-nic4
+              use_dhcp: false
+              addresses:
+                -
+                  ip_netmask: {get_param: StorageIpSubnet}
+              members:
+                -
+                  type: interface
+                  name: nic4
+                  primary: true
+                -
+                  type: vlan
+                  vlan_id: {get_param: InternalApiNetworkVlanID}
+                  addresses:
+                  -
+                    ip_netmask: {get_param: InternalApiIpSubnet}
+
+outputs:
+  OS::stack_id:
+    description: The OsNetConfigImpl resource.
+    value: {get_resource: OsNetConfigImpl}
+----
+=== compute.yaml
+[source%autofit, shell]
+----
+heat_template_version: 2015-04-30
+
+description: >
+  Software Config to drive os-net-config with 2 bonded nics on a bridge
+  with a VLANs attached for the compute role.
+
+parameters:
+  ExternalIpSubnet:
+    default: ''
+    description: IP address/subnet on the external network
+    type: string
+  InternalApiIpSubnet:
+    default: ''
+    description: IP address/subnet on the internal API network
+    type: string
+  StorageIpSubnet:
+    default: ''
+    description: IP address/subnet on the storage network
+    type: string
+  StorageMgmtIpSubnet:
+    default: ''
+    description: IP address/subnet on the storage mgmt network
+    type: string
+  TenantIpSubnet:
+    default: ''
+    description: IP address/subnet on the tenant network
+    type: string
+  InternalApiNetworkVlanID:
+    default: 4041
+    description: Vlan ID for the internal_api network traffic.
+    type: number
+  StorageNetworkVlanID:
+    default: 4042
+    description: Vlan ID for the storage network traffic.
+    type: number
+  TenantNetworkVlanID:
+    default: 4044
+    description: Vlan ID for the tenant network traffic.
+    type: number
+
+resources:
+  OsNetConfigImpl:
+    type: OS::Heat::StructuredConfig
+    properties:
+      group: os-apply-config
+      config:
+        os_net_config:
+          network_config:
+            -
+              type: interface
+              name: nic1
+              use_dhcp: false
+            -
+              type: ovs_bridge
+              name: br-nic3
+              use_dhcp: false
+              addresses:
+                -
+                  ip_netmask: {get_param: TenantIpSubnet}
+              members:
+                -
+                  type: interface
+                  name: nic3
+                  primary: true
+            -
+              type: ovs_bridge
+              name: br-nic4
+              use_dhcp: false
+              addresses:
+                -
+                  ip_netmask: {get_param: StorageIpSubnet}
+              members:
+                -
+                  type: interface
+                  name: nic4
+                  primary: true
+                -
+                  type: vlan
+                  vlan_id: {get_param: InternalApiNetworkVlanID}
+                  addresses:
+                  -
+                    ip_netmask: {get_param: InternalApiIpSubnet}
+
+outputs:
+  OS::stack_id:
+    description: The OsNetConfigImpl resource.
+    value: {get_resource: OsNetConfigImpl}
+----
+=== ceph.-storage.yaml
+[source%autofit, shell]
+----
+heat_template_version: 2015-04-30
+
+description: >
+  Software Config to drive os-net-config with 2 bonded nics on a bridge
+  with a VLANs attached for the compute role.
+
+parameters:
+  ExternalIpSubnet:
+    default: ''
+    description: IP address/subnet on the external network
+    type: string
+  InternalApiIpSubnet:
+    default: ''
+    description: IP address/subnet on the internal API network
+    type: string
+  StorageIpSubnet:
+    default: ''
+    description: IP address/subnet on the storage network
+    type: string
+  StorageMgmtIpSubnet:
+    default: ''
+    description: IP address/subnet on the storage mgmt network
+    type: string
+  TenantIpSubnet:
+    default: ''
+    description: IP address/subnet on the tenant network
+    type: string
+  StorageNetworkVlanID:
+    default: 4042
+    description: Vlan ID for the storage network traffic.
+    type: number
+  StorageMgmtNetworkVlanID:
+    default: 4043
+    description: Vlan ID for the storage network traffic.
+    type: number
+
+resources:
+  OsNetConfigImpl:
+    type: OS::Heat::StructuredConfig
+    properties:
+      group: os-apply-config
+      config:
+        os_net_config:
+          network_config:
+            -
+              type: interface
+              name: nic1
+              use_dhcp: false
+            -
+              type: ovs_bridge
+              name: br-nic3
+              use_dhcp: false
+              addresses:
+                -
+                  ip_netmask: {get_param: StorageMgmtIpSubnet}
+              members:
+                -
+                  type: interface
+                  name: nic3
+                  primary: true
+            -
+              type: ovs_bridge
+              name: br-nic4
+              use_dhcp: false
+              addresses:
+                -
+                  ip_netmask: {get_param: StorageIpSubnet}
+              members:
+                -
+                  type: interface
+                  name: nic4
+                  primary: true
+
+outputs:
+  OS::stack_id:
+    description: The OsNetConfigImpl resource.
+    value: {get_resource: OsNetConfigImpl}
 ----
 
 // vim: set syntax=asciidoc:

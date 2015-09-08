@@ -285,7 +285,7 @@ This configuration defines:
   storage servers, and the remainder as compute nodes.
 +
 NOTE: View
-https://github.com/redhat-cip/edeploy/blob/master/docs/eDeployUserGuide.rst#appendix[Appendix
+https://github.com/redhat-cip/edeploy/blob/master/docs/eDeployUserGuide.rst#appendix-a[Appendix
 A] of the
 https://github.com/redhat-cip/edeploy/blob/master/docs/eDeployUserGuide.rst[eDeploy
 User's Guide] for an exhaustive
@@ -422,7 +422,7 @@ $ *ls ~/nic-configs*
 ceph-storage.yaml  cinder-storage.yaml  compute.yaml  controller.yaml swift-storage.yaml
 ----
 Complete examples of each network configuration file are in
-<<Appendix-nic-configs>>.
+<<Appendix-nic-configuration-files>>.
 +
 NOTE: `Swift` and `Cinder` servers are not used in this reference
 architecture. Their files are included for completeness but not called
@@ -459,8 +459,8 @@ $ *cp -rp /usr/share/openstack-tripleo-heat-templates/ ~/templates*
 ----
 4. Edit
    _~/templates/openstack-tripleo-heat-templates/puppet/hieradata/ceph.yaml_
-   to include the Ceph custiomizations. This example includes the
-   additional OSDs accepting the Puppet defaults for journalling.
+   to include the Ceph customizations. This example includes the
+   additional OSDs accepting the Puppet defaults for journaling.
 [source%autofit, ruby, numbered]
 ----
 ceph::profile::params::osd_journal_size: 1024
@@ -505,7 +505,6 @@ free space on the operating system disk. The OSD journal is
 configured as a 5 GB file on the disk. This configuration is only
 suitable for evaluation and proof of concept.
 
-<<<
 == Deploy and Test the overcloud
 This section describes how to deploy and test the overcloud defined in
 the previous section.
@@ -557,7 +556,7 @@ This lengthy command does the following:
 * Specifies the location of the _storage-environment.yaml_ for Ceph
   customization.
 * Registers the overcloud servers with the lab satellite server using a
-  pre-defined activation key.
+  predefined activation key.
 3. Watch deployment progress in a separate console window.
 +
 [subs=+quotes]
@@ -573,10 +572,8 @@ $ *heat resource-list overcloud | grep CREATE_COMPLETE*
 +
 [subs=+quotes]
 ----
-$ nova list
-+--------------------------------------+-------------------------+--------+------------+-------------+---------------------+
-| ID                                   | Name                    | Status | Task State | Power State | Networks            |
-+--------------------------------------+-------------------------+--------+------------+-------------+---------------------+
+$ *nova list*
+...
 | e50a67fa-ed75-4f39-a58f-47b51371f61d | overcloud-cephstorage-0 | ACTIVE | -          | Running     | ctlplane=192.0.2.20 |
 | e36b2f28-463c-4e01-91e0-8ed762a1c057 | overcloud-cephstorage-1 | ACTIVE | -          | Running     | ctlplane=192.0.2.21 |
 | 37c67128-8432-4330-afe7-ab3b01bdcb6e | overcloud-cephstorage-2 | ACTIVE | -          | Running     | ctlplane=192.0.2.19 |
@@ -588,7 +585,6 @@ $ nova list
 | 520c5af6-fc91-4b93-bb95-93f947a7cc71 | overcloud-controller-0  | ACTIVE | -          | Running     | ctlplane=192.0.2.9  |
 | 23a2de54-e3c9-4c1d-aaff-75ef5993b7af | overcloud-controller-1  | ACTIVE | -          | Running     | ctlplane=192.0.2.6  |
 | 2afb18d3-3494-41da-951a-b72d68b4bf88 | overcloud-controller-2  | ACTIVE | -          | Running     | ctlplane=192.0.2.10 |
-+--------------------------------------+-------------------------+--------+------------+-------------+---------------------+
 ----
 +
 5. Source the _overcloudrc_ file to set environment variables for the overcloud.
@@ -597,9 +593,7 @@ $ nova list
 [subs=+quotes]
 ----
 $ *nova service-list*
-+-----+------------------+------------------------------------+----------+---------+-------+----------------------------+-----------------+
-| Id  | Binary           | Host                               | Zone     | Status  | State | Updated_at                 | Disabled Reason |
-+-----+------------------+------------------------------------+----------+---------+-------+----------------------------+-----------------+
+...
 | 3   | nova-scheduler   | overcloud-controller-0.localdomain | internal | enabled | up    | 2015-08-28T21:56:01.000000 | -               |
 | 6   | nova-scheduler   | overcloud-controller-2.localdomain | internal | enabled | up    | 2015-08-28T21:56:03.000000 | -               |
 | 9   | nova-scheduler   | overcloud-controller-1.localdomain | internal | enabled | up    | 2015-08-28T21:56:04.000000 | -               |
@@ -610,36 +604,21 @@ $ *nova service-list*
 | 57  | nova-conductor   | overcloud-controller-0.localdomain | internal | enabled | up    | 2015-08-28T21:55:57.000000 | -               |
 | 105 | nova-conductor   | overcloud-controller-1.localdomain | internal | enabled | up    | 2015-08-28T21:55:58.000000 | -               |
 | 123 | nova-compute     | overcloud-compute-1.localdomain    | nova     | enabled | up    | 2015-08-28T21:55:59.000000 | -               |
-| 126 | nova-compute     | overcloud-compute-0.localdomain    | nova     | enabled | up    | 2015-08-28T21:55:59.000000 | -               |
-| 129 | nova-compute     | overcloud-compute-2.localdomain    | nova     | enabled | up    | 2015-08-28T21:55:57.000000 | -               |
-| 132 | nova-compute     | overcloud-compute-3.localdomain    | nova     | enabled | up    | 2015-08-28T21:55:57.000000 | -               |
-+-----+------------------+------------------------------------+----------+---------+-------+----------------------------+-----------------+
+[ ... Output truncated ... ]
 ----
 7. Verify all `Neutron` agents are alive and up.
 +
 [subs=+quotes]
 ----
 $ *neutron agent-list*
-+--------------------------------------+--------------------+------------------------------------+-------+----------------+---------------------------+
-| id                                   | agent_type         | host                               | alive | admin_state_up | binary                    |
-+--------------------------------------+--------------------+------------------------------------+-------+----------------+---------------------------+
+...
 | 2034c620-e2be-4fc3-8c7e-878125cccb46 | Open vSwitch agent | overcloud-compute-3.localdomain    | :-)   | True           | neutron-openvswitch-agent |
 | 290a09bb-9878-4661-9c55-dee4c53f103c | Metadata agent     | overcloud-controller-2.localdomain | :-)   | True           | neutron-metadata-agent    |
 | 369ef1fd-992a-462a-8569-128c329cf7b1 | Open vSwitch agent | overcloud-compute-2.localdomain    | :-)   | True           | neutron-openvswitch-agent |
 | 42b35c58-dda0-4e55-b53f-5f7466acdac5 | Open vSwitch agent | overcloud-compute-0.localdomain    | :-)   | True           | neutron-openvswitch-agent |
 | 45b4e429-1ad7-4678-aa8b-bc8afa8761ea | DHCP agent         | overcloud-controller-1.localdomain | :-)   | True           | neutron-dhcp-agent        |
 | 91ff4990-6080-4fd2-98c2-b69cb5ea3d79 | L3 agent           | overcloud-controller-0.localdomain | :-)   | True           | neutron-l3-agent          |
-| 92ba4b2e-452f-49bb-9ec5-06a95c0b62b5 | DHCP agent         | overcloud-controller-0.localdomain | :-)   | True           | neutron-dhcp-agent        |
-| 9697e2eb-edd3-4b84-8621-b1564208db5b | Open vSwitch agent | overcloud-controller-1.localdomain | :-)   | True           | neutron-openvswitch-agent |
-| 9ca0d604-4341-4c5f-be01-d03d870412d5 | Metadata agent     | overcloud-controller-1.localdomain | :-)   | True           | neutron-metadata-agent    |
-| a2055a30-8f81-4ec3-9e91-354837a9b1d2 | Open vSwitch agent | overcloud-controller-0.localdomain | :-)   | True           | neutron-openvswitch-agent |
-| b2548f09-a200-4f35-bc57-c8b0abe4e540 | Open vSwitch agent | overcloud-controller-2.localdomain | :-)   | True           | neutron-openvswitch-agent |
-| cd30d121-d2c2-4f1e-95ba-653624713735 | Metadata agent     | overcloud-controller-0.localdomain | :-)   | True           | neutron-metadata-agent    |
-| d0aae869-e091-471a-a3cb-9890b1fac770 | Open vSwitch agent | overcloud-compute-1.localdomain    | :-)   | True           | neutron-openvswitch-agent |
-| e683f35d-b49a-465d-a2db-276fa45f6550 | DHCP agent         | overcloud-controller-2.localdomain | :-)   | True           | neutron-dhcp-agent        |
-| f16a2429-6ff7-4435-8ea0-cb52ae1f96fa | L3 agent           | overcloud-controller-2.localdomain | :-)   | True           | neutron-l3-agent          |
-| f5d5d3f5-7f06-4917-84f2-7dca96577e91 | L3 agent           | overcloud-controller-1.localdomain | :-)   | True           | neutron-l3-agent          |
-+--------------------------------------+--------------------+------------------------------------+-------+----------------+---------------------------+
+[ ... Output truncated ... ]
 ----
 8. *ssh* to a controller node and switch to root user. 
 +
@@ -679,7 +658,8 @@ ip-172.16.1.11 (ocf::heartbeat:IPaddr2): Started overcloud-controller-0
 ip-10.19.137.121  (ocf::heartbeat:IPaddr2): Started overcloud-controller-1 
 ...
 ----
-NOTE: Appendix ?? contains a complete list of pacemaker resources.
+NOTE: Appendix <<Appendix-overcloud-servce-list>> shows complete *pcs status*
+`Pacemaker` output for a deployed overcloud.
 
 === Tune Ceph storage
 This section includes steps for increasing the number of Placement
@@ -716,7 +696,7 @@ $ *sudo -i*
  cluster 7ced0d2a-4db6-11e5-86a4-90b11c56332a
  health HEALTH_WARN too few PGs per OSD (19 < min 30)
  monmap e2: 3 mons at {overcloud-controller-0=172.16.2.16:6789/0,overcloud-controller-1=172.16.2.15:6789/0,overcloud-controller-2=172.16.2.21:6789/0}
-        
+
         election epoch 6, quorum 0,1,2 overcloud-controller-1,overcloud-controller-0,overcloud-controller-2
  osdmap e82: 40 osds: 40 up, 40 in
   pgmap v120: 256 pgs, 4 pools, 0 bytes data, 0 objects
@@ -786,7 +766,7 @@ IPMI interfaces act as fence devices. However, OSP director does not
 configure fencing. This section describes how the controller nodes were
 manually configured for fencing in this reference architecture.
 
-<<Appendix-contoller_fencing_script>> shows an example script used to
+<<Appendix-controller_fencing_script>> shows an example script used to
 configure fencing in this reference architecture. This script
 configures each controller nodes IPMI as a fence device, constrains it
 so a controller cannot fence itself, and then enables all fence
@@ -796,7 +776,7 @@ devices.
 +
 [subs=+quotes]
 ----
-$ *sh 4_oc_fence.sh enable*
+$ *sh configure_fence.sh enable*
 Cluster Properties:
  cluster-infrastructure: corosync
  cluster-name: tripleo_cluster
@@ -815,4 +795,52 @@ $ *ssh -l heat-admin 192.0.2.9 sudo pcs status | grep -i fence*
  overcloud-controller-2-ipmi  (stonith:fence_ipmilan):  Started overcloud-controller-0
 ----
 
-<<<
+=== Configure additional Pacemaker constraints
+`Pacemaker` _resource constraints_ enforce service co-location and start ordering requirements. In this section several additional resource constraints are manually added to the cluster to ensure proper recovery and startup.
+
+NOTE: The missing resource constraints are documented in https://bugzilla.redhat.com/show_bug.cgi?id=1257414[bug 1257414] and slated for addition in the next OSP director point release.
+
+1. *ssh* to a controller node and run *sudo* to execute commands as
+   the root user.
++
+[subs=+quotes]
+----
+$ *ssh -l heat-admin 192.0.2.17*
+$ *sudo -i*
+----
+2. Configure additional *pcs* restart location and startup
+   constraints.
++
+[subs=+quotes]
+----
+# *pcs constraint order start rabbitmq-clone then openstack-keystone-clone*
+Adding rabbitmq-clone openstack-keystone-clone (kind: Mandatory) (Options: first-action=start then-action=start)
+# *pcs constraint order promote galera-master then openstack-keystone-clone*
+Adding galera-master openstack-keystone-clone (kind: Mandatory) (Options: first-action=promote then-action=start)
+# *pcs constraint order start haproxy-clone then openstack-keystone-clone*
+Adding haproxy-clone openstack-keystone-clone (kind: Mandatory) (Options: first-action=start then-action=start)
+# *pcs constraint order start memcached-clone then openstack-keystone-clone*
+Adding memcached-clone openstack-keystone-clone (kind: Mandatory) (Options: first-action=start then-action=start)
+# *pcs constraint order start openstack-nova-novncproxy-clone then openstack-nova-api-clone*
+Adding openstack-nova-novncproxy-clone openstack-nova-api-clone (kind: Mandatory) (Options: first-action=start then-action=start)
+# *pcs constraint order promote redis-master then start openstack-ceilometer-central-clone require-all=false*
+Adding redis-master openstack-ceilometer-central-clone (kind: Mandatory) (Options: require-all=false first-action=promote then-action=start)
+# *pcs resource defaults resource-stickiness=INFINITY*
+----
+3. List the resource constraints.
++
+[subs=+quotes]
+----
+# *pcs constraint list*
+Location Constraints:
+Ordering Constraints:
+  start ip-172.16.1.10 then start haproxy-clone (kind:Optional)
+  start ip-192.0.2.6 then start haproxy-clone (kind:Optional)
+  start ip-172.16.3.10 then start haproxy-clone (kind:Optional)
+  start ip-10.19.137.121 then start haproxy-clone (kind:Optional)
+  start ip-172.16.1.11 then start haproxy-clone (kind:Optional)
+  start ip-172.16.2.10 then start haproxy-clone (kind:Optional)
+  start mongod-clone then start openstack-ceilometer-central-clone (kind:Mandatory)
+  start openstack-glance-registry-clone then start openstack-glance-api-clone (kind:Mandatory)
+  [ ... Output truncated ... ]
+----
