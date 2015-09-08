@@ -14,7 +14,8 @@ OpenStack director then implementing the microservice architecture via
 
 [[OSP-director]]
 .OpenStack Platform director
-image::images/DIRECTOR.png[align="center", scaledwidth="50%"]
+image::images/DIRECTOR.png[caption="Figure 2.1: ", title="OpenStack
+Platform director", align="center", scaledwidth="50%"]
 
 The first section of this reference architecture introduces the principal
 components: Red Hat Enterprise Linux OpenStack Platform 7, OpenStack

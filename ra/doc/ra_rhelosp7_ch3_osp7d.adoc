@@ -198,7 +198,8 @@ types by server role.
 
 [[network-topology-diagram]]
 .Network topology
-image::images/NETWORK.png[align="center", scaledwidth="80%"]
+image::images/NETWORK.png[caption="Figure 3.1 ", title="Network
+Topology", align="center", scaledwidth="80%"]
 
 <<network-topology>> depicts the network roles by server type in
 this reference architecture.
@@ -361,7 +362,8 @@ is beyond the scope of this document.
 
 [[segregated-cluster]]
 .Segregated cluster
-image::images/HA_SEGREGATED.png[align="center", scaledwidth="80%"]
+image::images/HA_SEGREGATED.png[caption="Figure 3.2: ",
+title="Segregated Cluster Services", align="center", scaledwidth="80%"]
 
 ==== Cluster Services and Quorum
 Each clustered service operates in one of the following modes:
@@ -399,7 +401,8 @@ OpenStack service.
 
 [[collapsed-cluster]]
 .Collapsed cluster
-image::images/HA_COLLAPSED.png[align="center", scaledwidth="80%"]
+image::images/HA_COLLAPSED.png[caption="Figure 3.3: ",
+title="Collapsed Cluter Services", align="center", scaledwidth="80%"]
 
 The following table lists service mode by service.
 
@@ -502,7 +505,8 @@ communicate directly with the primary data-owning OSD.
 
 [[ceph-integration]]
 .Ceph Integration
-image::images/CEPH.png[align="center", scaledwidth="80%"]
+image::images/CEPH.png[caption="Figure 3.4: ", title="Ceph
+Integration", align="center", scaledwidth="80%"]
 
 OSP director can install a Ceph cluster with one or more OSD servers.
 By default the OSD server will use free space on its primary disk for

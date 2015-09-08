@@ -34,12 +34,13 @@ workflow.
 
 [[reference-workflow]]
 .Reference Architecture Workflow
-image::images/WORKFLOW.png[align="center", scaledwidth="60%"]
+image::images/WORKFLOW.png[caption="Figure 4.1 ", title="Reference
+Architecture Workflow", align="center", scaledwidth="60%"]
 
 The use case is divided into the following steps:
 
 . *Install the undercloud*:
-.. Download the software.
+.. Download the OpenStack Platform deployment package.
 .. Deploy the undercloud baremetal server.
 . *Prepare the overcloud*:
 .. Import overcloud disk images.
@@ -48,12 +49,12 @@ The use case is divided into the following steps:
 .. Customize the Ceph OSDs.
 .. Define the network isolation configuration.
 . *Create the overcloud*: 
-.. Deploy the overcloud via `Heat`.
+.. Deploy the overcloud via `Heat` templates.
 .. Configure HA fencing devices.
 .. Test the overcloud deployment.
 . *Deploy the EAP 6 MSA*:
 .. Configure the tenant
-.. Deploy EAP 6 MSA via Heat templates
+.. Deploy EAP 6 MSA via `Heat` templates
 .. Test EAP6
 
 === Conceptual Diagram of the Solution Stack
@@ -62,7 +63,8 @@ including, server roles, and service placement.
 
 [[reference-architecture-diagram]]
 .Reference Architecture
-image::images/REFARCH.png[align="center", scaledwidth="60%"]
+image::images/REFARCH.png[caption="Figure 4.2: ", title="Reference
+Architecture Diagram", align="center", scaledwidth="60%"]
 
 <<network-topology-section>> describes the networking components in detail.
 

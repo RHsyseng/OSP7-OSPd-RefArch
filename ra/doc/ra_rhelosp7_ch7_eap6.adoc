@@ -28,7 +28,8 @@ They can be developed, scaled, and maintained independently, without leading to 
 
 [[EAP6-MSA]]
 .EAP6 Microservices Architecture
-image::images/EAP6_MSA.png[align="center", scaledwidth="50%"]
+image::images/EAP6_MSA.png[caption="Figure 7.1: ", title="EAP6
+Microservices Architecture", align="center", scaledwidth="50%"]
 
 OpenStack Platform 7 provides a comprehensive platform for implementing,
 maintaining, and scaling an MSA application. Because microservices are independent,
@@ -386,7 +387,8 @@ $ *sudo -i*
 
 [[EAP6-web]]
 .EAP6 Web Interface
-image::images/EAP6_WEB.png[align="center", scaledwidth="80%"]
+image::images/EAP6_WEB.png[caption="Figure 7.2: ", title="EAP6 Web
+Interface", align="center", scaledwidth="80%"]
 
 NOTE: Complete steps are described in  Section 4.6 of
 this reference architecture:
