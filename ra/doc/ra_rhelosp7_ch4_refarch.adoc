@@ -150,3 +150,5 @@ characteristics must dictate this design decision.
 
 https://access.redhat.com/articles/1507893[This paper] shares an approach
 to using cloud benchmarks to guide Red Hat OpenStack Platform 7 design decisions.
+
+<<<

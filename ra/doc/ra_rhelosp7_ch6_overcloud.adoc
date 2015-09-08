@@ -167,8 +167,7 @@ $ *openstack baremetal introspection bulk status*
 +
 [subs=+quotes]
 ----
-$ *openstack flavor create --id auto --ram 4096 --disk 40 --vcpus 1
-baremetal*
+$ *openstack flavor create --id auto --ram 4096 --disk 40 --vcpus 1 baremetal*
 +----------------------------+--------------------------------------+
 | Field                      | Value                                |
 +----------------------------+--------------------------------------+
@@ -188,8 +187,7 @@ baremetal*
 +
 [subs=+quotes]
 ----
-$ *openstack flavor set --property "cpu_arch"="x86_64" --property
-"capabilities:boot_option"="local" baremetal*
+$ *openstack flavor set --property "cpu_arch"="x86_64" --property "capabilities:boot_option"="local" baremetal*
 +----------------------------+-----------------------------------------------------+
 | Field                      | Value                                               |
 +----------------------------+-----------------------------------------------------+
@@ -345,10 +343,8 @@ compute.
 +
 [subs=+quotes]
 ----
-$ *neutron subnet-update $(neutron subnet-list | awk ' /192.0.2/ {
-print $2 } ') --dns-nameserver 10.19.143.247*
-$ *neutron subnet-show $(neutron subnet-list | awk ' /192.0.2/ { print
-$2 } ') | grep -B 1 nameserver*
+$ *neutron subnet-update $(neutron subnet-list | awk ' /192.0.2/ { print $2 } ') --dns-nameserver 10.19.143.247*
+$ *neutron subnet-show $(neutron subnet-list | awk ' /192.0.2/ { print $2 } ') | grep -B 1 nameserver*
 | cidr              | 192.0.2.0/24
 | dns_nameservers   | 10.19.143.247 
 ----
@@ -432,8 +428,7 @@ by the installer.
 +
 [subs=+quotes]
 ----
-$ *neutron subnet-update $(neutron subnet-list | awk ' /192.0.2/ {
-print $2 } ') --dns-nameserver 10.19.143.247*
+$ *neutron subnet-update $(neutron subnet-list | awk ' /192.0.2/ { print $2 } ') --dns-nameserver 10.19.143.247*
 ----
 
 === Customize Ceph Storage
@@ -844,3 +839,5 @@ Ordering Constraints:
   start openstack-glance-registry-clone then start openstack-glance-api-clone (kind:Mandatory)
   [ ... Output truncated ... ]
 ----
+
+<<<

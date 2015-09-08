@@ -43,3 +43,5 @@ EAP 6 microservices application when it is coupled with `Heat` and
 `Ceilometer` auto-scaling functionality. Auto-scaling the EAP 6
 application behind a `Neutron` LBaaS has potential as an interesting
 direction for future work.
+
+<<<

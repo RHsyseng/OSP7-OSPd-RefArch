@@ -400,7 +400,7 @@ Daemon Status:
 
 [appendix]
 [[Appendix-controller_fencing_script]]
-=== Example fencing Script
+== Example fencing Script
 This script was used by the Red Hat Systems Engineering team to
 configure and test `Pacemaker` fencing. The script is not tested nor
 suitable for production use. It is included as a reference for

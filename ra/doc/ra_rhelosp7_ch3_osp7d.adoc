@@ -190,15 +190,15 @@ concept, and development environments. It is not recommended for
 production environments where scaling and performance are primary
 concerns.
 
+[[network-topology-diagram]]
+.Network topology
+image::images/NETWORK.png[caption="Figure 3.1 " title="Network Topology" align="center", scaledwidth="75%"]
+
 The network isolation feature allows OSP director to segment network
 traffic by particular network types. When using network isolation,
 each server role must have access to its required network traffic
 types. <<network-topology-table>> summarizes the required network
 types by server role.
-
-[[network-topology-diagram]]
-.Network topology
-image::images/NETWORK.png[caption="Figure 3.1 " title="Network Topology" align="center", scaledwidth="75%"]
 
 <<network-topology>> depicts the network roles by server type in
 this reference architecture.
@@ -273,7 +273,7 @@ the cluster's internal state across multiple machines. State changes
 trigger appropriate responses from the cluster manager to ensure
 service availability and data integrity.
 
-Cluster managers offer the following benefits:
+===== Cluster manager benefits
 
 . Deterministic recovery of a complex, multi-machine application stack
 . State awareness of other cluster machines to co-ordinate service
@@ -291,7 +291,7 @@ In OSP's HA model, clients do not directly connect to service
 endpoints. Connection requests are routed to service endpoints by a
 proxy server.
 
-Benefits of using a proxy server include:
+===== Proxy server benefits
 
 . Connections are load balanced across service endpoints
 . Service requests can be monitored in a central location
@@ -304,6 +304,8 @@ round-robin fashion. `Galera` and `RabbitMQ` use persistent options to
 ensure requests go only to active and/or synchronized nodes. `Pacemaker`
 checks service health at 1 second intervals. Timeout settings vary by
 service. 
+
+===== Benefits of combining Pacemaker and HAproxy
 
 The combination of `Pacemaker` and `HAproxy`:
 
@@ -531,8 +533,7 @@ storage for the deployed instances.
 
 Consult
 https://access.redhat.com/documentation/en/red-hat-ceph-storage/version-1.3/red-hat-ceph-storage-13-red-hat-ceph-architecture/red-hat-ceph-architecture[Ceph
-documentation] for more information on Ceph 1.3.
+documentation] for more information on Ceph 1.3. This https://access.redhat.com/articles/1370143[reference
+architecture] details how to install and run Ceph with standalone versions of OpenStack Platform.
 
-This https://access.redhat.com/articles/1370143[reference
-architecture] details how to install and run Ceph with standalone
-versions of OpenStack Platform.
+<<<
