@@ -30,35 +30,35 @@ and describes the following features:
 
 === Ready State Provisioning and Server Roles
 OSP director is a converged installer. It combines mature upstream
-OpenStack deployment projects (TripleO and Ironic) with
+OpenStack deployment projects (`TripleO` and `Ironic`) with
 components from Red Hat's past OpenStack Platform installers.
 
-*TripleO* stands for "OpenStack on OpenStack." TripleO is an upstream
-OpenStack project that uses an existing OpenStack environment to install 
-a production OpenStack environment. The deployment environment is called 
-the undercloud. The production environment is called the overcloud. 
+`TripleO` stands for "OpenStack on OpenStack." `TripleO` is an upstream
+OpenStack project that uses an existing OpenStack environment to install
+a production OpenStack environment. The deployment environment is called
+the undercloud. The production environment is called the overcloud.
 
-The *undercloud* is TripleO's control plane. It uses native OpenStack APIs 
-and services to deploy, configure, and manage the production OpenStack 
-deployment. The undercloud defines the overcloud with Heat templates
-then deploys it via the Ironic baremetal provisioning service. OSP director 
-includes Heat predefined templates for the basic server roles that comprise 
+The `undercloud` is the `TripleO` control plane. It uses native OpenStack APIs
+and services to deploy, configure, and manage the production OpenStack
+deployment. The undercloud defines the overcloud with `Heat` templates
+then deploys it via the `Ironic` baremetal provisioning service. OSP director
+includes `Heat` predefined templates for the basic server roles that comprise
 the overcloud. Customizable templates allow OSP director to deploy,
 redeploy, and scale complex overclouds in a repeatable fashion.
 
-*Ironic* is a community bare-metal provisioning project. OSP 
-director uses Ironic to deploy the overcloud servers. Ironic
+`Ironic` is a community bare-metal provisioning project. OSP
+director uses `Ironic` to deploy the overcloud servers. `Ironic`
 gathers information about baremetal servers via a discovery mechanism
-known as introspection. Ironic pairs servers with a bootable disk
-image and then installs them via PXE and remote power management. 
+known as introspection. `Ironic` pairs servers with a bootable disk
+image and then installs them via PXE and remote power management.
 
-OSP director deploys all servers with the same generic image by injecting *Puppet modules* into the generic 
-disk image to tailor it for specific server roles. It then 
-applies host-specific customizations via Puppet including network and 
+OSP director deploys all servers with the same generic image by injecting `Puppet modules` into the generic
+disk image to tailor it for specific server roles. It then
+applies host-specific customizations via Puppet including network and
 storage configurations.
 
 While the undercloud is primarily used to deploy OpenStack, the
-*overcloud* is a functional cloud available to run virtual machines
+`overcloud` is a functional cloud available to run virtual machines
 and workloads. Servers in the following roles comprise the overcloud:
 
 [[server-roles]]
@@ -67,13 +67,12 @@ and workloads. Servers in the following roles comprise the overcloud:
     This role provides the endpoint for REST-based API queries to the
     majority of the OpenStack services. These include Compute, Image,
     Identity, Block, Network, and Data processing.  The controller can
-    run as a standalone server or as a 3-16 node high availability
-    (HA) cluster.
+    run as a standalone server or as a high availability (HA) cluster.
 *Compute*::
     This role provides the processing, memory, storage, and
     networking resources to run virtual machine instances. They run
     the KVM hypervisor by default. New instances are spawned across
-    compute nodes in a round-robin fashion. 
+    compute nodes in a round-robin fashion.
 *Block storage*::
     This role provides external block storage for Highly Available controller nodes
     via the OpenStack Block Storage service `Cinder`.
@@ -118,7 +117,7 @@ network traffic types can be assigned to a physical,
 virtual, or bonded interface. Multiple traffic types can be combined
 across the same physical interfaces or switches. Each OpenStack
 service is bound to an IP on a particular network. A virtual IP is
-created on that network and shared among all of the HA controllers. 
+created on that network and shared among all of the HA controllers.
 
 OPS director supports network isolation for the following traffic
 types:
@@ -138,7 +137,7 @@ types:
     This network provides overcloud nodes with external connectivity.
     Controller nodes connect the external network to an Open vSwitch
     bridge and forward traffic originating from hypervisor instances
-    through it. The Horizon service and OpenStack Public API endpoints
+    through it. The `Horizon` service and OpenStack Public API endpoints
     can share this network or they can be broken out to an optional
     Public API network.
 *Internal API*::
@@ -164,7 +163,7 @@ types:
     with the storage servers via this network. Data-intensive
     OpenStack deployments should isolate storage traffic on a
     dedicated high bandwidth interface, i.e. 10 GB interface. The
-    Glance API, Swift proxy, and Ceph Public interface services are
+    `Glance` API, `Swift` proxy, and Ceph Public interface services are
     all delivered via this network.
 *Storage Management*::
     Storage management communication can generate large amounts of
@@ -173,7 +172,8 @@ types:
     data storage nodes. This network is also used for storage clustering
     and replication traffic.
 
-Network traffic types are assigned to network interfaces through Heat template
+Network traffic types are assigned to network interfaces through
+`Heat` template
 customizations prior to deploying the overcloud. OSP director supports
 several network interface types including physical interfaces, bonded
 interfaces, and either tagged or native 802.1Q VLANs.
@@ -248,7 +248,7 @@ networking types:
 Although Red Hat certifies third-party network plug-ins, OSP director
 uses the ML2 network plugin with the Open vSwitch driver by default.
 
-NOTE: OSP director does not deploy Nova networking.
+NOTE: OSP director does not deploy `Nova` networking.
 
 === High Availability
 OSP director's approach to high availability OpenStack leverages Red Hat's
@@ -292,7 +292,7 @@ Benefits of using a proxy server include:
 . Service requests can be monitored in a central location
 . Cluster nodes can be added or removed without interrupting service
 
-OSP director uses *`HAproxy`* and *`Pacemaker`* to manage HA services and load
+OSP director uses `HAproxy` and `Pacemaker` to manage HA services and load
 balance connection requests. With the exception of `RabbitMQ` and
 `Galera`, HAproxy distributes connection requests to active nodes in a
 round-robin fashion. `Galera` and `RabbitMQ` use persistent options to
@@ -343,11 +343,11 @@ document.
 *Collapsed* clusters run every service and component on the same set of
 three or more nodes. Cluster services share the same virtual IP
 address set. Collapsed services require fewer physical machines and
-are simpler to implement and manage. 
+are simpler to implement and manage.
 
 Previous Red Hat OpenStack Platform installers deployed segregated
 clusters. OSP director deploys overclouds as collapsed clusters. All
-controller nodes run the same services. Service endpoints are bound to 
+controller nodes run the same services. Service endpoints are bound to
 the same set of virtual IP addresses. The undercloud is not clustered.
 
 <<collapsed-cluster, This diagram>> depicts OSP director's default
@@ -378,11 +378,11 @@ Each clustered service operates in one of the following modes:
   in different modes, or the service runs active/active but is used as
   active/passive. Mixed services are explained individually.
 * *Single*: Each node runs an independent cluster manager that only
-  monitors its local service. 
+  monitors its local service.
 
 A cluster *quorum* is the majority node set when a failure splits the
-cluster into two or more partitions. In this situation the majority 
-fences the minority to ensure both sides are not running the same 
+cluster into two or more partitions. In this situation the majority
+fences the minority to ensure both sides are not running the same
 services -- a so-called "split brain" situation. *Fencing* is the
 process of isolating a failed machine -- typically via remote power
 control or networked switches -- by powering it off. This is necessary
@@ -409,7 +409,7 @@ The following table lists service mode by service.
 |====
 |Service|Mode|Description
 |*Ceilometer*|Active/active|Measures usage of core OpenStack
-components. It is used within Heat to trigger application autoscaling.
+components. It is used within `Heat` to trigger application autoscaling.
 |*Cinder*|Mixed|Provides persistent block storage to virtual
 machines. All services are active/active except `cinder-volume` runs
 active/passive to prevent a potential
@@ -420,10 +420,10 @@ machine images.
 active/active mode.
 |*Keystone*|Active/active|Common OpenStack authentication system runs
 in `httpd`.
-|*Neutron server*|Active/active|Neutron allows users to define and join
+|*Neutron server*|Active/active|`Neutron` allows users to define and join
 networks on demand.
 |*Neutron agents*|Active/active|Support Layer 2 and 3 communication
-plus  numerous virtual networking technologies including `ml2` and `open vswitch`.
+plus numerous virtual networking technologies including `ml2` and `open vswitch`.
 |*Nova*|Active/active|Provides compute capabilities to deploy and run
 virtual machine instances.
 |*Swift proxy server*|Active/active|Routes data requests to the
@@ -433,7 +433,7 @@ appropriate `Swift` ACO server.
 ==== Cluster Modes for Supporting Services
 
 The majority of the core OpenStack services run in active/active mode.
-The same is true for the supporting servicesr, although several of
+The same is true for the supporting services, although several of
 them field connection requests directly from clients rather than
 `HAProxy`. The following tables lists the cluster mode for the non-core OpenStack
 services.
@@ -514,7 +514,7 @@ deployed in the overcloud.
 
 This reference architecture includes a 4-node Ceph cluster. Each node
 has 10 OSD disks (40 total). The OSDs in the reference architecture
-store Glance images, host Cinder volumes, and provide ephemeral
+store `Glance` images, host `Cinder` volumes, and provide ephemeral
 storage for the deployed instances.
 
 Consult

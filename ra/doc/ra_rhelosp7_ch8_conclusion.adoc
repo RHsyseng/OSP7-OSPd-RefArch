@@ -7,7 +7,7 @@ introduces OpenStack director -- Red Hat's intergrated management tool set
 also describes the steps performed by the Red Hat Systems Engineering
 team to deploy a highly available OpenStack Platform 7 cluster running
 a modern EAP6 microservices application installed and configured via
-nested Heat templates. Every step in the reference architecture was
+nested `Heat` templates. Every step in the reference architecture was
 tested with customer-available code on bare metal servers. It
 complements existing documentation by providing a comprehensive
 example of using OpenStack Platform director in a realistic
@@ -16,7 +16,7 @@ environment with its own hardware and network constraints.
 The use case provides:
 
 1. undercloud installation steps including post-installation
-   configuration of the database and Neutron quotas.
+   configuration of the database and `Neutron` quotas.
 2. overcloud installation steps including post-installation
    configuration of the Pacemaker resource constraints and fence
    devices.
@@ -30,7 +30,7 @@ The use case provides:
    OpenStack including service placement and protection as implemented
    by OpenStack Platform director.
 6. A fully worked example of deploying a multi-tiered JBOSS Enterprise
-   Application Platform 6 application using nested Heat templates.
+   Application Platform 6 application using nested `Heat` templates.
 
 EAP microservices applications can be delivered via Red Hat OpenShift
 Enterprise using containers or another PaaS model. However, the use
@@ -39,7 +39,7 @@ developing the application, and also for customers who are reluctant
 to move to PaaS because they already have a substantial investment in
 existing IaaS infrastructure. Also, although it is not covered in this
 reference architecture, OpenStack can put additional muscle behind an
-EAP 6 microservices application when it is coupled with 'Heat' and
-'Ceilometer' auto-scaling functionality. Auto-scaling the EAP 6
-application behind a Neutron LBaaS has potential as an interesting
+EAP 6 microservices application when it is coupled with `Heat` and
+`Ceilometer` auto-scaling functionality. Auto-scaling the EAP 6
+application behind a `Neutron` LBaaS has potential as an interesting
 direction for future work.

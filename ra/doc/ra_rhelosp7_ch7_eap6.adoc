@@ -4,7 +4,7 @@ This section describes the steps to install and configure an example
 EAP application on the deployed cloud. The example EAP application is
 a multi-tier web application with a shopping cart.
 
-Red Hat® JBoss® Enterprise Application Platform (EAP) is a fully certified 
+`Red Hat® JBoss® Enterprise Application Platform (EAP)` is a fully certified 
 Java™ EE platform for developing and deploying enterprise
 applications. This reference architecture documents the steps to
 deploy an EAP 6 application demonstrating Microservices Architecture (MSA) on OSP 7. MSA is
@@ -18,7 +18,7 @@ such as REST over HTTP.
 More information about Red Hat JBOSS EAP can be found at
 https://access.redhat.com/products/red-hat-jboss-enterprise-application-platform[http://red.ht/1NZrW0A].
 
-The MSA application used in this reference architecture is an example of Business-Driven 
+The MSA application used in this reference architecture is an example of Business-Driven
 Microservices. The services in the application do not communicate
 directly with one another. A web application aggregates and
 coordinates communication between the services. It acts as a
@@ -30,28 +30,28 @@ They can be developed, scaled, and maintained independently, without leading to 
 .EAP6 Microservices Architecture
 image::images/EAP6_MSA.png[align="center", scaledwidth="50%"]
 
-OpenStack Platform 7 provides a comprehensive platform for implementing, 
+OpenStack Platform 7 provides a comprehensive platform for implementing,
 maintaining, and scaling an MSA application. Because microservices are independent,
 scalable services, they require a scalable platform to reach their
 potential. OpenStack provides a robust underlying toolset for automating service
 implementation, deployment, discovery, and scaling. This reference
 architecture demonstrates how to deploy and orchestrate an EAP6 MSA application
-using nested Heat templates. Directions for future work might include
-auto-scaling to multiple MSA applications via Heat and Ceilometer and load
+using nested `Heat` templates. Directions for future work might include
+auto-scaling to multiple MSA applications via `Heat` and `Ceilometer` and load
 balancing between them via LBaaS.
 
 <<EAP6-MSA>> depicts the MSA application deployed in this reference
-architecture. 
+architecture.
 
 More information on deploying a RHEL JBOSS EAP 6 MSA application can be found at
 https://access.redhat.com/articles/1452603[ Microservice Architecture:
-Building Microservices with JBOSS EAP 6]. 
+Building Microservices with JBOSS EAP 6].
 
 === Create the test environment
 The MSA application does not exist in a vacuum. This section
 describes the steps for installing the supporting infrastructure
-around the application including a public Neutron network and subnet, a demo
-tenant and user, a RHEL 7.1 Glance image, and a key pair for accessing
+around the application including a public `Neutron` network and subnet, a demo
+tenant and user, a RHEL 7.1 `Glance` image, and a key pair for accessing
 the MSA application servers via *ssh*.
 
 . Source *overcloudrc*.
@@ -241,17 +241,17 @@ $ *openstack keypair list*
 ----
 
 === Deploy the MSA Application via Heat
-Heat Orchestration Template (HOT) is the template format natively
-supported by Heat. Heat templates define resources. They accept user
+`Heat Orchestration Template (HOT)` is the template format natively
+supported by `Heat`. These templates define resources. They accept user
 input to promote re-use.
 
 The MSA application used in this reference architecture is defined as
 a series of nested templates. Each of the four services and two
 databases are defined in templates called by the master template. The
-private Neutron network, subnet, and router are also defined in a
+private `Neutron` network, subnet, and router are also defined in a
 nested template.
 
-NOTE: The Heat templates used in this example are provided via the
+NOTE: The `Heat` templates used in this example are provided via the
 associated script archive. They are too lengthy to document.
 
 . Create the _templates/lib_ directory.
@@ -270,7 +270,7 @@ $ ls templates/lib/
 billing-service.yaml       private_network.yaml  product-service.yaml sales-service.yaml
 presentation-service.yaml  product-db.yaml       sales-db.yaml
 ----
-. Deploy the MSA application with Heat.
+. Deploy the MSA application with `Heat`.
 +
 [subs=+quotes]
 ----
@@ -302,7 +302,7 @@ resource_status    | updated_time
 | security_group       | f429d022-9608-4fd5-87b5-da7584f5b806 | OS::Neutron::SecurityGroup                                 | CREATE_COMPLETE    | 2015-08-30T03:59:16Z
 +----------------------+--------------------------------------+------------------------------------------------------------+--------------------+----------------------
 ----
-. View *nova list* after Heat creates the stack successfully.
+. View *nova list* after `Heat` creates the stack successfully.
 +
 [subs=+quotes]
 ----

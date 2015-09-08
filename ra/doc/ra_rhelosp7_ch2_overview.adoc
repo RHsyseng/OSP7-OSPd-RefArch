@@ -10,7 +10,7 @@ a realistic use case for deploying an EAP 6 microservices architecture
 on a highly available RHEL OpenStack Platform 7 cluster. It provides a comprehensive,
 end-to-end example of depoying an Red Hat OpenStack Platform 7 cloud on baremetal using
 OpenStack director then implementing the microservice architecture via
-Heat templates.
+`Heat` templates.
 
 [[OSP-director]]
 .OpenStack Platform director

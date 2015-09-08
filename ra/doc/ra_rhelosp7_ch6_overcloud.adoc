@@ -5,7 +5,7 @@ This section describes steps for deploying the overcloud.
 === Create the images
 
 1. Download and extract the RHEL OSP 7 discovery, deployment, and
-  overcloud images. 
+  overcloud images.
 +
 NOTE: Download the images from: https://access.redhat.com/downloads/content/191/ver=7.0/rhel---7/7.0/x86_64/product-downloads 
 +
@@ -57,7 +57,7 @@ $ *openstack image list*
 === Register and introspect the nodes.
 
 1. Create the host definition file. _openstack-ironic-discoverd_
-  uses this file to discover nodes and populate the Ironic
+  uses this file to discover nodes and populate the `Ironic`
   database.
 +
 [source%autofit,ruby,numbered]
@@ -79,28 +79,13 @@ $ *openstack image list*
     },
     ...
 ----
-//     {
-//      "pm_password": "PASSWORD",
-//      "pm_type": "pxe_ipmitool",
-//      "mac": [
-//        "54:9F:35:F6:70:70"
-//      ],
-//      "cpu": "32",
-//      "memory": "98304",
-//      "disk": "130",
-//      "arch": "x86_64",
-//      "pm_user": "root",
-//      "pm_addr": "10.19.143.37"
-//     }
-//  ]
-//}
 +
 *mac* is the MAC address of the provisioning interface. The *pm_*
 entries refer to the hardware management interface.
 +
-NOTE: The example below is truncated for brevity. 
+NOTE: The example below is truncated for brevity.
 +
-2. Import the node definitions to the Ironic database.
+2. Import the node definitions to the `Ironic` database.
 +
 [subs=+quotes]
 ----
@@ -324,7 +309,7 @@ $ *openstack flavor list*
 +--------------------------------------+-----------+------+------+-----------+-------+-----------+
 ----
 +
-8. Assign Ironic nodes to profiles and view the results.
+8. Assign `Ironic` nodes to profiles and view the results.
 +
 [subs=+quotes]
 ----
@@ -370,9 +355,8 @@ $2 } ') | grep -B 1 nameserver*
 
 === Configure network isolation
 This section describes how to configure network isolation for the
-reference architecture. Configure network
-isolation by defining networks in environment files. Pass the
-environment files to Heat.
+reference architecture. Configure network isolation by defining
+networks in environment files. Pass the environment files to `Heat`.
 
 The network isolation environment files used in this section produce
 the network described in <<reference-architecture-diagram>>.
@@ -440,7 +424,7 @@ ceph-storage.yaml  cinder-storage.yaml  compute.yaml  controller.yaml swift-stor
 Complete examples of each network configuration file are in
 <<Appendix-nic-configs>>.
 +
-NOTE: Swift and Cinder servers are not used in this reference
+NOTE: `Swift` and `Cinder` servers are not used in this reference
 architecture. Their files are included for completeness but not called
 by the installer.
 +
@@ -453,7 +437,7 @@ print $2 } ') --dns-nameserver 10.19.143.247*
 ----
 
 === Customize Ceph Storage
-Like network isolation, Ceph is customized by passing Heat additional
+Like network isolation, Ceph is customized by passing `Heat` additional
 environment files. The customization produce the Ceph cluster depicted
 in the <<ceph-integration,Ceph integration graphic>>.
 
@@ -466,7 +450,7 @@ configuration for Ceph OSDs when SSD drives are not used.
    best performance. Ceph data is protected through replication across
    OSDs so RAID is not recommended.
 2. Initialize the virtual disks to remove all partition and MBR data.
-3. Create a _templates_ directory for Heat template customization.
+3. Create a _templates_ directory for `Heat` template customization.
 +
 [subs=+quotes]
 ----
@@ -527,7 +511,7 @@ This section describes how to deploy and test the overcloud defined in
 the previous section.
 
 === Deploy the Overcloud servers
-1. Use *ironic node-list* to verify all Ironic nodes are powered off,
+1. Use *ironic node-list* to verify all `Ironic` nodes are powered off,
    available for provisioning, and not in maintenance mode.
 +
 [subs=+quotes]
@@ -608,7 +592,7 @@ $ nova list
 ----
 +
 5. Source the _overcloudrc_ file to set environment variables for the overcloud.
-6. Verify all Nova services and enabled and up.
+6. Verify all `Nova` services and enabled and up.
 +
 [subs=+quotes]
 ----
@@ -631,7 +615,7 @@ $ *nova service-list*
 | 132 | nova-compute     | overcloud-compute-3.localdomain    | nova     | enabled | up    | 2015-08-28T21:55:57.000000 | -               |
 +-----+------------------+------------------------------------+----------+---------+-------+----------------------------+-----------------+
 ----
-7. Verify all Neutron agents are alive and up.
+7. Verify all `Neutron` agents are alive and up.
 +
 [subs=+quotes]
 ----

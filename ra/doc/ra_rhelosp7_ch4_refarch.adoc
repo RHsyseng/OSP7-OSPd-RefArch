@@ -21,7 +21,7 @@ including:
 * Satellite subscription
 
 The use case concludes with instructions for installing the EAP 6
-microservices architecture via Heat. The microservices architecture
+microservices architecture via `Heat`. The microservices architecture
 demonstrates OpenStack's ability to deploy and run a complex
 application typical to a production cloud. The microservices
 architecture in this example is a multi-tier shopping cart that
@@ -30,7 +30,7 @@ sales, billing, and product microservices.
 
 === Workflow
 <<reference-workflow>> depicts a high-level overview of the use case
-workflow. 
+workflow.
 
 [[reference-workflow]]
 .Reference Architecture Workflow
@@ -48,7 +48,7 @@ The use case is divided into the following steps:
 .. Customize the Ceph OSDs.
 .. Define the network isolation configuration.
 . *Create the overcloud*: 
-.. Deploy the overcloud via Heat.
+.. Deploy the overcloud via `Heat`.
 .. Configure HA fencing devices.
 .. Test the overcloud deployment.
 . *Deploy the EAP 6 MSA*:
