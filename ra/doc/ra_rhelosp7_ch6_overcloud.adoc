@@ -265,6 +265,7 @@ os_auth_url = http://192.0.2.1:5000/v2.0
 ----
 6. Create the AHC spec files.
 +
+NOTE: Servers are matched to profiles by the order they are listed in this file.
 [source%autofit, shell]
 ----
 [stack@rhos0 ~]$ for i in $(ls /etc/ahc-tools/edeploy/{*.specs,state}); do echo $i && cat $i; done
@@ -293,9 +294,15 @@ This configuration defines:
 * 8 cores per CPU, minimum 100 GB disk size and 64 GB RAM for
   controllers
 * The state file specifies that AHC should match 3 controllers, 4 Ceph
-  storage servers, and the remainder as compute nodes. 
+  storage servers, and the remainder as compute nodes.
 +
-NOTE: Servers are matched to profiles by the order they are listed in this file.
+NOTE: View
+https://github.com/redhat-cip/edeploy/blob/master/docs/eDeployUserGuide.rst#appendix[Appendix
+A] of the
+https://github.com/redhat-cip/edeploy/blob/master/docs/eDeployUserGuide.rst[eDeploy
+User's Guide] for an exhaustive
+list of the hardware components and settings that can be matched in a
+specification file.
 7. This loop creates a hardware profile for each node type defined in
    the state file.
 +

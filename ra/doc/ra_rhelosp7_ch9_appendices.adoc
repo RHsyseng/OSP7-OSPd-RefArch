@@ -9,14 +9,40 @@
 [appendix]
 == References
 
+=== Ceph
 . http://ceph.com/docs/master/rados/operations/placement-groups/[Ceph
   Placement Groups]
-. https://access.redhat.com/solutions/1320133[How can I execute the
-  JBoss EAP 6 using Systemctl?]
 . https://wiki.ceph.com/Guides/How_To/Benchmark_Ceph_Cluster_Performance[Benchmark
 Ceph Cluster Performance]
 . https://access.redhat.com/articles/1321163[2015 - RHEL OSP 5: Cinder Volume Performance on Inktank Ceph
 Enterprise 1.2.2]
+. https://access.redhat.com/documentation/en/red-hat-ceph-storage/version-1.3/red-hat-ceph-storage-13-red-hat-ceph-architecture/red-hat-ceph-architecture[
+Red Hat Ceph Architecture Guide]
+. https://access.redhat.com/articles/1370143[2015 - Deploying Highly
+  Available Red Hat Enterprise Linux OpenStack Platform 6 with Ceph
+  Storage]
+
+=== eDeploy and AHC
+. https://github.com/redhat-cip/edeploy/blob/master/docs/eDeployUserGuide.rst[eDeploy
+  User's Guide]
+. https://github.com/redhat-cip/edeploy/blob/master/docs/AHC.rst[
+Automatic Health Check (AHC) - User Guide]
+
+=== Heat
+. http://docs.openstack.org/developer/heat/template_guide/hot_spec.html[Heat
+  Orchestration Template (HOT) specification]
+. http://docs.openstack.org/developer/heat/template_guide/[Heat
+  Orchestration Template (HOT) Guide]
+. http://hardysteven.blogspot.com/2015/04/debugging-tripleo-heat-templates.html[Debugging
+TripleO Heat templates]
+
+=== JBOSS EAP
+. https://access.redhat.com/solutions/1320133[How can I execute the
+  JBoss EAP 6 using Systemctl?]
+. https://access.redhat.com/articles/1452603[2015 - Microservice
+  Architecture: Building microservices with JBoss EAP 6]
+
+=== Red Hat OpenStack Platform
 . https://access.redhat.com/articles/1507893[2015 - Guidelines and
 Considerations for Performance and Scaling your Red Hat Openstack 6
 Cloud]
@@ -27,29 +53,12 @@ backend database for Red Hat Enterprise Linux OpenStack Platform]
 . https://access.redhat.com/documentation/en-US/Red_Hat_Enterprise_Linux/6/html-single/Virtualization_Tuning_and_Optimization_Guide/index.html[Red Hat Enterprise Linux 6 Virtualization Tuning and Optimization Guide]
 . http://people.redhat.com/berrange/kvm-forum-2014/kvm-forum-2014-openstack-perf.pdf[OpenStack
 Performance Optimization]
-. https://access.redhat.com/documentation/en-US/Red_Hat_Enterprise_Linux_OpenStack_Platform/7/html/Director_Installation_and_Usage/[Red
-Hat Enterprise Linux OpenStack Platform 7 Director Installation and
-Usage]
-. http://hardysteven.blogspot.com/2015/04/debugging-tripleo-heat-templates.html[Debugging
-TripleO Heat templates]
-. https://github.com/redhat-cip/edeploy/blob/master/docs/AHC.rst[
-Automatic Health Check (AHC) - User Guide]
+. https://access.redhat.com/documentation/en-US/Red_Hat_Enterprise_Linux_OpenStack_Platform/7/html/Director_Installation_and_Usage/[Red Hat Enterprise Linux OpenStack Platform 7 Director Installation and Usage]
 . https://access.redhat.com/articles/973163[Certified Guest Operating
 Systems in Red Hat Enterprise Linux OpenStack Platform and Red Hat
 Enterprise Virtualization]
 https://access.redhat.com/articles/1436373[Deployment Limits for Red
 Hat OpenStack Platform]
-. https://access.redhat.com/documentation/en/red-hat-ceph-storage/version-1.3/red-hat-ceph-storage-13-red-hat-ceph-architecture/red-hat-ceph-architecture[
-Red Hat Ceph Architecture Guide]
-. https://access.redhat.com/articles/1370143[2015 - Deploying Highly
-  Available Red Hat Enterprise Linux OpenStack Platform 6 with Ceph
-  Storage]
-. https://access.redhat.com/articles/1452603[2015 - Microservice
-  Architecture: Building microservices with JBoss EAP 6]
-. http://docs.openstack.org/developer/heat/template_guide/hot_spec.html[Heat
-  Orchestration Template (HOT) specification]
-. http://docs.openstack.org/developer/heat/template_guide/[Heat
-  Orchestration Template (HOT) Guide]
 
 [appendix]
 [[hardware-specifications]]
@@ -89,5 +98,143 @@ Red Hat Enterprise Linux OpenStack Platform is available via the Content Deliver
 
 NOTE: This reference architecture uses a local satellite server for
 deployments and updates.
+
+[appendix]
+== Deploying undercloud with SSL
+
+This appendix describes steps for deploying the undercloud with SSL
+support.
+
+
+. Generate a private key file.
+----
+[stack@rhos0 ~]$ openssl genrsa -out privkey.pem 2048
+Generating RSA private key, 2048 bit long modulus
+.....................................................................+++
+.........+++
+e is 65537 (0x10001)
+----
+
+. Create the distinguished identifier for the certificate.
+NOTE: Replace this example with appropriate environment-specific answers.
+----
+[stack@rhos0 ~]$ openssl req -new -x509 -key privkey.pem -out
+cacert.pem -days 365
+You are about to be asked to enter information that will be
+incorporated
+into your certificate request.
+What you are about to enter is what is called a Distinguished Name or
+a DN.
+There are quite a few fields but you can leave some blank
+For some fields there will be a default value,
+If you enter '.', the field will be left blank.
+\-----
+Country Name (2 letter code) [XX]:US
+State or Province Name (full name) []:Texas
+Locality Name (eg, city) [Default City]:Austin
+Organization Name (eg, company) [Default Company Ltd]:Red Hat
+Organizational Unit Name (eg, section) []:Systems Engineering
+Common Name (eg, your name or your server's hostname) []:192.0.2.2
+Email Address []:jliberma@redhat.com
+----
+
+. Write the certificate and key to _undercloud.pem_.
+----
+[stack@rhos0 ~]$ cat cacert.pem privkey.pem > undercloud.pem
+----
+
+. Copy the combined SSL key to _/etc/pki/instal-cert/_.
+----
+[stack@rhos0 ~]$ sudo mkdir /etc/pki/instack-certs
+[stack@rhos0 ~]$ sudo cp ~/undercloud.pem /etc/pki/instack-certs/.
+----
+
+. Set the SELinux context on the key certificate directory and files.
+----
+[stack@rhos0 ~]$ sudo semanage fcontext -a -t etc_t
+"/etc/pki/instack-certs(/.*)?"
+[stack@rhos0 ~]$ sudo restorecon -R /etc/pki/instack-certs
+----
+
+. Modify the undercloud.conf from the previous example to include:
+.. An undercloud public VIP
+.. An undercloud private VIP
+.. The location for the undercloud service certificate.
+----
+[stack@rhos0 ~]$ head undercloud.conf 
+[DEFAULT]
+
+image_path = .
+local_ip = 192.0.2.1/24
+undercloud_public_vip = 192.0.2.2
+undercloud_admin_vip = 192.0.2.3
+undercloud_service_certificate = /etc/pki/instack-certs/undercloud.pem
+local_interface = eno4
+masquerade_network = 192.0.2.0/24
+dhcp_start = 192.0.2.5
+----
+
+. Install the undercloud with SSL support.
+----
+[stack@rhos0 ~]$ openstack undercloud install
+...
+#############################################################################
+instack-install-undercloud complete.
+
+The file containing this installation's passwords is at
+/home/stack/undercloud-passwords.conf.
+
+There is also a stackrc file at /home/stack/stackrc.
+
+These files are needed to interact with the OpenStack services, and
+should be
+secured.
+
+#############################################################################
+----
+
+[appendix]
+== undercloud service list
+
+neutron-dhcp-agent
+neutron-openvswitch-agent
+neutron-server
+openstack-ceilometer-alarm-evaluator
+openstack-ceilometer-alarm-notifier
+openstack-ceilometer-api
+openstack-ceilometer-central
+openstack-ceilometer-collector
+openstack-ceilometer-notification
+openstack-glance-api
+openstack-glance-registry
+openstack-heat-api-cfn
+openstack-heat-api-cloudwatch
+openstack-heat-api
+openstack-heat-engine
+openstack-ironic-api
+openstack-ironic-conductor
+openstack-ironic-discoverd-dnsmasq
+openstack-ironic-discoverd
+openstack-keystone
+openstack-nova-api
+openstack-nova-compute
+openstack-nova-conductor
+openstack-nova-consoleauth
+openstack-nova-scheduler
+openstack-swift-account-auditor
+openstack-swift-account-reaper
+openstack-swift-account-replicator
+openstack-swift-account
+openstack-swift-container-auditor
+openstack-swift-container-replicator
+openstack-swift-container-updater
+openstack-swift-container
+openstack-swift-object-auditor
+openstack-swift-object-replicator
+openstack-swift-object-updater
+openstack-swift-object
+openstack-swift-proxy
+openstack-tuskar-api
+
 
 // vim: set syntax=asciidoc:

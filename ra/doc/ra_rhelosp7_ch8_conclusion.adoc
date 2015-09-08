@@ -1,17 +1,45 @@
 [conclusion]
 == Conclusion
 OpenStack Platform 7 is Red Hat's 5th iteration of OpenStack Platform
-based on the Kilo community OpenStack release. This reference
-architecture is a comprehensive example of deploying an EAP6
-microservices application on a RHEL 7 OpenStack cluster. It provides a
-comprehensive example for deploying an application end-to-end on
-realistic hardware using customer-available code. The use case
-provides a frame of reference for customizing the storage and
-networking. The reference architecture also introduces OpenStack director --
-Red Hat's intergrated management tool set -- and describes Red Hat's
-approach to OpenStack high availability.
+based on the Kilo community OpenStack release. The reference architecture 
+introduces OpenStack director -- Red Hat's intergrated management tool set 
+-- and describes Red Hat's approach to OpenStack high availability. It
+also describes the steps performed by the Red Hat Systems Engineering
+team to deploy a highly available OpenStack Platform 7 cluster running
+a modern EAP6 microservices application installed and configured via
+nested Heat templates. Every step in the reference architecture was
+tested with customer-available code on bare metal servers. It
+complements existing documentation by providing a comprehensive
+example of using OpenStack Platform director in a realistic
+environment with its own hardware and network constraints.
 
-Future extensions to this use case might include using `keepalived`
-instead of `Pacemaker` for HA, auto-scaling the EAP application with
-`Heat` and `Ceilometer`, and implementing Neutron LBaaS in front of a
-scaled EAP 6 application.
+The use case provides:
+
+1. undercloud installation steps including post-installation
+   configuration of the database and Neutron quotas.
+2. overcloud installation steps including post-installation
+   configuration of the Pacemaker resource constraints and fence
+   devices.
+3. A fully worked example of Ceph OSD and journal customization via Puppet Hiera
+   data accompanied by post-installtion configuration steps for
+   increasing placement group settings for improved performance.
+4. A fully worked example of network isolation configuration that
+   describes a sensible method for collapsing multiple networks onto
+   four physical interfaces using both tagged and native VLANs.
+5. A detailed description of Red Hat's approach to highly available
+   OpenStack including service placement and protection as implemented
+   by OpenStack Platform director.
+6. A fully worked example of deploying a multi-tiered JBOSS Enterprise
+   Application Platform 6 application using nested Heat templates.
+
+EAP microservices applications can be delivered via Red Hat OpenShift
+Enterprise using containers or another PaaS model. However, the use
+case is still valid from a DevOps perpspective for staging anf
+developing the application, and also for customers who are reluctant
+to move to PaaS because they already have a substantial investment in
+existing IaaS infrastructure. Also, although it is not covered in this
+reference architecture, OpenStack can put additional muscle behind an
+EAP 6 microservices application when it is coupled with 'Heat' and
+'Ceilometer' auto-scaling functionality. Auto-scaling the EAP 6
+application behind a Neutron LBaaS has potential as an interesting
+direction for future work.

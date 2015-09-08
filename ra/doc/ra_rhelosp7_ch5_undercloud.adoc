@@ -176,6 +176,8 @@ OS_NO_CACHE=True
 +
 6. Verify all services are active.
 +
+NOTE: This command output was truncated for brevity. Verify all
+services are _active_.
 [source%autofit, shell]
 ----
 $ openstack-service status
@@ -188,39 +190,13 @@ openstack-ceilometer-api (pid 16068) is active
 openstack-ceilometer-central (pid 15998) is active
 openstack-ceilometer-collector (pid 15965) is active
 openstack-ceilometer-notification (pid 15932) is active
-openstack-glance-api (pid 16984) is active
-openstack-glance-registry (pid 16915) is active
-openstack-heat-api-cfn (pid 17783) is active
-openstack-heat-api-cloudwatch (pid 17959) is active
-openstack-heat-api (pid 17886) is active
-openstack-heat-engine (pid 17818) is active
-openstack-ironic-api (pid 14485) is active
-openstack-ironic-conductor (pid 19038) is active
-openstack-ironic-discoverd-dnsmasq (pid 19953) is active
-openstack-ironic-discoverd (pid 19959) is active
-openstack-keystone (pid 16636) is active
-openstack-nova-api (pid 17129) is active
-openstack-nova-compute (pid 19831) is active
-openstack-nova-conductor (pid 17319) is active
-openstack-nova-consoleauth (pid 17087) is active
-openstack-nova-scheduler (pid 17279) is active
-openstack-swift-account-auditor (pid 15378) is active
-openstack-swift-account-reaper (pid 15349) is active
-openstack-swift-account-replicator (pid 15725) is active
-openstack-swift-account (pid 15758) is active
-openstack-swift-container-auditor (pid 15486) is active
-openstack-swift-container-replicator (pid 15822) is active
-openstack-swift-container-updater (pid 16429) is active
-openstack-swift-container (pid 15851) is active
-openstack-swift-object-auditor (pid 15590) is active
-openstack-swift-object-replicator (pid 16288) is active
-openstack-swift-object-updater (pid 15619) is active
-openstack-swift-object (pid 16255) is active
-openstack-swift-proxy (pid 16155) is active
-openstack-tuskar-api (pid 19994) is active
+...
 ----
 +
-7. Increase the maximum database connections.
+7. Increase the maximum database connections. This is recommended for
+   production cluster deployments in
+   https://access.redhat.com/articles/1432053[Performance Tuning the
+   Backend Database for Red Hat Enterprise Linux OpenStack Platform]
 +
 [source%autofit, shell]
 ----
@@ -235,8 +211,13 @@ $ sudo mysql -e "SHOW GLOBAL VARIABLES LIKE 'max_connections'"
 +-----------------+-------+
 ----
 +
-8. Increase or disable Neutron port quotas.
+8. Increase or disable Neutron port quotas. In this example the port
+   quota is disabled in order to accomodate all of the ports created
+   for the overcloud servers and Pacemaker VIPs.
 +
+NOTE: A https://bugzilla.redhat.com/show_bug.cgi?id=1243121[bug]
+tracking this issue has been filed to change the default Neutron port
+quota to accomodate network isolation.
 [source%autofit, shell]
 ----
 $ neutron quota-update --port -1
@@ -259,46 +240,6 @@ $ neutron quota-show
 | security_group_rule | 100   |
 | subnet              | 10    |
 +---------------------+-------+
-----
-+
-9. Increase the RPC response timeout for Ironic and Neutron to 600 if
-  they are not already set.
-+
-[source%autofit, shell]
-----
-$ sudo openstack-config --set /etc/nova/nova.conf DEFAULT rpc_response_timeout 600
-$ sudo openstack-config --set /etc/ironic/ironic.conf DEFAULT rpc_response_timeout 600
-----
-10. Restart `nova` and `ironic` for the changes to take effect.
-+
-[subs=+quotes]
-----
-$ *sudo openstack-service restart nova*
-$ *sudo openstack-service restart ironic*
-----
-11. Verify the services started successfully.
-+
-[source%autofit, shell]
-----
-$ sudo openstack-service status | grep -E 'ironic|nova'
-openstack-ironic-api (pid 22864) is active
-openstack-ironic-conductor (pid 22873) is active
-openstack-ironic-discoverd-dnsmasq (pid 22867) is active
-openstack-ironic-discoverd (pid 22863) is active
-openstack-nova-api (pid 22584) is active
-openstack-nova-compute (pid 22586) is active
-openstack-nova-conductor (pid 22601) is active
-openstack-nova-consoleauth (pid 22605) is active
-openstack-nova-scheduler (pid 22600) is active
-----
-12. Verify the timeout values are set correctly.
-+
-[source%autofit, shell]
-----
-$ sudo openstack-config --get /etc/nova/nova.conf DEFAULT rpc_response_timeout
-600
-$ sudo openstack-config --get /etc/ironic/ironic.conf DEFAULT rpc_response_timeout
-600
 ----
 
 <<<
