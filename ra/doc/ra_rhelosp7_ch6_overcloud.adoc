@@ -666,13 +666,16 @@ durability and performance. By default OSP director creates 4 pools
 with 64 PGs and 3 replicas per pool. There are 40 OSDs which leaves 
 19.2 PGs per OSD. Ceph recommends at least 30 PGs per OSD.
 
-Each pool has two properties that dictate its number of placement groups: 
+Each pool has two properties that dictate its number of placement groups:
 _pg_num_ (number of placement groups) and _pgp_num_ (number of PGs for
 placement on OSD.)  At the time of writing, customizing _pg_num_ 
 in _ceph.yaml_ prior to deployment was not working. See
 https://bugzilla.redhat.com/show_bug.cgi?id=1252546[BZ1252546] for details.
 Therefore, this reference architecture manually inceases _pg_num_ and _pgp_num_
 to Ceph recommendations.
+
+Figure 6.1 <<image-ceph-perf>> shows the relative performance impact
+of Ceph tuning on an IO microbenchmark.
 
 1. *ssh* to a Ceph OSD node and switch to root user. 
 +
@@ -752,6 +755,27 @@ v180: 1024 pgs: 1024 active+clean; 0 bytes data, 201 GB used, 37020 GB
 ----
 
 NOTE: Increase the PGs on only one Ceph node in the cluster.
+
+==== Performance Impact of Ceph Tuning
+This graphic illustrates the performance impact of increasing the OSD
+count from 4 to 40 and the PG count from 100 to 256. All performance
+numbers are relative to the default settings.
+
+. The _random read_ performance improves slightly but does not benefit
+  very much from increasing OSD or PG count. Random read performance
+  is still limited by the average seek time on the disks.
+. Increasing the OSD count improves _sequential read_ performance by
+  more than 100% due to increased parallelism.
+. _sequential write_ benefits from both OSD and PG increases and shows
+  the largest relative improvement versus the default configuration.
+
+[[image-ceph-perf]]
+.image-ceph-benchmark
+image::images/ceph_perf.png[caption="Figure 6.1: " title="Ceph benchmark performance" align="center"]
+
+NOTE: These performance tests are are for illustrative purposes only
+and do not reflect the achievable performance of the machines on a
+real application workload.
 
 === Configure controller fencing
 _Fencing_ is an important concept for HA clusters. It is a method for
