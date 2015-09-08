@@ -59,6 +59,8 @@ Systems in Red Hat Enterprise Linux OpenStack Platform and Red Hat
 Enterprise Virtualization]
 https://access.redhat.com/articles/1436373[Deployment Limits for Red
 Hat OpenStack Platform]
+. https://access.redhat.com/documentation/en-US/Red_Hat_Satellite/6.0/pdf/Provisioning_Guide/Red_Hat_Satellite-6.0-Provisioning_Guide-en-US.pdf[The
+Red Hat Satellite 6.0 Provisioning Guide]
 
 [appendix]
 [[hardware-specifications]]
@@ -191,6 +193,25 @@ should be
 secured.
 
 #############################################################################
+----
+. Source _stackrc_ and verify the OpenStack services have separate
+  internal and public endpoint URLs.
+----
+[stack@rhos0 ~]$ source ~stackrc
+[stack@rhos0 ~]$ openstack endpoint show glance
+    +--------------+----------------------------------+
+    | Field        | Value                            |
+    +--------------+----------------------------------+
+    | adminurl     | http://192.0.2.1:9292/           |
+    | enabled      | True                             |
+    | id           | 6f715600451f433f98e38b72a5b70606 |
+    | internalurl  | http://192.0.2.1:9292/           |
+    | publicurl    | https://192.0.2.2:13292/         |
+    | region       | regionOne                        |
+    | service_id   | 8553ca00fa2c4aa98b1d60aa53df3f89 |
+    | service_name | glance                           |
+    | service_type | image                            |
+    +--------------+----------------------------------+
 ----
 
 [appendix]

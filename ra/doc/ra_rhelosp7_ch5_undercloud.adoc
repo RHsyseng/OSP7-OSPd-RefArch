@@ -38,6 +38,14 @@ Product Name: Red Hat Enterprise Linux Server
 Status:       Subscribed
 ----
 +
+NOTE: In this example the system is registered to a satellite server
+via an organization activation key. The
+https://access.redhat.com/documentation/en-US/Red_Hat_Enterprise_Linux_OpenStack_Platform/7/html/Director_Installation_and_Usage/sect-Registering_your_System.html[product documentation] includes
+instructions for registering directly via
+_subscription-manager_.
+https://access.redhat.com/documentation/en-US/Red_Hat_Satellite/6.0/pdf/Provisioning_Guide/Red_Hat_Satellite-6.0-Provisioning_Guide-en-US.pdf[The
+Red Hat Satellite 6.0 Provisioning Guide] includes instructions for
+creating an organization activation key.
 4. List active repositories.
 +
 [source%autofit, shell]
@@ -75,9 +83,10 @@ uid=1000(stack) gid=1000(stack) groups=1000(stack)
 1. Switch to the `stack` user account.
 +
 [source%autofit, shell]
+[subs=+quotes]
 ----
-# su - stack
-$ id
+# *su - stack*
+$ *id*
 uid=1000(stack) gid=1000(stack) groups=1000(stack) context=unconfined_u:unconfined_r:unconfined_t:s0-s0:c0.c1023
 ----
 +
