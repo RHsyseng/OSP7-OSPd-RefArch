@@ -56,10 +56,10 @@ the MSA application servers via *ssh*.
 
 . Source *overcloudrc*.
 +
-[source%autofit, shell]
+[subs=+quotes]
 ----
-$ source overcloudrc
-$ env | grep OS_
+$ *source overcloudrc*
+$ *env | grep OS_*
 OS_PASSWORD=009fe566ba853020923a06c67c5c6a05fe7f9877
 OS_AUTH_URL=http://10.19.137.121:5000/v2.0/
 OS_USERNAME=admin
@@ -70,9 +70,9 @@ OS_CLOUDNAME=overcloud
 . Create an external network and subnet. This will be the public
   network for the MSA application. Export the external network ID.
 +
-[source%autofit, shell]
+[subs=+quotes]
 ----
-$ neutron net-create ext-net -- --router:external=True --shared=True
+$ *neutron net-create ext-net -- --router:external=True --shared=True*
 Created a new network:
 +---------------------------+--------------------------------------+
 | Field                     | Value                                |
@@ -94,17 +94,20 @@ Created a new network:
 . Export _ext_net_ network ID to pass it as a parameter to *heat
   stack-create*.
 +
-[source%autofit, shell]
+[subs=+quotes]
 ----
-$ export ext_net_id=$(neutron net-show ext-net | awk ' / id/ { print $4 } ')
-$ echo $ext_net_id
+$ *export ext_net_id=$(neutron net-show ext-net | awk ' / id/ { print
+$4 } ')*
+$ *echo $ext_net_id*
 b1f27b52-6229-41e7-a597-02a070320ab4
 ----
 . Create a subnet on _ext-net_.
 +
-[source%autofit, shell]
+[subs=+quotes]
 ----
-$ neutron subnet-create --name ext-net --allocation-pool=start=10.19.137.137,end=10.19.137.150 --gateway_ip=10.19.143.254 ext-net 10.19.136.0/21
+$ *neutron subnet-create --name ext-net
+--allocation-pool=start=10.19.137.137,end=10.19.137.150
+--gateway_ip=10.19.143.254 ext-net 10.19.136.0/21*
 
 Created a new subnet:
 +-------------------+----------------------------------------------------+
@@ -128,9 +131,9 @@ Created a new subnet:
 ----
 . Create a demo user.
 +
-[source%autofit, shell]
+[subs=+quotes]
 ----
-$ openstack user create --password redhat demo
+$ *openstack user create --password redhat demo*
 +----------+----------------------------------+
 | Field    | Value                            |
 +----------+----------------------------------+
@@ -143,9 +146,9 @@ $ openstack user create --password redhat demo
 ----
 . Create a demo tenant.
 +
-[source%autofit, shell]
+[subs=+quotes]
 ----
-$ openstack project create demo-tenant
+$ *openstack project create demo-tenant*
 +-------------+----------------------------------+
 | Field       | Value                            |
 +-------------+----------------------------------+
@@ -157,9 +160,9 @@ $ openstack project create demo-tenant
 ----
 . Add the __member__ role to the _demo-tenant_ user.
 +
-[source%autofit, shell]
+[subs=+quotes]
 ----
-$ openstack role add --user demo --project demo-tenant _member_
+$ *openstack role add --user demo --project demo-tenant _member_*
 +-------+----------------------------------+
 | Field | Value                            |
 +-------+----------------------------------+
@@ -169,23 +172,25 @@ $ openstack role add --user demo --project demo-tenant _member_
 ----
 . Create and source a _keystonerc_ file for the demo user.
 +
-[source%autofit, shell]
+[subs=+quotes]
 ----
-$ cat > ~/demorc << EOF
+$ *cat > ~/demorc << EOF
 export OS_USERNAME=demo
 export OS_TENANT_NAME=demo-tenant
 export OS_PASSWORD=redhat
 export OS_CLOUDNAME=overcloud
 export OS_AUTH_URL=${OS_AUTH_URL}
 export PS1='[\u@\h \W(demo_member)]\$ '
-EOF
-$ source ~/demorc
+EOF*
+$ *source ~/demorc*
 ----
 . Upload a RHEL 7.1 image for the MSA application servers.
 +
-[source%autofit, shell]
+[subs=+quotes]
 ----
-$ openstack image create --disk-format qcow2  --container-format bare --file /pub/rhel-guest-image-7.1-20150224.0.x86_64.qcow2 rhel-server7.1
+$ *openstack image create --disk-format qcow2  --container-format bare
+--file /pub/rhel-guest-image-7.1-20150224.0.x86_64.qcow2
+rhel-server7.1*
 +------------------+--------------------------------------+
 | Field            | Value                                |
 +------------------+--------------------------------------+
@@ -211,9 +216,9 @@ $ openstack image create --disk-format qcow2  --container-format bare --file /pu
 ----
 . List the image.
 +
-[source%autofit, shell]
+[subs=+quotes]
 ----
-$ openstack image list
+$ *openstack image list*
 +--------------------------------------+----------------+
 | ID                                   | Name           |
 +--------------------------------------+----------------+
@@ -223,11 +228,11 @@ $ openstack image list
 . Create a key pair for accessing the MSA application servers via
   *ssh*.
 +
-[source%autofit, shell]
+[subs=+quotes]
 ----
-$ openstack keypair create demokp > ~/demokp.pem
-$ chmod 600 ~/demokp.pem
-$ openstack keypair list
+$ *openstack keypair create demokp > ~/demokp.pem*
+$ *chmod 600 ~/demokp.pem*
+$ *openstack keypair list*
 +--------+-------------------------------------------------+
 | Name   | Fingerprint                                     |
 +--------+-------------------------------------------------+
@@ -251,15 +256,15 @@ associated script archive. They are too lengthy to document.
 
 . Create the _templates/lib_ directory.
 +
-[source%autofit, shell]
+[subs=+quotes]
 ----
-$ mkdir ~/templates/lib
+$ *mkdir ~/templates/lib*
 ----
 . Extract the nested example templates to _templates/lib_.
 +
-[source%autofit, shell]
+[subs=+quotes]
 ----
-$ ls templates/
+$ *ls templates/*
 eapws5_nested.yaml  lib  openstack-tripleo-heat-templates
 $ ls templates/lib/
 billing-service.yaml       private_network.yaml  product-service.yaml sales-service.yaml
@@ -267,9 +272,10 @@ presentation-service.yaml  product-db.yaml       sales-db.yaml
 ----
 . Deploy the MSA application with Heat.
 +
-[source%autofit, shell]
+[subs=+quotes]
 ----
-$ heat stack-create --template-file templates/eapws5_nested.yaml eap6 --parameters="public_net_id=$ext_net_id"
+$ *heat stack-create --template-file templates/eapws5_nested.yaml eap6
+--parameters="public_net_id=$ext_net_id"*
 +--------------------------------------+------------+--------------------+----------------------+
 | id                                   | stack_name | stack_status       | creation_time        |
 +--------------------------------------+------------+--------------------+----------------------+
@@ -278,27 +284,29 @@ $ heat stack-create --template-file templates/eapws5_nested.yaml eap6 --paramete
 ----
 . Watch progress with *heat resource-list*.
 +
-[source%autofit, shell]
+[subs=+quotes]
 ----
-$ heat resource-list eap6
+$ *heat resource-list eap6*
 +----------------------+--------------------------------------+------------------------------------------------------------+--------------------+----------------------
-| resource_name        | physical_resource_id                 | resource_type                                              | resource_status    | updated_time         
+| resource_name        | physical_resource_id                 |
+resource_type                                              |
+resource_status    | updated_time
 +----------------------+--------------------------------------+------------------------------------------------------------+--------------------+----------------------
-| billing-service      | ca3dc55e-42a4-4501-a9ff-848856a4982d | file:///home/stack/templates/lib/billing-service.yaml      | CREATE_IN_PROGRESS | 2015-08-30T03:59:16Z 
-| presentation-service | 5262f57a-846e-4ff5-8535-b66a049f0743 | file:///home/stack/templates/lib/presentation-service.yaml | CREATE_IN_PROGRESS | 2015-08-30T03:59:16Z 
-| private_network      | aa0fda9e-dc55-4ec2-af62-1d184db5b409 | file:///home/stack/templates/lib/private_network.yaml      | CREATE_COMPLETE    | 2015-08-30T03:59:16Z 
-| product-db           | 3b5ca63d-22f4-40cc-a691-79eec5a317b5 | file:///home/stack/templates/lib/product-db.yaml           | CREATE_IN_PROGRESS | 2015-08-30T03:59:16Z 
-| product-service      | 605abef9-0001-4649-9a39-bfda3654f7a5 | file:///home/stack/templates/lib/product-service.yaml      | CREATE_IN_PROGRESS | 2015-08-30T03:59:16Z 
-| sales-db             | cf49eed9-5e47-47db-95fb-e50baad04954 | file:///home/stack/templates/lib/sales-db.yaml             | CREATE_IN_PROGRESS | 2015-08-30T03:59:16Z 
-| sales-service        | 14b0a0e0-8322-4548-9dd7-d52a29e7ebfa | file:///home/stack/templates/lib/sales-service.yaml        | CREATE_IN_PROGRESS | 2015-08-30T03:59:16Z 
-| security_group       | f429d022-9608-4fd5-87b5-da7584f5b806 | OS::Neutron::SecurityGroup                                 | CREATE_COMPLETE    | 2015-08-30T03:59:16Z 
+| billing-service      | ca3dc55e-42a4-4501-a9ff-848856a4982d | file:///home/stack/templates/lib/billing-service.yaml      | CREATE_IN_PROGRESS | 2015-08-30T03:59:16Z
+| presentation-service | 5262f57a-846e-4ff5-8535-b66a049f0743 | file:///home/stack/templates/lib/presentation-service.yaml | CREATE_IN_PROGRESS | 2015-08-30T03:59:16Z
+| private_network      | aa0fda9e-dc55-4ec2-af62-1d184db5b409 | file:///home/stack/templates/lib/private_network.yaml      | CREATE_COMPLETE    | 2015-08-30T03:59:16Z
+| product-db           | 3b5ca63d-22f4-40cc-a691-79eec5a317b5 | file:///home/stack/templates/lib/product-db.yaml           | CREATE_IN_PROGRESS | 2015-08-30T03:59:16Z
+| product-service      | 605abef9-0001-4649-9a39-bfda3654f7a5 | file:///home/stack/templates/lib/product-service.yaml      | CREATE_IN_PROGRESS | 2015-08-30T03:59:16Z
+| sales-db             | cf49eed9-5e47-47db-95fb-e50baad04954 | file:///home/stack/templates/lib/sales-db.yaml             | CREATE_IN_PROGRESS | 2015-08-30T03:59:16Z
+| sales-service        | 14b0a0e0-8322-4548-9dd7-d52a29e7ebfa | file:///home/stack/templates/lib/sales-service.yaml        | CREATE_IN_PROGRESS | 2015-08-30T03:59:16Z
+| security_group       | f429d022-9608-4fd5-87b5-da7584f5b806 | OS::Neutron::SecurityGroup                                 | CREATE_COMPLETE    | 2015-08-30T03:59:16Z
 +----------------------+--------------------------------------+------------------------------------------------------------+--------------------+----------------------
 ----
 . View *nova list* after Heat creates the stack successfully.
 +
-[source%autofit, shell]
+[subs=+quotes]
 ----
-$ nova list
+$ *nova list*
 +--------------------------------------+----------------------+--------+------------+-------------+-------------------------------------+
 | ID                                   | Name                 | Status | Task State | Power State | Networks                            |
 +--------------------------------------+----------------------+--------+------------+-------------+-------------------------------------+
@@ -316,11 +324,11 @@ $ nova list
   instance. *ssh* to _presentation-service_ to view
   _/var/log/cloud-init.log_ to track progress.
 +
-[source%autofit, shell]
+[subs=+quotes]
 ----
-$ ssh -l cloud-user -i ~/demokp.pem 10.19.137.146
-$ sudo -i
-# tail /var/log/cloud-init.log
+$ *ssh -l cloud-user -i ~/demokp.pem 10.19.137.146*
+$ *sudo -i*
+# *tail /var/log/cloud-init.log*
 Sep  2 23:55:21 localhost cloud-init: 03:55:21,588 INFO [org.jboss.as.server] (ServerService Thread Pool -- 39) JBAS015859:
 Deployed "presentation.war" (runtime-name : "presentation.war")
 Sep  2 23:55:21 localhost cloud-init: 03:55:21,887 INFO [org.jboss.as] (Controller Boot Thread) JBAS015961: Http management
@@ -340,11 +348,11 @@ This section describes a test procedure for the application.
 
 1. Connect to a server via *ssh* and use *curl* verify the services are running.
 +
-[source%autofit, shell]
+[subs=+quotes]
 ----
-$ ssh -l cloud-user -i ~/demokp.pem 10.19.137.144
-$ sudo -i
-# curl http://172.16.5.13:8080/product/products/?featured=true
+$ *ssh -l cloud-user -i ~/demokp.pem 10.19.137.144*
+$ *sudo -i*
+# *curl http://172.16.5.13:8080/product/products/?featured=true*
 [{"sku":10001,"name":"ABC HD32CS5002 32-inch LED TV","description":"HD
 LED Picture Quality<p/>ConnectShare Movie<p/>Wide Color Enhancement<p/>Clear Motion Rate
 60","length":29,"width":3,"height":17,"weight":17,"featured":true,"availability":52,"price":249.99,"image":"TV"},{"sku":10002,"name":"ABC
@@ -355,11 +363,11 @@ Motion Rate 60","length":37,"width":2,"height":22,"weight":20,"featured":true,"a
 
 2. Verify the databases are running and mounted on the persistent storage.
 +
-[source%autofit, shell]
+[subs=+quotes]
 ----
-$ ssh -l cloud-user -i ~/demokp.pem 10.19.137.142
-$ sudo -i
-# mysql -e 'SHOW TABLES' product
+$ *ssh -l cloud-user -i ~/demokp.pem 10.19.137.142*
+$ *sudo -i*
+# *mysql -e 'SHOW TABLES' product*
 +-------------------+
 | Tables_in_product |
 +-------------------+
@@ -367,7 +375,7 @@ $ sudo -i
 | PRODUCT_KEYWORD   |
 | Product           |
 +-------------------+
-# mount -v | grep mysql
+# *mount -v | grep mysql*
 /dev/vdb on /var/lib/mysql type ext4
 (rw,relatime,seclabel,data=ordered)
 ----

@@ -9,30 +9,30 @@ The following steps are to be perfromed within the undercloud server as the `roo
 
 1. Install the operating system.
 +
-[source%autofit, shell]
+[subs=+quotes]
 ----
-# cat /etc/redhat-release
+# *cat /etc/redhat-release*
 Red Hat Enterprise Linux Server release 7.1 (Maipo)
 ----
 +
 2. Set the hostname using the `hostnamectl` command.
 +
-[source%autofit, shell]
+[subs=+quotes]
 ----
-# hostnamectl set-hostname rhos0.osplocal
-# hostnamectl set-hostname --transient rhos0.osplocal
-# export HOSTNAME=rhos0.osplocal
-# hostname
+# *hostnamectl set-hostname rhos0.osplocal*
+# *hostnamectl set-hostname --transient rhos0.osplocal*
+# *export HOSTNAME=rhos0.osplocal*
+# *hostname*
 rhos0.osplocal
 ----
 +
 3. Register the system with `subscription-manager`.
 +
-[source%autofit, shell]
+[subs=+quotes]
 ----
-# subscription-manager register --org syseng --activationkey OSP7-undercloud
+# *subscription-manager register --org syseng --activationkey OSP7-undercloud*
 The system has been registered with ID:
-84e0fb33-24b0-4a1d-968e-e80352daa4f6 
+84e0fb33-24b0-4a1d-968e-e80352daa4f6
 Installed Product Current Status:
 Product Name: Red Hat Enterprise Linux Server
 Status:       Subscribed
@@ -48,9 +48,9 @@ Red Hat Satellite 6.0 Provisioning Guide] includes instructions for
 creating an organization activation key.
 4. List active repositories.
 +
-[source%autofit, shell]
+[subs=+quotes]
 ----
-# yum repolist
+# *yum repolist*
 Loaded plugins: langpacks, product-id, rhnplugin, subscription-manager
 This system is receiving updates from RHN Classic or Red Hat
 Satellite.
@@ -67,22 +67,20 @@ repolist: 21,076
 +
 5. Create the `stack` user
 +
-[source%autofit, shell]
+[subs=+quotes]
 ----
-# useradd stack
-# echo 'stack:password' | chpasswd
-# echo "stack ALL=(root) NOPASSWD:ALL" | tee -a
-/etc/sudoers.d/stack
+# *useradd stack
+# *echo 'stack:password' | chpasswd*
+# *echo "stack ALL=(root) NOPASSWD:ALL" | tee -a /etc/sudoers.d/stack*
 stack ALL=(root) NOPASSWD:ALL
-# chmod 0440 /etc/sudoers.d/stack
-# id stack
+# *chmod 0440 /etc/sudoers.d/stack*
+# *id stack*
 uid=1000(stack) gid=1000(stack) groups=1000(stack)
 ----
 
 === Deploy the Control Plane
 1. Switch to the `stack` user account.
 +
-[source%autofit, shell]
 [subs=+quotes]
 ----
 # *su - stack*
@@ -92,10 +90,10 @@ uid=1000(stack) gid=1000(stack) groups=1000(stack) context=unconfined_u:unconfin
 +
 2. Install the OpenStack director plugin.
 +
-[source%autofit, shell]
+[subs=+quotes]
 ----
-$ sudo yum install -y -q python-rdomanager-oscplugin
-$ sudo rpm -q python-rdomanager-oscplugin
+$ *sudo yum install -y -q python-rdomanager-oscplugin*
+$ *sudo rpm -q python-rdomanager-oscplugin*
 python-rdomanager-oscplugin-0.0.8-44.el7ost.noarch
 ----
 +
@@ -152,9 +150,9 @@ reference architecture. For details on how to use SSL support for the undercloud
 +
 4. Install the undercloud.
 +
-[source%autofit, shell]
+[subs=+quotes]
 ----
-$ openstack undercloud install | tee uc.out 2>&1
+$ *openstack undercloud install | tee uc.out*
 
 ... [Output Abbreviated] ...
 #############################################################################
@@ -172,10 +170,10 @@ secured.
 +
 5. Source _stackrc_ to set environment variables for interacting with the undercloud.
 +
-[source%autofit, shell]
+[subs=+quotes]
 ----
-$ source stackrc 
-$ env | grep OS_
+$ *source stackrc*
+$ *env | grep OS_*
 OS_PASSWORD=7f1dbeead29fe7b1ca96fcf4bec20efb1717f6db
 OS_AUTH_URL=http://192.0.2.1:5000/v2.0
 OS_USERNAME=admin
@@ -187,9 +185,10 @@ OS_NO_CACHE=True
 +
 NOTE: This command output was truncated for brevity. Verify all
 services are _active_.
-[source%autofit, shell]
++
+[subs=+quotes]
 ----
-$ openstack-service status
+$ *openstack-service status*
 neutron-dhcp-agent (pid 16458) is active
 neutron-openvswitch-agent (pid 17750) is active
 neutron-server (pid 16517) is active
@@ -207,12 +206,24 @@ openstack-ceilometer-notification (pid 15932) is active
    https://access.redhat.com/articles/1432053[Performance Tuning the
    Backend Database for Red Hat Enterprise Linux OpenStack Platform]
 +
-[source%autofit, shell]
+[subs=+quotes]
 ----
-$ sudo sed -i 's/max_connections =.*$/max_connections = 4096/' /etc/my.cnf.d/server.cnf
-$ sudo grep max_connections /etc/my.cnf.d/server.cnf max_connections = 4096
-$ sudo mysql -e "SET GLOBAL max_connections = 4096"
-$ sudo mysql -e "SHOW GLOBAL VARIABLES LIKE 'max_connections'"
+$ **sudo sed -i 's/max_connections =.\*$/max_connections = 4096/' /etc/my.cnf.d/server.cnf**
+----
++
+8. Verify the connections have been increased.
++
+[subs=+quotes]
+----
+$ *sudo grep max_connections /etc/my.cnf.d/server.cnf max_connections = 4096*
+----
++
+9. Increase the connection limit for the running databases and verify.
++
+[subs=+quotes]
+----
+$ *sudo mysql -e "SET GLOBAL max_connections = 4096"*
+$ *sudo mysql -e "SHOW GLOBAL VARIABLES LIKE 'max_connections'"*
 +-----------------+-------+
 | Variable_name   | Value |
 +-----------------+-------+
@@ -220,16 +231,17 @@ $ sudo mysql -e "SHOW GLOBAL VARIABLES LIKE 'max_connections'"
 +-----------------+-------+
 ----
 +
-8. Increase or disable Neutron port quotas. In this example the port
+10. Increase or disable Neutron port quotas. In this example the port
    quota is disabled in order to accomodate all of the ports created
    for the overcloud servers and Pacemaker VIPs.
 +
 NOTE: A https://bugzilla.redhat.com/show_bug.cgi?id=1243121[bug]
 tracking this issue has been filed to change the default Neutron port
 quota to accomodate network isolation.
-[source%autofit, shell]
++
+[subs=+quotes]
 ----
-$ neutron quota-update --port -1
+$ *neutron quota-update --port -1*
 +---------------------+-------+
 | Field               | Value |
 +---------------------+-------+
@@ -239,7 +251,13 @@ $ neutron quota-update --port -1
 | security_group_rule | 100   |
 | subnet              | 10    |
 +---------------------+-------+
-$ neutron quota-show
+----
++
+11. Verify the quota increase.
++
+[subs=+quotes]
+----
+$ *neutron quota-show*
 +---------------------+-------+
 | Field               | Value |
 +---------------------+-------+

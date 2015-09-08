@@ -9,7 +9,7 @@
 [appendix]
 == References
 
-=== Ceph
+=== Ceph References
 . http://ceph.com/docs/master/rados/operations/placement-groups/[Ceph
   Placement Groups]
 . https://wiki.ceph.com/Guides/How_To/Benchmark_Ceph_Cluster_Performance[Benchmark
@@ -22,27 +22,25 @@ Red Hat Ceph Architecture Guide]
   Available Red Hat Enterprise Linux OpenStack Platform 6 with Ceph
   Storage]
 
-=== eDeploy and AHC
+=== eDeploy and AHC References
 . https://github.com/redhat-cip/edeploy/blob/master/docs/eDeployUserGuide.rst[eDeploy
   User's Guide]
 . https://github.com/redhat-cip/edeploy/blob/master/docs/AHC.rst[
 Automatic Health Check (AHC) - User Guide]
 
-=== Heat
+=== Heat References
 . http://docs.openstack.org/developer/heat/template_guide/hot_spec.html[Heat
   Orchestration Template (HOT) specification]
-. http://docs.openstack.org/developer/heat/template_guide/[Heat
-  Orchestration Template (HOT) Guide]
 . http://hardysteven.blogspot.com/2015/04/debugging-tripleo-heat-templates.html[Debugging
 TripleO Heat templates]
 
-=== JBOSS EAP
+=== JBOSS EAP References
 . https://access.redhat.com/solutions/1320133[How can I execute the
   JBoss EAP 6 using Systemctl?]
 . https://access.redhat.com/articles/1452603[2015 - Microservice
   Architecture: Building microservices with JBoss EAP 6]
 
-=== Red Hat OpenStack Platform
+=== Red Hat OpenStack Platform References
 . https://access.redhat.com/articles/1507893[2015 - Guidelines and
 Considerations for Performance and Scaling your Red Hat Openstack 6
 Cloud]
@@ -107,21 +105,30 @@ deployments and updates.
 This appendix describes steps for deploying the undercloud with SSL
 support.
 
+NOTE: The
+https://access.redhat.com/documentation/en-US/Red_Hat_Enterprise_Linux_OpenStack_Platform/7/html/Director_Installation_and_Usage/sect-Configuring_the_Director.html[product
+documentation] includes additional information for installing the
+undercloud with SSL support.
 
-. Generate a private key file.
+
+1. Generate a private key file.
++
+[subs=+quotes]
 ----
-[stack@rhos0 ~]$ openssl genrsa -out privkey.pem 2048
+$ *openssl genrsa -out privkey.pem 2048*
 Generating RSA private key, 2048 bit long modulus
 .....................................................................+++
 .........+++
 e is 65537 (0x10001)
 ----
 
-. Create the distinguished identifier for the certificate.
+2. Create the distinguished identifier for the certificate.
++
 NOTE: Replace this example with appropriate environment-specific answers.
++
+[subs=+quotes]
 ----
-[stack@rhos0 ~]$ openssl req -new -x509 -key privkey.pem -out
-cacert.pem -days 365
+$ *openssl req -new -x509 -key privkey.pem -out cacert.pem -days 365*
 You are about to be asked to enter information that will be
 incorporated
 into your certificate request.
@@ -131,39 +138,52 @@ There are quite a few fields but you can leave some blank
 For some fields there will be a default value,
 If you enter '.', the field will be left blank.
 \-----
-Country Name (2 letter code) [XX]:US
-State or Province Name (full name) []:Texas
-Locality Name (eg, city) [Default City]:Austin
-Organization Name (eg, company) [Default Company Ltd]:Red Hat
-Organizational Unit Name (eg, section) []:Systems Engineering
-Common Name (eg, your name or your server's hostname) []:192.0.2.2
-Email Address []:jliberma@redhat.com
+Country Name (2 letter code) [XX]:*US*
+State or Province Name (full name) []:*Texas*
+Locality Name (eg, city) [Default City]:*Austin*
+Organization Name (eg, company) [Default Company Ltd]:*Red Hat*
+Organizational Unit Name (eg, section) []:*Systems Engineering*
+Common Name (eg, your name or your server's hostname) []:*192.0.2.2*
+Email Address []:*jliberma@redhat.com*
 ----
 
-. Write the certificate and key to _undercloud.pem_.
+3. Write the certificate and key to _undercloud.pem_.
++
+[subs=+quotes]
 ----
-[stack@rhos0 ~]$ cat cacert.pem privkey.pem > undercloud.pem
-----
-
-. Copy the combined SSL key to _/etc/pki/instal-cert/_.
-----
-[stack@rhos0 ~]$ sudo mkdir /etc/pki/instack-certs
-[stack@rhos0 ~]$ sudo cp ~/undercloud.pem /etc/pki/instack-certs/.
+$ *cat cacert.pem privkey.pem > undercloud.pem*
 ----
 
-. Set the SELinux context on the key certificate directory and files.
+4. Copy the combined SSL key to _/etc/pki/instal-cert/_.
++
+[subs=+quotes]
 ----
-[stack@rhos0 ~]$ sudo semanage fcontext -a -t etc_t
-"/etc/pki/instack-certs(/.*)?"
-[stack@rhos0 ~]$ sudo restorecon -R /etc/pki/instack-certs
+$ *sudo mkdir /etc/pki/instack-certs*
+$ *sudo cp ~/undercloud.pem /etc/pki/instack-certs/.*
 ----
 
-. Modify the undercloud.conf from the previous example to include:
+5. Set the SELinux context on the key certificate directory and files.
++
+[subs=+quotes]
+----
+$ **sudo semanage fcontext -a -t etc_t "/etc/pki/instack-certs(/.\*)?"**
+----
+
+6. Run *restorecon* to enforce the new SELinux contexts.
++
+[subs=+quotes]
+----
+$ *sudo restorecon -R /etc/pki/instack-certs*
+----
+
+7. Modify the undercloud.conf from the previous example to include:
 .. An undercloud public VIP
 .. An undercloud private VIP
 .. The location for the undercloud service certificate.
++
+[subs=+quotes]
 ----
-[stack@rhos0 ~]$ head undercloud.conf 
+$ *head undercloud.conf*
 [DEFAULT]
 
 image_path = .
@@ -176,9 +196,11 @@ masquerade_network = 192.0.2.0/24
 dhcp_start = 192.0.2.5
 ----
 
-. Install the undercloud with SSL support.
+8. Install the undercloud with SSL support.
++
+[subs=+quotes]
 ----
-[stack@rhos0 ~]$ openstack undercloud install
+$ *openstack undercloud install*
 ...
 #############################################################################
 instack-install-undercloud complete.
@@ -194,11 +216,13 @@ secured.
 
 #############################################################################
 ----
-. Source _stackrc_ and verify the OpenStack services have separate
+9. Source _stackrc_ and verify the OpenStack services have separate
   internal and public endpoint URLs.
++
+[subs=+quotes]
 ----
-[stack@rhos0 ~]$ source ~stackrc
-[stack@rhos0 ~]$ openstack endpoint show glance
+$ *source ~stackrc*
+$ *openstack endpoint show glance*
     +--------------+----------------------------------+
     | Field        | Value                            |
     +--------------+----------------------------------+
@@ -217,6 +241,8 @@ secured.
 [appendix]
 == undercloud service list
 
+[subs=+quotes]
+----
 neutron-dhcp-agent
 neutron-openvswitch-agent
 neutron-server
@@ -256,6 +282,6 @@ openstack-swift-object-updater
 openstack-swift-object
 openstack-swift-proxy
 openstack-tuskar-api
-
+----
 
 // vim: set syntax=asciidoc:
