@@ -1,0 +1,1 @@
+OSD/pg_num,Test,Relative PerformanceOSD04_PG100,rand-read,1OSD40_PG100,rand-read,1.33OSD40_PG256,rand-read,1.29OSD04_PG100,seq-read,1OSD40_PG100,seq-read,2.27OSD40_PG256,seq-read,2.26OSD04_PG100,seq-write,1OSD40_PG100,seq-write,4.03OSD40_PG256,seq-write,5.29
