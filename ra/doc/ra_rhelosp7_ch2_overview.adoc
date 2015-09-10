@@ -1,6 +1,6 @@
 [chapter 2]
 == Architecture Overview
-{rhelosp} ({ro}) delivers an integrated
+{osp} ({ro}) delivers an integrated
 foundation to create, deploy, and scale an OpenStack cloud. {ro}
 7, Red Hat's 5th iteration of OpenStack Platform, is based on the
 community Kilo OpenStack release. {eapver} (EAP)
