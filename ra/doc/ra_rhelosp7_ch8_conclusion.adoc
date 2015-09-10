@@ -18,10 +18,10 @@ The use case provides:
 1. undercloud installation steps including post-installation
    configuration of the database and `Neutron` quotas.
 2. overcloud installation steps including post-installation
-   configuration of the Pacemaker resource constraints and fence
+   configuration of the `Pacemaker` resource constraints and fence
    devices.
-3. A fully worked example of Ceph OSD and journal customization via Puppet Hiera
-   data accompanied by post-installation configuration steps for
+3. A fully worked example of Ceph OSD and journal customization via
+   `Puppet` hiera data accompanied by post-installation configuration steps for
    increasing placement group settings for improved performance.
 4. A fully worked example of network isolation configuration that
    describes a sensible method for collapsing multiple networks onto
