@@ -1,13 +1,13 @@
 [chapter 7]
 == Install and Configure EAP 6
 This section describes the steps to install and configure an example
-EAP application on the deployed cloud. The example EAP application is
+{eapver} application on the deployed cloud. The example application is
 a multi-tier web application with a shopping cart.
 
-`Red Hat® JBoss® Enterprise Application Platform (EAP)` is a fully certified 
-Java™ EE platform for developing and deploying enterprise
-applications. This reference architecture documents the steps to
-deploy an EAP 6 application demonstrating Microservices Architecture (MSA) on OSP 7. MSA is
+{eapver} (EAP) is a fully certified Java™ EE platform for developing
+and deploying enterprise applications. This reference architecture
+documents the steps to deploy an EAP 6 application demonstrating
+Microservices Architecture (MSA) on {ro} 7. MSA is
 software architectural style that increases modularity to decrease
 complexity. Applications are developed from suites of small services,
 each running as an independent process in its own container or
@@ -15,22 +15,23 @@ virtual machine. Each service has a single responsibility. The
 services communicate with standard lightweight protocols and APIs,
 such as REST over HTTP.
 
-More information about Red Hat JBOSS EAP can be found at
+More information about {eapver} can be found at
 https://access.redhat.com/products/red-hat-jboss-enterprise-application-platform[http://red.ht/1NZrW0A].
 
-The MSA application used in this reference architecture is an example of Business-Driven
-Microservices. The services in the application do not communicate
+The MSA application used in this reference architecture is an example of
+_Business-Driven_ microservices. The services in the application do not communicate
 directly with one another. A web application aggregates and
 coordinates communication between the services. It acts as a
 perimeter between the application and the clients. By employing this
 presentation layer, the microservices remain independent from each other.
-They can be developed, scaled, and maintained independently, without leading to a complex dependency graph and its many associated complexities that are inherent to other MSA approaches.
+They can be developed, scaled, and maintained independently, without
+leading to the complex dependency graph inherent to other MSA approaches.
 
 [[EAP6-MSA]]
 .EAP6 Microservices Architecture
 image::images/EAP6_MSA.png[caption="Figure 7.1: " title="EAP6 Microservices Architecture" align="center", scaledwidth="40%"]
 
-OpenStack Platform 7 provides a comprehensive platform for implementing,
+{ro} 7 provides a comprehensive platform for implementing,
 maintaining, and scaling an MSA application. Because microservices are independent,
 scalable services, they require a scalable platform to reach their
 potential. OpenStack provides a robust underlying tool set for automating service
@@ -43,7 +44,7 @@ balancing between them via LBaaS.
 <<EAP6-MSA>> depicts the MSA application deployed in this reference
 architecture.
 
-More information on deploying a RHEL JBOSS EAP 6 MSA application can be found at
+More information on deploying a {eapver} 6 MSA application can be found at
 https://access.redhat.com/articles/1452603[ Microservice Architecture:
 Building Microservices with JBOSS EAP 6].
 
@@ -51,7 +52,7 @@ Building Microservices with JBOSS EAP 6].
 The MSA application does not exist in a vacuum. This section
 describes the steps for installing the supporting infrastructure
 around the application including a public `Neutron` network and subnet, a demo
-tenant and user, a RHEL 7.1 `Glance` image, and a key pair for accessing
+tenant and user, a {rhel} Server 7.1 `Glance` image, and a key pair for accessing
 the MSA application servers via *ssh*.
 
 . Source *overcloudrc*.
@@ -181,7 +182,7 @@ export PS1='[\u@\h \W(demo_member)]\$ '
 EOF*
 $ *source ~/demorc*
 ----
-. Upload a RHEL 7.1 image for the MSA application servers.
+. Upload a {rhel} Server 7.1 image for the MSA application servers.
 +
 [subs=+quotes]
 ----

@@ -6,11 +6,12 @@ section also describes the test environment used to execute the use
 case in the Red Hat Systems Engineering lab.
 
 === Objective
-This use case provides a comprehensive example for deploying an EAP 6
-microservices architecture on a high availability OpenStack Platform 7
-cloud using Red Hat Enterprise Linux OpenStack Platform 7 director. The Red Hat Systems Engineering team
+This use case provides a comprehensive example for deploying an
+{eapver}
+microservices architecture on a high availability {ospver}
+cloud using {ro}  director. The Red Hat Systems Engineering team
 validated all commands on bare metal servers using generally available
-software. The use case highlights many of OSP director's features
+software. The use case highlights many of {ro} director's features
 including:
 
 * High Availability
@@ -39,7 +40,7 @@ image::images/WORKFLOW.png[caption="Figure 4.1 " title="Reference Architecture W
 The use case is divided into the following steps:
 
 . *Install the undercloud*:
-.. Download the OpenStack Platform deployment package.
+.. Download the {ro} deployment package.
 .. Deploy the undercloud baremetal server.
 . *Prepare the overcloud*:
 .. Import overcloud disk images.
@@ -53,8 +54,8 @@ The use case is divided into the following steps:
 .. Test the overcloud deployment.
 . *Deploy the EAP 6 MSA*:
 .. Configure the tenant
-.. Deploy EAP 6 MSA via `Heat` templates
-.. Test EAP6
+.. Deploy EAP 6 microservices application via `Heat` templates
+.. Test the application
 
 === Conceptual Diagram of the Solution Stack
 <<reference-architecture-diagram>> depicts the deployed solution stack
@@ -113,7 +114,7 @@ There are six isolated networks but only four physical interfaces.
 Two networks are isolated on each physical 10 Gb interface using a
 combination of tagged and native VLANs.
 
-NOTE: The Red Hat OpenStack Platform 7 network isolation feature supports bonded interfaces.
+NOTE: The {ro} 7 network isolation feature supports bonded interfaces.
 Limitations in the Systems Engineering lab precluded the use of bonded
 interfaces in this reference architecture. Bonded interfaces are
 recommended for production deployments.
@@ -149,6 +150,6 @@ no one-size-fits-all approach. Hardware constraints and workload
 characteristics must dictate this design decision.
 
 https://access.redhat.com/articles/1507893[This paper] shares an approach
-to using cloud benchmarks to guide Red Hat OpenStack Platform 7 design decisions.
+to using cloud benchmarks to guide {ro} 7 design decisions.
 
 <<<

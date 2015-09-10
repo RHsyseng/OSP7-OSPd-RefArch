@@ -1,4 +1,7 @@
 = Deploying EAP 6 Microservices on High Availability OpenStack Platform 7: with OpenStack Platform director
+//Deploying Red Hat JBOSS Enterprise Application Platform 6
+//Microservices on High Availability Red Hat Enterprise Linux
+//OpenStack Platform 7: with Red Hat Enterprise Linux OpenStack Platform director
 Jacob Liberman <jliberma@redhat.com>
 v1.0, 2015-09-08
 :description: Reference architecture
@@ -11,6 +14,14 @@ v1.0, 2015-09-08
 :icons: font
 :toc:
 :toclevels: 3
+:cdn: Red Hat Content Delivery Network
+:eap: Red Hat JBoss Enterprise Application Platform
+:eapver: Red Hat JBoss Enterprise Application Platform 6
+:osp: Red Hat Enterprise Linux OpenStack Platform
+:ospver: Red Hat Enterprise Linux OpenStack Platform 7
+:rhel: Red Hat Enterprise Linux
+:rhss: Red Hat Satellite Server
+:ro: RHEL-OSP
 ifdef::backend-pdf[]
 :pagenums:
 :pygments-style: bw
@@ -18,17 +29,15 @@ ifdef::backend-pdf[]
 :autofit-option:
 endif::[]
 
-[abstract]
-//empty on purpose so that legal can be on separate page and not conflict with toc
-
 <<<
-100 East Davie Street + 
-Raleigh NC 27601 USA + 
-Phone: +1 919 754 3700 + 
-Phone: 888 733 4281 + 
-Fax: +1 919 754 3701 + 
-PO Box 13588 + 
-Research Triangle Park NC 27709 USA + 
+
+100 East Davie Street +
+Raleigh NC 27601 USA +
+Phone: +1 919 754 3700 +
+Phone: 888 733 4281 +
+Fax: +1 919 754 3701 +
+PO Box 13588 +
+Research Triangle Park NC 27709 USA +
 
 Linux is a registered trademark of Linus Torvalds. Red Hat, Red Hat Enterprise Linux and the Red Hat "Shadowman" logo are registered trademarks of Red Hat, Inc. in the United States and other countries.
 Microsoft and Windows are U.S. registered trademarks of Microsoft Corporation.

@@ -4,10 +4,10 @@ This section describes steps for deploying the overcloud.
 
 === Create the images
 
-1. Download and extract the RHEL OSP 7 discovery, deployment, and
+1. Download and extract the {ro} 7 discovery, deployment, and
   overcloud images.
 +
-NOTE: Download the images from: https://access.redhat.com/downloads/content/191/ver=7.0/rhel---7/7.0/x86_64/product-downloads 
+NOTE: Download the images from: https://access.redhat.com/downloads/content/191/ver=7.0/rhel---7/7.0/x86_64/product-downloads
 +
 [subs=+quotes]
 ----
@@ -346,7 +346,7 @@ compute.
 $ *neutron subnet-update $(neutron subnet-list | awk ' /192.0.2/ { print $2 } ') --dns-nameserver 10.19.143.247*
 $ *neutron subnet-show $(neutron subnet-list | awk ' /192.0.2/ { print $2 } ') | grep -B 1 nameserver*
 | cidr              | 192.0.2.0/24
-| dns_nameservers   | 10.19.143.247 
+| dns_nameservers   | 10.19.143.247
 ----
 
 === Configure network isolation
@@ -403,10 +403,10 @@ allocation pools for each network.
 The parameters defined in this file match the network configuration
 used in the reference architecture.
 +
-NOTE: In most cases NeutronExternalNetworkBridge would be set to "''"
+NOTE: In most cases _NeutronExternalNetworkBridge_ would be set to "''"
 in order to support multiple floating IP VLANs or physical interfaces. In
 this case there was only one floating IP network on the native VLAN of
-bridge "br-ex", so the bridge was specified directly for performance
+bridge _br-ex_, so the bridge was specified directly for performance
 reasons.
 2. Create the _nic-configs_ files to define network configuration for
    each interface by server role.
@@ -463,7 +463,7 @@ ceph::profile::params::osd_pool_default_pg_num: 128
 ceph::profile::params::osd_pool_default_pgp_num: 128
 ceph::profile::params::osd_pool_default_size: 3
 ceph::profile::params::osd_pool_default_min_size: 1
-ceph::profile::params::osds: 
+ceph::profile::params::osds:
   '/dev/sdb':
     journal: {}
   '/dev/sdc':
@@ -532,11 +532,11 @@ $ *ironic node-list*
 +
 [subs=+quotes]
 ----
-$ *openstack overcloud deploy -e /usr/share/openstack-tripleo-heat-templates/environments/network-isolation.yaml 
--e /home/stack/network-environment.yaml --control-flavor control --compute-flavor compute --ceph-storage-flavor ceph 
---ntp-server 10.16.255.2 --control-scale 3 --compute-scale 4 --ceph-storage-scale 4 --block-storage-scale 0 --swift-storage-scale 0 
--t 90 --templates /home/stack/templates/openstack-tripleo-heat-templates/ 
--e /usr/share/openstack-tripleo-heat-templates/environments/storage-environment.yaml 
+$ *openstack overcloud deploy -e /usr/share/openstack-tripleo-heat-templates/environments/network-isolation.yaml
+-e /home/stack/network-environment.yaml --control-flavor control --compute-flavor compute --ceph-storage-flavor ceph
+--ntp-server 10.16.255.2 --control-scale 3 --compute-scale 4 --ceph-storage-scale 4 --block-storage-scale 0 --swift-storage-scale 0
+-t 90 --templates /home/stack/templates/openstack-tripleo-heat-templates/
+-e /usr/share/openstack-tripleo-heat-templates/environments/storage-environment.yaml
 --rhel-reg --reg-method satellite --reg-sat-url
 http://se-sat6.syseng.bos.redhat.com --reg-org syseng
 --reg-activation-key OSP-Overcloud*
@@ -615,7 +615,7 @@ $ *neutron agent-list*
 | 91ff4990-6080-4fd2-98c2-b69cb5ea3d79 | L3 agent           | overcloud-controller-0.localdomain | :-)   | True           | neutron-l3-agent          |
 [ ... Output truncated ... ]
 ----
-8. *ssh* to a controller node and switch to root user. 
+8. *ssh* to a controller node and switch to root user.
 +
 [subs=+quotes]
 ----
@@ -649,8 +649,8 @@ Full list of resources:
 
  Clone Set: haproxy-clone [haproxy]
      Started: [ overcloud-controller-0 overcloud-controller-1 overcloud-controller-2 ]
-ip-172.16.1.11 (ocf::heartbeat:IPaddr2): Started overcloud-controller-0 
-ip-10.19.137.121  (ocf::heartbeat:IPaddr2): Started overcloud-controller-1 
+ip-172.16.1.11 (ocf::heartbeat:IPaddr2): Started overcloud-controller-0
+ip-10.19.137.121  (ocf::heartbeat:IPaddr2): Started overcloud-controller-1
 ...
 ----
 NOTE: Appendix <<Appendix-overcloud-servce-list>> shows complete *pcs status*
@@ -660,15 +660,15 @@ NOTE: Appendix <<Appendix-overcloud-servce-list>> shows complete *pcs status*
 This section includes steps for increasing the number of Placement
 Groups (PGs) per pool.
 http://ceph.com/docs/master/rados/operations/placement-groups/[Ceph
-Placement Groups (PGs)] aggregate objects 
-within pools. PGs within a pool are distributed across OSDs for data 
-durability and performance. By default OSP director creates 4 pools 
-with 64 PGs and 3 replicas per pool. There are 40 OSDs which leaves 
+Placement Groups (PGs)] aggregate objects
+within pools. PGs within a pool are distributed across OSDs for data
+durability and performance. By default OSP director creates 4 pools
+with 64 PGs and 3 replicas per pool. There are 40 OSDs which leaves
 19.2 PGs per OSD. Ceph recommends at least 30 PGs per OSD.
 
 Each pool has two properties that dictate its number of placement groups:
 _pg_num_ (number of placement groups) and _pgp_num_ (number of PGs for
-placement on OSD.)  At the time of writing, customizing _pg_num_ 
+placement on OSD.)  At the time of writing, customizing _pg_num_
 in _ceph.yaml_ prior to deployment was not working. See
 https://bugzilla.redhat.com/show_bug.cgi?id=1252546[BZ1252546] for details.
 Therefore, this reference architecture manually inceases _pg_num_ and _pgp_num_
@@ -677,7 +677,7 @@ to Ceph recommendations.
 Figure 6.1 <<image-ceph-perf>> shows the relative performance impact
 of Ceph tuning on an IO microbenchmark.
 
-1. *ssh* to a Ceph OSD node and switch to root user. 
+1. *ssh* to a Ceph OSD node and switch to root user.
 +
 [subs=+quotes]
 ----
@@ -724,8 +724,8 @@ HEALTH_WARN too few PGs per OSD (19 < min 30)
 +
 [subs=+quotes]
 ----
-# *for i in rbd images volume vms; do 
- ceph osd pool set $i pg_num 256; 
+# *for i in rbd images volume vms; do
+ ceph osd pool set $i pg_num 256;
  sleep 10
  ceph osd pool set $i pgp_num 256;
  sleep 10
@@ -781,7 +781,7 @@ real application workload.
 _Fencing_ is an important concept for HA clusters. It is a method for
 bringing the cluster into a known state by removing members that are
 in an unknown state. In this reference architecture the controller
-IPMI interfaces act as fence devices. However, OSP director does not
+IPMI interfaces act as fence devices. However, {osp} director does not
 configure fencing. This section describes how the controller nodes were
 manually configured for fencing in this reference architecture.
 

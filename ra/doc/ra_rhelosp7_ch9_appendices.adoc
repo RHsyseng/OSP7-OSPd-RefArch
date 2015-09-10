@@ -1,11 +1,15 @@
 [appendix]
 [[Appendix-contributors]]
 == Contributors
-1. Roger Lopez - Content review, technical content review (OSP)
+1. Roger Lopez - content review, technical content review (RHEL-OSP)
 2. Babak Mozaffari - technical content review (JBOSS EAP)
 3. Dan Sneddon - technical content review (Network isolation)
 4. Keith Schincke - technical content review (Ceph)
 5. Andrew Beekhoff - technical content review (HA)
+6. Steven Reichard -- content review, technical content review
+   (RHEL-OSP)
+7. Scott Lewis -- content review, messaging
+8. Vinny Valdez -- content review technical content review (RHEL-OSP)
 
 [appendix]
 [[Appendix-references]]
@@ -86,7 +90,7 @@ Corporation OneConnect 10Gb NIC, 6 x DDR3 8192 MB @1333 MHZ DIMMs, 12x
 [appendix]
 [[Appendix-required-channels]]
 == Required channels
-Red Hat Enterprise Linux OpenStack Platform is available via the Content Delivery Network or Satellite Server.
+{ospver} is available via the {cdn} or {rhss}.
 
 .Required channels
 [options="header,footer"]
@@ -308,16 +312,16 @@ Online: [ overcloud-controller-0 overcloud-controller-1 overcloud-controller-2 ]
 
 Full list of resources:
 
- ip-192.0.2.6   (ocf::heartbeat:IPaddr2):       Started overcloud-controller-0 
+ ip-192.0.2.6   (ocf::heartbeat:IPaddr2):       Started overcloud-controller-0
  Clone Set: haproxy-clone [haproxy]
      Started: [ overcloud-controller-0 overcloud-controller-1 overcloud-controller-2 ]
- ip-172.16.1.11 (ocf::heartbeat:IPaddr2):       Started overcloud-controller-1 
- ip-10.19.137.121       (ocf::heartbeat:IPaddr2):       Started overcloud-controller-2 
- ip-172.16.2.10 (ocf::heartbeat:IPaddr2):       Started overcloud-controller-0 
- ip-172.16.1.10 (ocf::heartbeat:IPaddr2):       Started overcloud-controller-1 
+ ip-172.16.1.11 (ocf::heartbeat:IPaddr2):       Started overcloud-controller-1
+ ip-10.19.137.121       (ocf::heartbeat:IPaddr2):       Started overcloud-controller-2
+ ip-172.16.2.10 (ocf::heartbeat:IPaddr2):       Started overcloud-controller-0
+ ip-172.16.1.10 (ocf::heartbeat:IPaddr2):       Started overcloud-controller-1
  Master/Slave Set: galera-master [galera]
      Masters: [ overcloud-controller-0 overcloud-controller-1 overcloud-controller-2 ]
- ip-172.16.3.10 (ocf::heartbeat:IPaddr2):       Started overcloud-controller-2 
+ ip-172.16.3.10 (ocf::heartbeat:IPaddr2):       Started overcloud-controller-2
  Master/Slave Set: redis-master [redis]
      Masters: [ overcloud-controller-2 ]
      Slaves: [ overcloud-controller-0 overcloud-controller-1 ]
@@ -383,7 +387,7 @@ Full list of resources:
      Started: [ overcloud-controller-0 overcloud-controller-1 overcloud-controller-2 ]
  Clone Set: openstack-heat-api-cfn-clone [openstack-heat-api-cfn]
      Started: [ overcloud-controller-0 overcloud-controller-1 overcloud-controller-2 ]
- openstack-cinder-volume        (systemd:openstack-cinder-volume):      Started overcloud-controller-2 
+ openstack-cinder-volume        (systemd:openstack-cinder-volume):      Started overcloud-controller-2
  Clone Set: openstack-nova-conductor-clone [openstack-nova-conductor]
      Started: [ overcloud-controller-0 overcloud-controller-1 overcloud-controller-2 ]
 
@@ -423,7 +427,7 @@ function usage {
 function enable_stonith {
         # for all controller nodes
         for i in $(nova list | awk ' /controller/ { print $12 } ' | cut -f2 -d=)
-        do 
+        do
                 echo $i
                 # create the fence device
                 $SSH_CMD $i 'sudo pcs stonith create $(hostname -s)-ipmi fence_ipmilan pcmk_host_list=$(hostname -s) ipaddr=$(sudo ipmitool lan print 1 | awk " /IP Address  / { print \$4 } ") login=root passwd=PASSWORD lanplus=1 cipher=1 op monitor interval=60sr'
@@ -439,15 +443,15 @@ function enable_stonith {
 function test_fence {
 
         for i in $(nova list | awk ' /controller/ { print $12 } ' | cut -f2 -d= | head -n 1)
-        do 
+        do
                 # get REDIS_IP
                 REDIS_IP=$($SSH_CMD $i 'sudo grep -ri redis_vip /etc/puppet/hieradata/' | awk '/vip_data.yaml/ { print $2 } ')
         done
         # for all controller nodes
         for i in $(nova list | awk ' /controller/ { print $12 } ' | cut -f2 -d=)
-        do 
+        do
                 if $SSH_CMD $i "sudo ip a" | grep -q $REDIS_IP
-                then 
+                then
                         FENCE_DEVICE=$($SSH_CMD $i 'sudo pcs stonith show $(hostname -s)-ipmi' | awk ' /Attributes/ { print $2 } ' | cut -f2 -d=)
                         IUUID=$(nova list | awk " /$i/ { print \$2 } ")
                         UUID=$(ironic node-list | awk " /$IUUID/ { print \$2 } ")
