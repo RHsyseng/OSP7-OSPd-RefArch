@@ -9,7 +9,7 @@
 6. Steven Reichard -- content review, technical content review
    (RHEL-OSP)
 7. Scott Lewis -- content review, messaging
-8. Vinny Valdez -- content review technical content review (RHEL-OSP)
+8. Vinny Valdez -- content review, technical content review (RHEL-OSP)
 
 [appendix]
 [[Appendix-references]]

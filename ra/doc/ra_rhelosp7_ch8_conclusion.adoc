@@ -2,7 +2,7 @@
 == Conclusion
 {ospver} is Red Hat's 5th iteration of {ro}
 based on the Kilo community OpenStack release. The reference architecture
-introduces OpenStack director -- Red Hat's integrated management tool set
+introduces {ro} director -- Red Hat's integrated management tool set
 -- and describes Red Hat's approach to OpenStack HA. It
 also describes the steps performed by the Red Hat Systems Engineering
 team to deploy a highly available {ro} 7 cluster running
@@ -10,7 +10,7 @@ a modern {eapver}  microservices application installed and configured via
 nested `Heat` templates. Every step in the reference architecture was
 tested with customer-available code on bare metal servers. It
 complements existing documentation by providing a comprehensive
-example of using OpenStack Platform director in a realistic
+example of using {ro} director in a realistic
 environment with its own hardware and network constraints.
 
 The use case provides:

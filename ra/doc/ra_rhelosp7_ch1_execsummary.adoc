@@ -1,7 +1,7 @@
 [abstract]
 == Executive Summary
 This reference architecture describes a realistic use case for
-deploying a microservices architecture application on
+deploying a microservices architecture application on a
 {ospver} cluster. It begins with steps for deploying {ro} 7 on baremetal
 servers via {ro} director, Red Hat's new deployment toolchain. Next it
 describes Red Hat's approach to implementing highly available OpenStack.

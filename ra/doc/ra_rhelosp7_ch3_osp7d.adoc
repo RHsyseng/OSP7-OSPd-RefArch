@@ -34,7 +34,7 @@ components from Red Hat's past {ro} installers.
 `TripleO` stands for _OpenStack on OpenStack_. `TripleO` is an upstream
 OpenStack project that uses an existing OpenStack environment to install
 a production OpenStack environment. The deployment environment is called
-the undercloud. The production environment is called the overcloud.
+the `undercloud`. The production environment is called the `overcloud`.
 
 The `undercloud` is the `TripleO` control plane. It uses native OpenStack APIs
 and services to deploy, configure, and manage the production OpenStack
@@ -66,7 +66,7 @@ and workloads. Servers in the following roles comprise the overcloud:
     This role provides the endpoint for REST-based API queries to the
     majority of the OpenStack services. These include Compute, Image,
     Identity, Block, Network, and Data processing.  The controller can
-    run as a standalone server or as a High Availability (HA) cluster.
+    run as a standalone server or as a HA cluster.
 *Compute*::
     This role provides the processing, memory, storage, and
     networking resources to run virtual machine instances. They run
@@ -119,7 +119,7 @@ across the same physical interfaces or switches. Each OpenStack
 service is bound to an IP on a particular network. A virtual IP is
 created on that network and shared among all of the HA controllers.
 
-OPS director supports network isolation for the following traffic
+{ro} director supports network isolation for the following traffic
 types:
 
 [[traffic-types]]
@@ -135,7 +135,7 @@ types:
     this network.
 *External*::
     This network provides overcloud nodes with external connectivity.
-    Controller nodes connect the external network to an Open vSwitch
+    Controller nodes connect the external network to an `Open vSwitch`
     bridge and forward traffic originating from hypervisor instances
     through it. The `Horizon` service and OpenStack public API endpoints
     can share this network or they can be broken out to an optional
@@ -163,7 +163,7 @@ types:
     with the storage servers via this network. Data-intensive
     OpenStack deployments should isolate storage traffic on a
     dedicated high bandwidth interface, i.e. 10 GB interface. The
-    `Glance` API, `Swift` proxy, and Ceph Public interface services are
+    `Glance` API, `Swift` proxy, and `Ceph Public interface` services are
     all delivered via this network.
 *Storage Management*::
     Storage management communication can generate large amounts of
@@ -182,25 +182,27 @@ loops.
 
 ==== Network Types by Server Role
 The previous section discussed <<server-roles, server roles>>. Each
-server role requires access to specific types of network traffic. By
-default, {ro} director collapses all network traffic to the provisioning
+server role requires access to specific types of network traffic.
+Figure 3.1 <<network-topology-diagram>> depicts the network roles by server type in
+this reference architecture.
+
+[[network-topology-diagram]]
+.Network topology
+image::images/NETWORK.png[caption="Figure 3.1 " title="Network Topology" align="center", scaledwidth="60%"]
+
+The network isolation feature allows {ro} director to segment network
+traffic by particular network types. When using network isolation,
+each server role must have access to its required network traffic
+types.
+
+By default, {ro} director collapses all network traffic to the provisioning
 interface. This configuration is suitable for evaluation, proof of
 concept, and development environments. It is not recommended for
 production environments where scaling and performance are primary
 concerns.
 
-[[network-topology-diagram]]
-.Network topology
-image::images/NETWORK.png[caption="Figure 3.1 " title="Network Topology" align="center", scaledwidth="75%"]
-
-The network isolation feature allows {ro} director to segment network
-traffic by particular network types. When using network isolation,
-each server role must have access to its required network traffic
-types. <<network-topology-table>> summarizes the required network
+Table 1 <<network-topology-table>> summarizes the required network
 types by server role.
-
-<<network-topology-diagram>> depicts the network roles by server type in
-this reference architecture.
 
 [[network-topology-table]]
 .Network type by server role
@@ -250,7 +252,7 @@ networking types:
   and scalability of GRE with superior performance.
 
 Although Red Hat certifies third-party network plug-ins, {ro} director
-uses the ML2 network plugin with the Open vSwitch driver by default.
+uses the `ML2` network plugin with the `Open vSwitch` driver by default.
 
 NOTE: {ro} director does not deploy legacy (`Nova`) networking.
 
@@ -340,7 +342,7 @@ offers flexibility in service placement. Multiple services can be run
 on the same physical nodes, or, in an extreme case, each service can
 run on its own dedicated hardware.
 
-<<segregated-cluster,This diagram>> depicts OpenStack service deployed
+Figure 3.2 <<segregated-cluster>> depicts OpenStack service deployed
 in a segregated cluster model. Red Hat supports {ro} 7 services
 deployed in a segregated model but it is beyond the scope of this
 document.
@@ -355,7 +357,7 @@ clusters. {ro} director deploys overclouds as collapsed clusters. All
 controller nodes run the same services. Service endpoints are bound to
 the same set of virtual IP addresses. The undercloud is not clustered.
 
-<<collapsed-cluster, This diagram>> depicts {ro} director's default
+Figure 3.3 <<collapsed-cluster>> depicts {ro} director's default
 approach to deploying collapsed HA OpenStack services.
 
 NOTE: Segregated and collapsed are the dominant approaches to
@@ -366,7 +368,7 @@ is beyond the scope of this document.
 
 [[segregated-cluster]]
 .Segregated cluster
-image::images/HA_SEGREGATED.png[caption="Figure 3.2: " title="Segregated Cluster Services" align="center", scaledwidth="75%"]
+image::images/HA_SEGREGATED.png[caption="Figure 3.2: " title="Segregated Cluster Services" align="center", scaledwidth="60%"]
 
 ==== Cluster Services and Quorum
 Each clustered service operates in one of the following modes:
@@ -400,9 +402,9 @@ process of isolating a failed machine -- typically via remote power
 control or networked switches -- by powering it off. This is necessary
 to ensure data integrity.
 
-NOTE: Although {ro} director supports up to 16 cluster nodes, Red Hat
+NOTE: Although `Pacemaker` supports up to 16 cluster nodes, Red Hat
 recommends an odd number of cluster members to help ensure quorum during
-cluster communication failure. {ro} director requires a minimum of three
+cluster communication failure. {ro} director requires three
 active cluster members to achieve quorum.
 
 ==== Cluster Modes for Core Services
@@ -411,9 +413,11 @@ OpenStack service.
 
 [[collapsed-cluster]]
 .Collapsed cluster
-image::images/HA_COLLAPSED.png[caption="Figure 3.3: " title="Collapsed Cluter Services" align="center", scaledwidth="75%"]
+image::images/HA_COLLAPSED.png[caption="Figure 3.3: " title="Collapsed Cluter Services" align="center", scaledwidth="60%"]
 
 The following table lists service mode by service.
+
+<<<
 
 [[core-cluster-modes]]
 .Core Service Cluster Modes and Description
@@ -435,7 +439,7 @@ in `httpd`.
 |*Neutron server*|Active/active|`Neutron` allows users to define and join
 networks on demand.
 |*Neutron agents*|Active/active|Support Layer 2 and 3 communication
-plus numerous virtual networking technologies including `ml2` and `open vswitch`.
+plus numerous virtual networking technologies including `ML2` and `Open vSwitch`.
 |*Nova*|Active/active|Provides compute capabilities to deploy and run
 virtual machine instances.
 |*Swift proxy server*|Active/active|Routes data requests to the
@@ -449,7 +453,9 @@ The same is true for the supporting services, although several of
 them field connection requests directly from clients rather than
 `HAproxy`.
 
-The following tables lists the cluster mode for the non-core OpenStack
+<<<
+
+The following table lists the cluster mode for the non-core OpenStack
 services.
 
 [[supporting-cluster-modes]]
@@ -496,18 +502,16 @@ If a service fails to start, the node where the service is running
 will be fenced in order to guarantee data integrity.
 
 === Ceph Storage Integration
-Red Hat Ceph is a distributed data object store designed for
+Red Hat Ceph Storage 1.3 is a distributed data object store designed for
 performance, reliability, and scalability. {ro} 7 director can deploy
 an integrated Ceph cluster in the overcloud. The integrated Ceph
 cluster acts as a storage virtualization layer for `Glance` images,
-`Cinder` volumes, and `Nova` ephemeral storage. The
-<<ceph-integration,Ceph integration graphic>> depicts {ro} 7 director
-Ceph cluster integration from a high level.
-
-The Ceph cluster consists of two types of daemons: Ceph OSD and Ceph
-Monitor. The *Ceph OSD Daemon* stores data in pools striped across one
-or more disks. Ceph OSDs also replicate, rebalance, and recover data,
-and report data usage.
+`Cinder` volumes, and `Nova` ephemeral storage. Figure 3.4
+<<ceph-integration>> depicts {ro} 7 director Ceph cluster integration
+from a high level. The Ceph cluster consists of two types of daemons:
+Ceph OSD and Ceph Monitor. The *Ceph OSD Daemon* stores data in pools
+striped across one or more disks. Ceph OSDs also replicate, rebalance,
+and recover data, and report data usage.
 
 The *Ceph Monitor* maintains a master copy of the Ceph storage map and
 the current state of the storage cluster. Ceph clients consult the
@@ -516,7 +520,7 @@ communicate directly with the primary data-owning OSD.
 
 [[ceph-integration]]
 .Ceph Integration
-image::images/CEPH.png[caption="Figure 3.4: " title="Ceph Integration" align="center", scaledwidth="75%"]
+image::images/CEPH.png[caption="Figure 3.4: " title="Ceph Integration" align="center", scaledwidth="60%"]
 
 {ro} director can install a Ceph cluster with one or more OSD servers.
 By default the OSD server will use free space on its primary disk for
@@ -533,8 +537,7 @@ instances with ephemeral storage.
 
 Consult
 https://access.redhat.com/documentation/en/red-hat-ceph-storage/version-1.3/red-hat-ceph-storage-13-red-hat-ceph-architecture/red-hat-ceph-architecture[Ceph
-documentation] for more information on Ceph 1.3. This https://access.redhat.com/articles/1370143[reference
-architecture] details how to install and run Ceph with standalone
+documentation] for more information on Red Hat Ceph Storage 1.3. This https://access.redhat.com/articles/1370143[reference architecture] details how to install and run Ceph with standalone
 versions of {osp}.
 
 <<<

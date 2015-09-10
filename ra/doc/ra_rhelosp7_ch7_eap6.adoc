@@ -41,7 +41,7 @@ using nested `Heat` templates. Directions for future work might include
 auto-scaling to multiple MSA applications via `Heat` and `Ceilometer` and load
 balancing between them via LBaaS.
 
-<<EAP6-MSA>> depicts the MSA application deployed in this reference
+Figure 7.1 <<EAP6-MSA>> depicts the MSA application deployed in this reference
 architecture.
 
 More information on deploying a {eapver} 6 MSA application can be found at

@@ -30,7 +30,7 @@ includes a web presentation layer, product and customer databases, and
 sales, billing, and product microservices.
 
 === Workflow
-<<reference-workflow>> depicts a high-level overview of the use case
+Figure 4.1 <<reference-workflow>> depicts a high-level overview of the use case
 workflow.
 
 [[reference-workflow]]
@@ -58,7 +58,7 @@ The use case is divided into the following steps:
 .. Test the application
 
 === Conceptual Diagram of the Solution Stack
-<<reference-architecture-diagram>> depicts the deployed solution stack
+Figure 4.2 <<reference-architecture-diagram>> depicts the deployed solution stack
 including, server roles, and service placement.
 
 [[reference-architecture-diagram]]
@@ -68,7 +68,7 @@ image::images/REFARCH.png[caption="Figure 4.2: " title="Reference Architecture D
 <<network-topology-section>> describes the networking components in detail.
 
 ==== Server Roles
-As depicted in <<reference-architecture-diagram>>, the use case requires 12
+As depicted in Figure 4.2 <<reference-architecture-diagram>>, the use case requires 12
 bare metal servers deployed with the following roles:
 
 * 1 undercloud server
@@ -94,12 +94,12 @@ model.
 
 [[network-topology-section]]
 ==== Network Topology
-<<reference-architecture-diagram>> details and describes the network topology of this
-reference architecture. 
+Figure 4.2 <<reference-architecture-diagram>> details and describes the network topology of this
+reference architecture.
 
 Each server has two Gigabit interfaces (nic1:2) and two 10-Gigabit
-interfaces (nic3:4) for network isolation to
-segment OpenStack communication by type.
+interfaces (nic3:4) for network isolation to segment OpenStack
+communication by type.
 
 The following network traffic types are isolated:
 
@@ -150,6 +150,7 @@ no one-size-fits-all approach. Hardware constraints and workload
 characteristics must dictate this design decision.
 
 https://access.redhat.com/articles/1507893[This paper] shares an approach
-to using cloud benchmarks to guide {ro} 7 design decisions.
+to using cloud benchmarks to guide {ro} design decisions for
+performance and scaling.
 
 <<<

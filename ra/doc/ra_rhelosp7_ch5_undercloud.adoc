@@ -1,6 +1,7 @@
 [chapter 5]
 == Install the undercloud
-This section lists the steps to install and configure {ospver} with director in the Red Hat Systems Engineering lab.
+This section lists the steps to install and configure {ospver} with
+{ro} director in the Red Hat Systems Engineering lab.
 
 === Prepare the undercloud server
 
@@ -153,7 +154,7 @@ NOTE: Installing with SSL support is beyond the scope of this
 reference architecture. For details on how to use SSL support for the
 undercloud see
 https://access.redhat.com/documentation/en-US/Red_Hat_Enterprise_Linux_OpenStack_Platform/7/html/Director_Installation_and_Usage/chap-Installing_the_Undercloud.html[the
-product documentation] or the <<Appendix-undercloud-SSL>> appendix.
+product documentation] or Appendix E <<Appendix-undercloud-SSL>>.
 +
 4. Install the undercloud.
 +
@@ -190,7 +191,8 @@ OS_NO_CACHE=True
 6. Verify all services are active.
 +
 NOTE: This command output was truncated for brevity. Verify all
-services are _active_.
+services are _active_. Appendix F <<Appendix-undercloud-servce-list>>
+lists the OpenStack services running on the undercloud.
 +
 [subs=+quotes]
 ----
@@ -210,7 +212,7 @@ openstack-ceilometer-notification (pid 15932) is active
 7. Increase the maximum database connections. This is recommended for
    production cluster deployments in
    https://access.redhat.com/articles/1432053[Performance Tuning the
-   Backend Database for Red Hat Enterprise Linux OpenStack Platform]
+   Backend Database for Red Hat Enterprise Linux OpenStack Platform].
 +
 [subs=+quotes]
 ----

@@ -335,7 +335,7 @@ do ironic node-show $i | grep capabilities; done**
 ----
 +
 In this example, the 4 R510 servers are assigned to Ceph, 3 M520
-servers are assigned to control, and the remained are assigned to
+servers are assigned to control, and the remainer are assigned to
 compute.
 
 === Configure network isolation
@@ -404,7 +404,7 @@ $ *mkdir ~/nic-configs*
 $ *ls ~/nic-configs*
 ceph-storage.yaml  cinder-storage.yaml  compute.yaml  controller.yaml swift-storage.yaml
 ----
-Complete examples of each network configuration file are in
+Complete examples of each network configuration file are in Appendix I
 <<Appendix-nic-configuration-files>>.
 +
 NOTE: `Swift` and `Cinder` servers are not used in this reference
@@ -643,7 +643,7 @@ ip-172.16.1.11 (ocf::heartbeat:IPaddr2): Started overcloud-controller-0
 ip-10.19.137.121  (ocf::heartbeat:IPaddr2): Started overcloud-controller-1
 ...
 ----
-NOTE: Appendix <<Appendix-overcloud-servce-list>> shows complete *pcs status*
+NOTE: Appendix G <<Appendix-overcloud-servce-list>> shows complete *pcs status*
 `Pacemaker` output for a deployed overcloud.
 
 === Tune Ceph storage
@@ -775,7 +775,7 @@ IPMI interfaces act as fence devices. However, {osp} director does not
 configure fencing. This section describes how the controller nodes were
 manually configured for fencing in this reference architecture.
 
-<<Appendix-controller_fencing_script>> shows an example script used to
+Appendix H <<Appendix-controller_fencing_script>> shows an example script used to
 configure fencing in this reference architecture. This script
 configures each controller nodes IPMI as a fence device, constrains it
 so a controller cannot fence itself, and then enables all fence
