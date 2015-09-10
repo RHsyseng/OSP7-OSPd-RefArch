@@ -77,11 +77,11 @@ Red Hat Satellite 6.0 Provisioning Guide]
 |8|Dell PowerEdge M520|2x Intel Xeon CPU E5-2450 0 @ 2.10GHz, Broadcom 5720 1Gb Dual Port LOMs, Broadcom 57810S-k
 Dual Port 10Gb NIC, 6x DDR3 8192 MB @1333 MHZ DIMMs, 2 x 146GB SAS
 internal disk drives
-|4|Dell PowerEdge R520|2x Intel(R) Xeon(R) CPU X5650 @ 2.67 GHz (6
+|4|Dell PowerEdge R510|2x Intel(R) Xeon(R) CPU X5650 @ 2.67 GHz (6
 core), 2 x Broadcom NetXtreme II BCM5709S Gb Ethernet, 2x  Emulex
 Corporation OneConnect 10Gb NIC, 6 x DDR3 8192 MB @1333 MHZ DIMMs, 12x
 146GB SAS internal disk drives
-|1|Dell PowerEdge M720|2x Intel(R) Xeon(R) CPU X5650 @ 2.67 GHz (6
+|1|Dell PowerEdge R720xd|2x Intel(R) Xeon(R) CPU X5650 @ 2.67 GHz (6
 core), 2 x Broadcom NetXtreme II BCM5709S Gb Ethernet, 2x  Emulex
 Corporation OneConnect 10Gb NIC, 6 x DDR3 8192 MB @1333 MHZ DIMMs, 12x
 146GB SAS internal disk drives

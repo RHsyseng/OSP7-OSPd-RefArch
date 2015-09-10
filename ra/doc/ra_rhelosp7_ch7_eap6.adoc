@@ -183,6 +183,8 @@ EOF*
 $ *source ~/demorc*
 ----
 . Upload a {rhel} Server 7.1 image for the MSA application servers.
+  The image can be obtained by installing the _rhel-guest-image-7_
+  package via `yum'.
 +
 [subs=+quotes]
 ----

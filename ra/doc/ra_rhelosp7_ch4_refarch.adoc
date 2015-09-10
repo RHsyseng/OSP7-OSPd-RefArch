@@ -83,10 +83,10 @@ Servers are assigned to roles based on their hardware characteristics.
 [options="header,footer"]
 |====
 |Role|Count|Model
-|Undercloud|1|Dell PowerEdge M720
+|Undercloud|1|Dell PowerEdge R720xd
 |Cloud controller|3|Dell PowerEdge M520
 |Compute node|4|Dell PowerEdge M520
-|Ceph storage server|4|Dell PowerEdge R520
+|Ceph storage server|4|Dell PowerEdge R510
 |====
 
 Appendix C <<Appendix-hardware-specifications>> lists hardware specifics for each server
@@ -123,7 +123,7 @@ recommended for production deployments.
 .Network isolation
 [options="header, footer"]
 |====
-|Role|Interface|Network|VLAN ID|VLAN Type|Network
+|Role|Interface|VLAN ID|Network|VLAN Type|CIDR
 .2+^.^|Undercloud|nic1|168|External|Native|10.19.137.0/21
 |nic2|4040|Provisioning|Native|192.0.2.0/24
 .6+^.^|Control|nic1|168|External|Native|10.19.137.0/21

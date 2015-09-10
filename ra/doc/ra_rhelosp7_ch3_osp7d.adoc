@@ -128,7 +128,7 @@ types:
     The control plane installs the overcloud via this network. All cluster
     nodes must have a physical interface attached to the provisioning network.
     This network carries DHCP/PXE and TFTP traffic so it must be
-    provided on a native VLAN to the interfaces used for booting. The
+    provided on a dedicated interface or a native VLAN to the boot interface. The
     provisioning interface can act as a default gateway for
     the overcloud if there is no other gateway on the network. Disable
     PXE on the remaining interfaces to ensure the servers boot from
@@ -199,7 +199,7 @@ each server role must have access to its required network traffic
 types. <<network-topology-table>> summarizes the required network
 types by server role.
 
-<<network-topology>> depicts the network roles by server type in
+<<network-topology-diagram>> depicts the network roles by server type in
 this reference architecture.
 
 [[network-topology-table]]
@@ -252,7 +252,7 @@ networking types:
 Although Red Hat certifies third-party network plug-ins, {ro} director
 uses the ML2 network plugin with the Open vSwitch driver by default.
 
-NOTE: {ro} director does not deploy `Nova` networking.
+NOTE: {ro} director does not deploy legacy (`Nova`) networking.
 
 === High Availability
 {ro} director's approach to high availability OpenStack leverages Red Hat's
@@ -447,7 +447,9 @@ appropriate `Swift` ACO server.
 The majority of the core OpenStack services run in active/active mode.
 The same is true for the supporting services, although several of
 them field connection requests directly from clients rather than
-`HAproxy`. The following tables lists the cluster mode for the non-core OpenStack
+`HAproxy`.
+
+The following tables lists the cluster mode for the non-core OpenStack
 services.
 
 [[supporting-cluster-modes]]
@@ -526,8 +528,8 @@ deployed in the overcloud.
 
 This reference architecture includes a 4-node Ceph cluster. Each node
 has 10 OSD disks (40 total). The OSDs in the reference architecture
-store `Glance` images, host `Cinder` volumes, and provide ephemeral
-storage for the deployed instances.
+store `Glance` images, host `Cinder` volumes, and provide `Nova`
+instances with ephemeral storage.
 
 Consult
 https://access.redhat.com/documentation/en/red-hat-ceph-storage/version-1.3/red-hat-ceph-storage-13-red-hat-ceph-architecture/red-hat-ceph-architecture[Ceph

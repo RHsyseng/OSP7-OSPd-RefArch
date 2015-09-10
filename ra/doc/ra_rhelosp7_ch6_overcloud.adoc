@@ -271,7 +271,7 @@ $ **for i in $(ls /etc/ahc-tools/edeploy/{\*.specs,state}); do echo $i && cat $i
  ('memory', 'total', 'size', 'ge(64000000000)'),
  ]
 /etc/ahc-tools/edeploy/state
-[('control', '3'), ('ceph', '4'), ('compute', '*')]
+[('ceph', '4'), ('control', '3'), ('compute', '*')]
 ----
 This configuration defines:
 +
@@ -337,17 +337,6 @@ do ironic node-show $i | grep capabilities; done**
 In this example, the 4 R510 servers are assigned to Ceph, 3 M520
 servers are assigned to control, and the remained are assigned to
 compute.
-+
-10. Set the provisioning network nameserver. The overcloud servers
-   users this nameserver for DNS resolution.
-+
-[subs=+quotes]
-----
-$ *neutron subnet-update $(neutron subnet-list | awk ' /192.0.2/ { print $2 } ') --dns-nameserver 10.19.143.247*
-$ *neutron subnet-show $(neutron subnet-list | awk ' /192.0.2/ { print $2 } ') | grep -B 1 nameserver*
-| cidr              | 192.0.2.0/24
-| dns_nameservers   | 10.19.143.247
-----
 
 === Configure network isolation
 This section describes how to configure network isolation for the
@@ -393,12 +382,10 @@ parameter_defaults:
 The _resource_registery_ section defines role-specific configuration.
 These files are created in subsequent steps.
 +
-The _parameters_ section names the external network bridge created by
-Open vSwitch.
-+
 The _parameter_defaults_ section defines default parameters used
 across the resource registry. These include CIDRs, VLAN IDs, and IP
-allocation pools for each network.
+allocation pools for each network, as well as the external network
+bridge created by `Open vSwitch`.
 +
 The parameters defined in this file match the network configuration
 used in the reference architecture.
@@ -425,6 +412,7 @@ architecture. Their files are included for completeness but not called
 by the installer.
 +
 3. Set the provisioning network nameserver. The overcloud servers use
+   this nameserver for DNS resolution.
 +
 [subs=+quotes]
 ----
@@ -532,14 +520,15 @@ $ *ironic node-list*
 +
 [subs=+quotes]
 ----
-$ *openstack overcloud deploy -e /usr/share/openstack-tripleo-heat-templates/environments/network-isolation.yaml
--e /home/stack/network-environment.yaml --control-flavor control --compute-flavor compute --ceph-storage-flavor ceph
---ntp-server 10.16.255.2 --control-scale 3 --compute-scale 4 --ceph-storage-scale 4 --block-storage-scale 0 --swift-storage-scale 0
--t 90 --templates /home/stack/templates/openstack-tripleo-heat-templates/
--e /usr/share/openstack-tripleo-heat-templates/environments/storage-environment.yaml
---rhel-reg --reg-method satellite --reg-sat-url
-http://se-sat6.syseng.bos.redhat.com --reg-org syseng
---reg-activation-key OSP-Overcloud*
+$ *openstack overcloud deploy -e
+/usr/share/openstack-tripleo-heat-templates/environments/network-isolation.yaml \
+-e /home/stack/network-environment.yaml --control-flavor control --compute-flavor compute \
+--ceph-storage-flavor ceph --ntp-server 10.16.255.2 --control-scale 3 --compute-scale 4 \
+--ceph-storage-scale 4 --block-storage-scale 0 --swift-storage-scale 0 \
+-t 90 --templates /home/stack/templates/openstack-tripleo-heat-templates/ \
+-e /usr/share/openstack-tripleo-heat-templates/environments/storage-environment.yaml \
+--rhel-reg --reg-method satellite --reg-sat-url \
+http://se-sat6.syseng.bos.redhat.com --reg-org syseng --reg-activation-key OSP-Overcloud*
 Deploying templates in the directory /home/stack/templates/openstack-tripleo-heat-templates
 ----
 This lengthy command does the following:
@@ -615,7 +604,8 @@ $ *neutron agent-list*
 | 91ff4990-6080-4fd2-98c2-b69cb5ea3d79 | L3 agent           | overcloud-controller-0.localdomain | :-)   | True           | neutron-l3-agent          |
 [ ... Output truncated ... ]
 ----
-8. *ssh* to a controller node and switch to root user.
+8. *ssh* to a controller node and switch to root user. Find the
+   controller IP address by running *nova list* on the undercloud.
 +
 [subs=+quotes]
 ----

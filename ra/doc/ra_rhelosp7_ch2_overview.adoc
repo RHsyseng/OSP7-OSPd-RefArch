@@ -3,14 +3,29 @@
 {osp} ({ro}) delivers an integrated
 foundation to create, deploy, and scale an OpenStack cloud. {ro}
 7, Red Hat's 5th iteration of OpenStack Platform, is based on the
-community Kilo OpenStack release. {eapver} (EAP)
-is a fully-certified Java EE platform to quickly deploy and
+community Kilo OpenStack release. This version introduces {ro}
+director, Red Hat's new deployment toolchain. {ro} director combines
+functinality from the upstream `TripleO` and `Ironic` projects
+with components from Red Hat's previous installers.
+
+{eapver} (EAP) is a fully-certified Java EE platform to quickly deploy and
 develop enterprise applications. This reference architecture describes
-a realistic use case for deploying an EAP 6 microservices architecture
-on a high availability {ro} 7 cluster. It provides a comprehensive,
+a realistic use case for deploying an EAP 6 Microservices Architecture
+(MSA) on a high availability {ro} 7 cluster. A microservices architecture is a
+modular enterprise application where individual instances or
+containers run single services and communicate via lightweight
+protocols and APIs. The EAP 6 MSA used in this reference architecture
+is a multi-tier shopping cart that processes customer transactions and
+logs them in a backend database.
+
+
+The complete reference architecture use case provides a comprehensive,
 end-to-end example of deploying a {ro} 7 cloud on baremetal using
 OpenStack director then implementing the microservices architecture via
-`Heat` templates.
+`Heat` templates. This reference architecture complements existing
+{ro} documentation by providing a _comprehensive example_ of deploying
+a complex enterprise web application on OpenStack, demonstrating {ro}
+7's features and tools in a realistic context.
 
 [[OSP-director]]
 .OpenStack Platform director
@@ -20,11 +35,17 @@ The first section of this reference architecture introduces the principal
 components: {ospver}, {ro}
 director, and a microservices architecture built with {eapver}. It
 also describes Red Hat's approach to making OpenStack high
-availability. The second section of the paper describes the lab
+availability. Core OpenStack services are managed and monitored in a
+High Availability (HA) cluster. A load balancer provides access to the
+service endpoints. There are no direct connections from the clients to
+the the services. This approach allows administrators to manage,
+operate, and scale services together or independently.
+
+The second section of the paper describes the lab
 environment, hardware, and software used to implement and test the
-reference architecture. The third section documents the installation
+reference architecture.
+
+The third section documents the installation
 and configuration procedure as performed by the Red Hat Systems
 Engineering team to deploy the reference architecture in their
-lab on bare metal servers using OpenStack director and production code. This
-reference architecture complements existing {ro} documentation by
-providing a realistic, comprehensive example of a complete deployment.
+lab on bare metal servers using OpenStack director and production code.

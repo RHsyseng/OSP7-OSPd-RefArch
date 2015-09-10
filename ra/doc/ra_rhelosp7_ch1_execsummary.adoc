@@ -1,29 +1,10 @@
 [abstract]
 == Executive Summary
-{osp} ({ro}) delivers an integrated
-foundation to create, deploy, and scale an OpenStack cloud. {ro}
-7, Red Hat's 5th iteration of OpenStack Platform, is based on the Kilo
-community OpenStack release. This reference architecture describes
-a realistic use case for deploying a microservices architecture on
-{ro} 7 cluster. A microservice architecture is a complex, modular
-enterprise applications where individual instances or containers run
-single services and communicate via lightweight protocols and APIs. The
-microservice architecture deployed in this reference architecture was
-built using {eapver} (EAP), Red Hat's
-fully-certified Java EE platform. This reference architecture supplements
-existing documentation by providing a _comprehensive example_ of deploying
-a complex enterprise web application on OpenStack, demonstrating {ro} 7's
-features and tools in a realistic context.
-
-The reference architecture begins with steps for deploying {ro} 7 on baremetal
-servers via {ro} director, Red Hat's new deployment toolchain. {ro} director
-combines functionality from the upstream TripleO and Ironic projects
-with components from Red Hat's previous installers. Next it describes
-Red Hat's approach to implementing highly available OpenStack.
-Core OpenStack services are managed and monitored in a highly available
-cluster. A load balancer provides access to the service endpoints. There
-are no direct connections from the clients to the services. This
-approach allows administrators to manage, operate, and scale services
-together or independently. The reference architecture concludes with
-instructions for implementing a microservices architecture that provides
+This reference architecture describes a realistic use case for
+deploying a microservices architecture application on
+{ospver} cluster. It begins with steps for deploying {ro} 7 on baremetal
+servers via {ro} director, Red Hat's new deployment toolchain. Next it
+describes Red Hat's approach to implementing highly available OpenStack.
+The reference architecture concludes with instructions for
+implementing a microservices architecture that provides
 shopping cart functionality via a multi-tier web application.
