@@ -57,8 +57,8 @@ The use case is divided into the following steps:
 .. Deploy EAP 6 microservices application via `Heat` templates
 .. Test the application
 
-NOTE: A complete archive of the configuration files and supportin
-scripts used in this reference architecture are avaialble at
+NOTE: A complete archive of the configuration files and supporting
+scripts used in this reference architecture is available at
 https://access.redhat.com/node/1610453/40/0.
 
 === Conceptual Diagram of the Solution Stack
