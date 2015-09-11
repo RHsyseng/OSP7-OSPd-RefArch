@@ -147,9 +147,8 @@ Deciding how to isolate networks is a crucial decision when
 designing for performance and scalability. There is
 no one-size-fits-all approach. Hardware constraints and workload
 characteristics must dictate this design decision.
-
-https://access.redhat.com/articles/1507893[This paper] shares an approach
-to using cloud benchmarks to guide {ro} design decisions for
+https://access.redhat.com/articles/1507893[This paper] shares an
+approach to using cloud benchmarks to guide {ro} design decisions for
 performance and scaling.
 
 NOTE: A complete archive of the configuration files and supporting
