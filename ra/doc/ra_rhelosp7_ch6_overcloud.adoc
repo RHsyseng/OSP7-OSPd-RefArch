@@ -759,13 +759,13 @@ numbers are relative to the default settings.
 . _sequential write_ benefits from both OSD and PG increases and shows
   the largest relative improvement versus the default configuration.
 
-[[image-ceph-perf]]
-.image-ceph-benchmark
-image::images/ceph_perf.png[caption="Figure 6.1: " title="Ceph benchmark performance" align="center"]
-
 NOTE: These performance tests are are for illustrative purposes only
 and do not reflect the achievable performance of the machines on a
 real application workload.
+
+[[image-ceph-perf]]
+.image-ceph-benchmark
+image::images/ceph_perf.png[caption="Figure 6.1: " title="Ceph benchmark performance" align="center"]
 
 === Configure controller fencing
 _Fencing_ is an important concept for HA clusters. It is a method for
