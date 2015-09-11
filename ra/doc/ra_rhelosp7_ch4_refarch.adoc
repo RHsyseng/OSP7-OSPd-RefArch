@@ -65,7 +65,7 @@ including, server roles, and service placement.
 .Reference Architecture
 image::images/REFARCH.png[caption="Figure 4.2: " title="Reference Architecture Diagram" align="center", scaledwidth="60%"]
 
-<<network-topology-section>> describes the networking components in detail.
+The <<network-topology-section>> section of this paper describes the networking components in detail.
 
 ==== Server Roles
 As depicted in Figure 4.2 <<reference-architecture-diagram>>, the use case requires 12
@@ -156,6 +156,5 @@ performance and scaling.
 NOTE: A complete archive of the configuration files and supporting
 scripts used in this reference architecture is available at
 https://access.redhat.com/node/1610453/40/0.
-
 
 <<<
