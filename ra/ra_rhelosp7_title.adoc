@@ -1,5 +1,3 @@
-//= Deploying EAP 6 Microservices on High Availability OpenStack Platform 7: with OpenStack Platform director
-//= Deploying Red Hat JBOSS Enterprise Application Platform 6 Microservices on High Availability Red Hat Enterprise Linux OpenStack Platform 7: with Red Hat Enterprise Linux OpenStack Platform director
 = Deploying Red Hat EAP 6 Microservices on High Availability Red Hat Enterprise Linux OpenStack Platform 7: with RHEL-OSP director
 Jacob Liberman <jliberma@redhat.com>
 v1.0, September 10, 2015
@@ -7,7 +5,6 @@ v1.0, September 10, 2015
 :doctype: book
 :title-logo-image: image:images/rh-ra-banner.jpg[scaledwidth=70%,align=center]
 // Settings:
-:compat-mode:
 :experimental:
 :listing-caption: Listing
 :icons: font
