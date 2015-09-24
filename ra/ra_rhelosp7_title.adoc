@@ -69,4 +69,4 @@ include::doc/ra_rhelosp7_ch7_eap6.adoc[]
 include::doc/ra_rhelosp7_ch8_conclusion.adoc[]
 include::doc/ra_rhelosp7_ch9_appendices.adoc[]
 
-// vim: set syntax=asciidoc:
+// vim: set syntax=asciidoc
