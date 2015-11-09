@@ -7,7 +7,7 @@ This section describes steps for deploying the overcloud.
 1. Download and extract the {ro} 7 discovery, deployment, and
   overcloud images.
 +
-NOTE: Download the images from: https://access.redhat.com/downloads/content/191/ver=7.0/rhel---7/7.0/x86_64/product-downloads
+NOTE: Download the images from: https://access.redhat.com/downloads/content/191/ver=7/rhel---7/7/x86_64/product-downloads
 +
 [subs=+quotes]
 ----
@@ -15,23 +15,23 @@ $ *mkdir images*
 $ *cd images*
 $ *cp ../*.tar .*
 $ *ls*
-overcloud-full-7.0.0-32.tar discovery-ramdisk-7.0.0-32.tar deploy-ramdisk-ironic-7.0.0-32.tar
+overcloud-full-7.1.0-39.tar discovery-ramdisk-7.1.0-39.tar deploy-ramdisk-ironic-7.1.0-39.tar
 ----
 +
 2. Extract the images from the tar archives.
 +
 [subs=+quotes]
 ----
-$ *tar xf deploy-ramdisk-ironic-7.0.0-32.tar*
-$ *tar xf discovery-ramdisk-7.0.0-32.tar*
-$ *tar xf overcloud-full-7.0.0-32.tar*
+$ *tar xf deploy-ramdisk-ironic-7.1.0-39.tar*
+$ *tar xf discovery-ramdisk-7.1.0-39.tar*
+$ *tar xf overcloud-full-7.1.0-39.tar*
 $ *ls*
-deploy-ramdisk-ironic-7.0.0-32.tar  discovery-ramdisk-7.0.0-32.tar overcloud-full-7.0.0-32.tar  overcloud-full.vmlinuz
+deploy-ramdisk-ironic-7.1.0-39.tar  discovery-ramdisk-7.1.0-39.tar overcloud-full-7.1.0-39.tar  overcloud-full.vmlinuz
 deploy-ramdisk-ironic.initramfs     discovery-ramdisk.initramfs overcloud-full.initrd
 deploy-ramdisk-ironic.kernel        discovery-ramdisk.kernel overcloud-full.qcow2
 ----
 +
-3. Upload the images
+3. Upload the images to `Glance`.
 +
 [subs=+quotes]
 ----
@@ -204,13 +204,14 @@ $ *openstack flavor set --property "cpu_arch"="x86_64" --property "capabilities:
 | vcpus                      | 1                                                   |
 +----------------------------+-----------------------------------------------------+
 ----
-3. Install _ahc-tools_.
+3. Install _ahc-tools_. This package contains reporting and matching
+   tools for automatic health checks.
 +
 [subs=+quotes]
 ----
 $ *sudo yum install -y -q ahc-tools*
 $ *sudo rpm -qa | grep ahc-tools*
-ahc-tools-0.1.1-5.el7ost.noarch
+ahc-tools-0.1.1-6.el7ost.noarch
 ----
 4. Create the AHC configuration file.
 +
@@ -248,7 +249,8 @@ password = d5ba7515326d740725ea74bf0aec65fb079c0e19
 tenant_name = service
 os_auth_url = http://192.0.2.1:5000/v2.0
 ----
-6. Create the AHC spec files.
+6. Create the AHC spec files. These files contain matching rules that
+   determine which profile gets assigned to each node.
 +
 NOTE: Servers are matched to profiles by the order they are listed in this file.
 +
@@ -307,7 +309,7 @@ $ *openstack flavor list*
 +--------------------------------------+-----------+------+------+-----------+-------+-----------+
 ----
 +
-8. Assign `Ironic` nodes to profiles and view the results.
+8. Assign `Ironic` nodes to their corresponding profiles.
 +
 [subs=+quotes]
 ----
@@ -334,14 +336,17 @@ do ironic node-show $i | grep capabilities; done**
 |                        | u'cpus': u'32', u'capabilities':u'profile:compute,boot_option:local'}  |
 ----
 +
-In this example, the 4 R510 servers are assigned to Ceph, 3 M520
-servers are assigned to control, and the remainer are assigned to
-compute.
+In this example, the 4 R510 servers are assigned to the Ceph profile, 3 M520
+servers are assigned to the control profile, and the remainder are assigned to
+the compute profile.
 
 === Configure network isolation
-This section describes how to configure network isolation for the
-reference architecture. Configure network isolation by defining
-networks in environment files. Pass the environment files to `Heat`.
+Network isolation assigns specific types of OpenStack network traffic
+to specific interfaces or bonds. Network isolation can improve
+security and scalability. This section describes how network isolation
+was configured for this reference architecture. Configure network
+isolation by defining networks in environment files. Pass the
+environment files to `Heat`.
 
 The network isolation environment files used in this section produce
 the network described in <<reference-architecture-diagram>>.
@@ -351,24 +356,27 @@ the network described in <<reference-architecture-diagram>>.
 [source%autofit, ruby, numbered]
 ----
 resource_registry:
-  OS::TripleO::BlockStorage::Net::SoftwareConfig:/home/stack/nic-configs/cinder-storage.yaml
-  OS::TripleO::Compute::Net::SoftwareConfig:/home/stack/nic-configs/compute.yaml
-  OS::TripleO::Controller::Net::SoftwareConfig:/home/stack/nic-configs/controller.yaml
-  OS::TripleO::ObjectStorage::Net::SoftwareConfig:/home/stack/nic-configs/swift-storage.yaml
-  OS::TripleO::CephStorage::Net::SoftwareConfig:/home/stack/nic-configs/ceph-storage.yaml
+  OS::TripleO::BlockStorage::Net::SoftwareConfig: /home/stack/nic-configs/cinder-storage.yaml
+  OS::TripleO::Compute::Net::SoftwareConfig: /home/stack/nic-configs/compute.yaml
+  OS::TripleO::Controller::Net::SoftwareConfig: /home/stack/nic-configs/controller.yaml
+  OS::TripleO::ObjectStorage::Net::SoftwareConfig: /home/stack/nic-configs/swift-storage.yaml
+  OS::TripleO::CephStorage::Net::SoftwareConfig: /home/stack/nic-configs/ceph-storage.yaml
 
 parameter_defaults:
+  ControlPlaneSubnetCidr: "24"
+  ControlPlaneDefaultRoute: 192.0.2.1
+  EC2MetadataIp: 192.0.2.1
   NeutronExternalNetworkBridge: "br-ex"
   InternalApiNetCidr: 172.16.1.0/24
   StorageNetCidr: 172.16.2.0/24
   StorageMgmtNetCidr: 172.16.3.0/24
   TenantNetCidr: 172.16.4.0/24
   ExternalNetCidr: 10.19.136.0/21
-  InternalApiAllocationPools: [{'start':'172.16.1.10', 'end': '172.16.1.100'}]
-  StorageAllocationPools: [{'start':'172.16.2.10', 'end': '172.16.2.200'}]
-  StorageMgmtAllocationPools: [{'start':'172.16.3.10', 'end': '172.16.3.200'}]
-  TenantAllocationPools: [{'start':'172.16.4.10', 'end': '172.16.4.200'}]
-  ExternalAllocationPools: [{'start':'10.19.137.121', 'end':'10.19.137.151'}]
+  InternalApiAllocationPools: [{'start': '172.16.1.10', 'end': '172.16.1.100'}]
+  StorageAllocationPools: [{'start': '172.16.2.10', 'end': '172.16.2.200'}]
+  StorageMgmtAllocationPools: [{'start': '172.16.3.10', 'end': '172.16.3.200'}]
+  TenantAllocationPools: [{'start': '172.16.4.10', 'end': '172.16.4.200'}]
+  ExternalAllocationPools: [{'start': '10.19.137.121', 'end': '10.19.137.151'}]
   InternalApiNetworkVlanID: 4041
   StorageNetworkVlanID: 4042
   StorageMgmtNetworkVlanID: 4043
@@ -376,7 +384,7 @@ parameter_defaults:
   ExternalNetworkVlanID: 168
   ExternalInterfaceDefaultRoute: "10.19.143.254"
   BondInterfaceOvsOptions:
-    "bond_mode=balance-tcp lacp=active other-config:lacp-fallback-ab=true"
+      "bond_mode=balance-tcp lacp=active other-config:lacp-fallback-ab=true"
 ----
 +
 The _resource_registery_ section defines role-specific configuration.
@@ -451,38 +459,33 @@ ceph::profile::params::osd_pool_default_pg_num: 128
 ceph::profile::params::osd_pool_default_pgp_num: 128
 ceph::profile::params::osd_pool_default_size: 3
 ceph::profile::params::osd_pool_default_min_size: 1
-ceph::profile::params::osds:
-  '/dev/sdb':
-    journal: {}
-  '/dev/sdc':
-    journal: {}
-  '/dev/sdd':
-    journal: {}
-  '/dev/sde':
-    journal: {}
-  '/dev/sdf':
-    journal: {}
-  '/dev/sdg':
-    journal: {}
-  '/dev/sdh':
-    journal: {}
-  '/dev/sdi':
-    journal: {}
-  '/dev/sdj':
-    journal: {}
-  '/dev/sdk':
-    journal: {}
+#ceph::profile::params::osds: {/srv/data: {}}
+ceph::profile::params::osds: 
+  '/dev/sdb': {}
+  '/dev/sdc': {}
+  '/dev/sdd': {}
+  '/dev/sde': {}
+  '/dev/sdf': {}
+  '/dev/sdg': {}
+  '/dev/sdh': {}
+  '/dev/sdi': {}
+  '/dev/sdj': {}
+  '/dev/sdk': {}
 ceph::profile::params::manage_repo: false
 ceph::profile::params::authentication_type: cephx
 
 ceph_pools:
-- volumes
-- vms
-- images
+  - volumes
+  - vms
+  - images
 
 ceph_osd_selinux_permissive: true
 ----
-
++
+This configuration file does not specify an OSD journal location. Omitting a custom
+location for the OSD journal instructs `Heat` to create a journal in the default
+location for each disk. The default location is a second partition on each disk.
++
 NOTE: By default Ceph creates one OSD per storage server using the remaining
 free space on the operating system disk. The OSD journal is
 configured as a 5 GB file on the disk. This configuration is only
@@ -492,7 +495,7 @@ suitable for evaluation and proof of concept.
 This section describes how to deploy and test the overcloud defined in
 the previous section.
 
-=== Deploy the Overcloud servers
+=== Deploy the overcloud servers
 1. Use *ironic node-list* to verify all `Ironic` nodes are powered off,
    available for provisioning, and not in maintenance mode.
 +
@@ -541,6 +544,7 @@ This lengthy command does the following:
   customization.
 * Registers the overcloud servers with the lab satellite server using a
   predefined activation key.
+* Enables tenant networking with the default VXLAN tenant networking type.
 3. Watch deployment progress in a separate console window.
 +
 [subs=+quotes]

@@ -245,11 +245,11 @@ networking types:
   tunnels to provide Layer 2 network connectivity between virtual
   machine instances on different hypervisors. GRE does not require
   changes to the network switches and supports more unique network IDs
-  than VLAN segmentation. This is the default mode of operation for
-  OpenStack Platform 7 director.
+  than VLAN segmentation. 
 *VXLAN*::
   This overlay method similar to GRE. VXLAN combines the ease
-  and scalability of GRE with superior performance.
+  and scalability of GRE with superior performance. This is the default
+  mode of operation for {ospver} as of the Y1 release.
 
 Although Red Hat certifies third-party network plug-ins, {ro} director
 uses the `ML2` network plugin with the `Open vSwitch` driver by default.
