@@ -94,7 +94,7 @@ uid=1000(stack) gid=1000(stack) groups=1000(stack) context=unconfined_u:unconfin
 ----
 $ *sudo yum install -y -q python-rdomanager-oscplugin*
 $ *sudo rpm -q python-rdomanager-oscplugin*
-python-rdomanager-oscplugin-0.0.8-44.el7ost.noarch
+python-rdomanager-oscplugin-0.0.10-8.el7ost.noarch
 ----
 +
 3. Create the _undercloud.conf_. This file contains

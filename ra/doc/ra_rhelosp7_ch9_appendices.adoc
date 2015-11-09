@@ -65,13 +65,15 @@ https://access.redhat.com/articles/1436373[Deployment Limits for Red
 Hat OpenStack Platform]
 . https://access.redhat.com/documentation/en-US/Red_Hat_Satellite/6.0/pdf/Provisioning_Guide/Red_Hat_Satellite-6.0-Provisioning_Guide-en-US.pdf[The
 Red Hat Satellite 6.0 Provisioning Guide]
+. https://access.redhat.com/articles/1462803[Understanding RHEL
+  OpenStack Platform High Availability (RHEL OSP7 and Director)]
 
 [appendix]
 [[Appendix-hardware-specifications]]
 == Hardware specifications
 
 .Hardware specifications
-[options="header,footer"]
+[options="header"]
 |====
 |Count|Model|Description
 |8|Dell PowerEdge M520|2x Intel Xeon CPU E5-2450 0 @ 2.10GHz, Broadcom 5720 1Gb Dual Port LOMs, Broadcom 57810S-k
@@ -93,7 +95,7 @@ Corporation OneConnect 10Gb NIC, 6 x DDR3 8192 MB @1333 MHZ DIMMs, 12x
 {ospver} is available via the {cdn} or {rhss}.
 
 .Required channels
-[options="header,footer"]
+[options="header"]
 |====
 |Name|Description
 |rhel-7-server-extras-rpms|Red Hat Enterprise Linux 7 Server - Extras
@@ -973,5 +975,23 @@ outputs:
     description: The OsNetConfigImpl resource.
     value: {get_resource: OsNetConfigImpl}0
 ----
+
+[appendix]
+[[Appendix-revision-history]]
+== Revision History
+
+.Revision History
+[cols="a,a,a"]
+|====
+|Revision 2.0|Monday, November 9, 2015|Jacob Liberman
+3+|
+- Updates for Y1 release
+
+|Revision 1.0|Wednesday, September 9, 2015|Jacob Liberman
+3+|
+- Initial publication based on 0-day release and reviews +
+- Ported to asciidoc template
+|====
+
 
 // vim: set syntax=asciidoc:
