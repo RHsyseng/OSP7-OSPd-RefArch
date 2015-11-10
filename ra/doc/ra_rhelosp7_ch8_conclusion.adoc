@@ -15,28 +15,26 @@ environment with its own hardware and network constraints.
 
 The use case provides:
 
-1. undercloud installation steps including post-installation
-   configuration of the database and `Neutron` quotas.
+1. undercloud installation steps
 2. overcloud installation steps including post-installation
-   configuration of the `Pacemaker` resource constraints and fence
-   devices.
+   configuration of the `Pacemaker` fence devices
 3. A fully worked example of Ceph OSD and journal customization via
    `Puppet` hiera data accompanied by post-installation configuration steps for
-   increasing placement group settings for improved performance.
-4. A fully worked example of network isolation configuration that
-   describes a sensible method for collapsing multiple networks onto
-   four physical interfaces using both tagged and native VLANs.
+   increasing placement groups
+4. A fully worked network isolation configuration that
+   collapses all networks onto four physical interfaces using both tagged
+   and native VLANs
 5. A detailed description of Red Hat's approach to highly available
    OpenStack including service placement and protection as implemented
-   by {ro} director.
+   by {ro} director
 6. A fully worked example of deploying a multi-tiered {eapver}
-   application using nested `Heat` templates.
+   application using nested `Heat` templates
 
 EAP microservices applications can be delivered via Red Hat OpenShift
 Enterprise using containers or another PaaS model. However, the use
 case is still valid from a DevOps perspective for staging and
 developing the application, and also for customers who are reluctant
-to move to PaaS because they already have a substantial investment in
+to move to PaaS because they have a substantial investment in
 existing IaaS infrastructure. Also, although it is not covered in this
 reference architecture, OpenStack can put additional muscle behind an
 EAP 6 microservices application when it is coupled with `Heat` and

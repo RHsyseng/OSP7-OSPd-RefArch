@@ -65,7 +65,7 @@ repolist: 21,076
 +
 NOTE: Appendix D <<Appendix-required-channels>> lists the required channels.
 +
-5. Create the `stack` user
+5. Create the `stack` user. Use this account for all deployment tasks.
 +
 [subs=+quotes]
 ----

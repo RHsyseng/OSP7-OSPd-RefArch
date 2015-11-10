@@ -342,8 +342,7 @@ the compute profile.
 
 === Configure network isolation
 Network isolation assigns specific types of OpenStack network traffic
-to specific interfaces or bonds. Network isolation can improve
-security and scalability. This section describes how network isolation
+to specific interfaces or bonds. This section describes how network isolation
 was configured for this reference architecture. Configure network
 isolation by defining networks in environment files. Pass the
 environment files to `Heat`.
@@ -430,7 +429,7 @@ $ *neutron subnet-update $(neutron subnet-list | awk ' /192.0.2/ { print $2 } ')
 === Customize Ceph Storage
 Like network isolation, Ceph is customized by passing `Heat` additional
 environment files. The customization produce the Ceph cluster depicted
-in the <<ceph-integration,Ceph integration graphic>>.
+in Figure 3.4 <<ceph-integration,Ceph integration>>.
 
 In this reference architecture ten SAS disks in each R510 are
 configured as OSD drives. The journal for each OSD is created as a
@@ -481,11 +480,10 @@ ceph_pools:
 
 ceph_osd_selinux_permissive: true
 ----
-+
 This configuration file does not specify an OSD journal location. Omitting a custom
 location for the OSD journal instructs `Heat` to create a journal in the default
 location for each disk. The default location is a second partition on each disk.
-+
+
 NOTE: By default Ceph creates one OSD per storage server using the remaining
 free space on the operating system disk. The OSD journal is
 configured as a 5 GB file on the disk. This configuration is only

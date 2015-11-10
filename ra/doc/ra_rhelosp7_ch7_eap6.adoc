@@ -69,7 +69,7 @@ OS_NO_CACHE=True
 OS_CLOUDNAME=overcloud
 ----
 . Create an external network and subnet. This will be the public
-  network for the MSA application. Export the external network ID.
+  network for the MSA application.
 +
 [subs=+quotes]
 ----
