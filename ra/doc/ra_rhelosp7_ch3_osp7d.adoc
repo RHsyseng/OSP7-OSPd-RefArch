@@ -8,7 +8,7 @@ Hat's OpenStack Platform technology to provide a production-ready
 cloud platform backed by an ecosystem of more than 350 certified partners.
 
 {ro} 7 is based on the community Kilo OpenStack release. This
-release is Red Hat's fifth iteration of {ro} which has been
+release is Red Hat's fifth iteration of {ro}. It has been
 successfully deployed by Red Hat customers worldwide across diverse
 vertical industries including financial, telecommunications, and
 education.
@@ -16,8 +16,7 @@ education.
 {ro} 7 introduces {ro} director, a cloud installation and
 lifecycle management tool chain. Director is the first {ro}
 installer to deploy OpenStack on and with OpenStack. This section of
-paper introduces {ro} director's architecture and describes the
-following features:
+the paper introduces {ro} director's architecture and features:
 
 * Simplified deployment through ready-state provisioning of bare metal resources.
 * Flexible network definitions
@@ -38,40 +37,41 @@ the `undercloud`. The production environment is called the `overcloud`.
 
 The `undercloud` is the `TripleO` control plane. It uses native OpenStack APIs
 and services to deploy, configure, and manage the production OpenStack
-deployment. The undercloud defines the overcloud with `Heat` templates
+deployment. The `undercloud` defines the overcloud with `Heat` templates
 then deploys it via the `Ironic` baremetal provisioning service. {ro} director
-includes `Heat` predefined templates for the basic server roles that comprise
+includes predefined `Heat` templates for the basic server roles that comprise
 the overcloud. Customizable templates allow director to deploy,
 redeploy, and scale complex overclouds in a repeatable fashion.
 
 `Ironic` is a community bare-metal provisioning project.
 Director uses `Ironic` to deploy the overcloud servers. `Ironic`
 gathers information about baremetal servers via a discovery mechanism
-known as introspection. `Ironic` pairs servers with a bootable disk
-image and then installs them via PXE and remote power management.
+known as introspection. `Ironic` pairs servers with bootable
+images and installs them via PXE and remote power management.
 
 {ro} director deploys all servers with the same generic image by
-injecting `Puppet modules` into the generic
-disk image to tailor it for specific server roles. It then
+injecting `Puppet modules` into the
+image to tailor it for specific server roles. It then
 applies host-specific customizations via Puppet including network and
 storage configurations.
 
-While the undercloud is primarily used to deploy OpenStack, the
+While the `undercloud` is primarily used to deploy OpenStack, the
 `overcloud` is a functional cloud available to run virtual machines
 and workloads. Servers in the following roles comprise the overcloud:
 
 [[server-roles]]
 [glossary]
 *Control*::
-    This role provides the endpoint for REST-based API queries to the
+    This role provides endpoints for REST-based API queries to the
     majority of the OpenStack services. These include Compute, Image,
     Identity, Block, Network, and Data processing.  The controller can
     run as a standalone server or as a HA cluster.
 *Compute*::
     This role provides the processing, memory, storage, and
-    networking resources to run virtual machine instances. They run
+    networking resources to run virtual machine instances. It runs
     the KVM hypervisor by default. New instances are spawned across
-    compute nodes in a round-robin fashion.
+    compute nodes in a round-robin fashion based on resource
+    availability.
 *Block storage*::
     This role provides external block storage for HA
     controller nodes via the OpenStack Block Storage service `Cinder`.
@@ -98,8 +98,7 @@ Profile to matching is performed after introspection but prior to deployment.
 
 {ro} director also supports pre-installation *benchmark collection*.
 Servers boot to a customized RAMdisk and run a series of benchmarks.
-The benchmarks report performance outliers to identify under performing
-nodes prior to installation.
+The benchmarks report performance outliers prior to installation.
 
 NOTE: {ro} 7 requires {rhel} 7 Server on all servers.
 Supported guest operating systems can be found at
@@ -116,8 +115,8 @@ networks provides better performance and scalability.
 network traffic types can be assigned to a physical,
 virtual, or bonded interface. Multiple traffic types can be combined
 across the same physical interfaces or switches. Each OpenStack
-service is bound to an IP on a particular network. A virtual IP is
-created on that network and shared among all of the HA controllers.
+service is bound to an IP on a particular network. In a cluster a
+service virtual IP is shared among all of the HA controllers.
 
 {ro} director supports network isolation for the following traffic
 types:
@@ -130,9 +129,10 @@ types:
     This network carries DHCP/PXE and TFTP traffic so it must be
     provided on a dedicated interface or a native VLAN to the boot interface. The
     provisioning interface can act as a default gateway for
-    the overcloud if there is no other gateway on the network. Disable
-    PXE on the remaining interfaces to ensure the servers boot from
-    this network.
+    the overcloud if there is no other gateway on the network.
+
+NOTE: Disable PXE on the remaining interfaces to ensure the servers boot from this network.
+
 *External*::
     This network provides overcloud nodes with external connectivity.
     Controller nodes connect the external network to an `Open vSwitch`
@@ -155,8 +155,7 @@ types:
     Virtual machines communicate over the tenant network. It supports
     three modes of operation: VXLAN, GRE, and VLAN. VXLAN and GRE
     tenant traffic is delivered via software tunnels on a single VLAN.
-    Individual VLANs correspond to tenant networks in the case where
-    VLAN tenant networks are used.
+    In VLAN mode, individual VLANs correspond to tenant networks.
 *Storage*::
     This network carries storage communication including `Ceph`, `Cinder`,
     and `Swift` traffic. The virtual machine instances communicate
@@ -206,7 +205,7 @@ types by server role.
 
 [[network-topology-table]]
 .Network type by server role
-[options="header, footer"]
+[options="header"]
 |====
 |Role|Network
 .2+^.^|Undercloud|External
@@ -230,7 +229,7 @@ types by server role.
 {ro} 7 supports tenant network communication through
 the OpenStack Networking (`Neutron`) service. OpenStack Networking supports
 overlapping IP address ranges across tenants via the Linux kernel's
-network namespace capability. It also supports three default
+`network namespace` capability. It also supports three default
 networking types:
 
 [[tenant-network-types]]
@@ -245,11 +244,11 @@ networking types:
   tunnels to provide Layer 2 network connectivity between virtual
   machine instances on different hypervisors. GRE does not require
   changes to the network switches and supports more unique network IDs
-  than VLAN segmentation. This is the default mode of operation for
-  OpenStack Platform 7 director.
+  than VLAN segmentation. 
 *VXLAN*::
   This overlay method similar to GRE. VXLAN combines the ease
-  and scalability of GRE with superior performance.
+  and scalability of GRE with superior performance. This is the default
+  mode of operation for {ospver} as of the Y1 release.
 
 Although Red Hat certifies third-party network plug-ins, {ro} director
 uses the `ML2` network plugin with the `Open vSwitch` driver by default.
@@ -275,7 +274,8 @@ service availability and data integrity.
 
 ===== Cluster manager benefits
 
-. Deterministic recovery of a complex, multi-machine application stack
+. Deterministic recovery of a complex, multi-machine application
+  stack.
 . State awareness of other cluster machines to co-ordinate service
    startup and failover.
 . Shared quorum calculation to determine majority set of surviving
@@ -421,7 +421,7 @@ The following table lists service mode by service.
 
 [[core-cluster-modes]]
 .Core Service Cluster Modes and Description
-[options="header, footer"]
+[options="header"]
 |====
 |Service|Mode|Description
 |*Ceilometer*|Active/active|Measures usage of core OpenStack
@@ -460,7 +460,7 @@ services.
 
 [[supporting-cluster-modes]]
 .Supporting Service Cluster Modes and Description
-[options="header, footer"]
+[options="header"]
 |====
 |Service|Mode|Description
 |*Replicated state database*|Active/active|`Galera` replicates databases
@@ -500,6 +500,10 @@ services in the following order:
 
 If a service fails to start, the node where the service is running
 will be fenced in order to guarantee data integrity.
+
+NOTE: This article contains more information regarding HA clustering
+and {ro}: https://access.redhat.com/articles/1462803[Understanding
+RHEL OpenStack Platform High Availability]
 
 === Ceph Storage Integration
 Red Hat Ceph Storage 1.3 is a distributed data object store designed for

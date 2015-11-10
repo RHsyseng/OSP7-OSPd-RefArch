@@ -79,7 +79,7 @@ Servers are assigned to roles based on their hardware characteristics.
 
 [[server-roles]]
 .Server hardware by role
-[options="header,footer"]
+[options="header"]
 |====
 |Role|Count|Model
 |Undercloud|1|Dell PowerEdge R720xd
@@ -120,7 +120,7 @@ recommended for production deployments.
 
 [[network-isolation-table]]
 .Network isolation
-[options="header, footer"]
+[options="header"]
 |====
 |Role|Interface|VLAN ID|Network|VLAN Type|CIDR
 .2+^.^|Undercloud|nic1|168|External|Native|10.19.137.0/21

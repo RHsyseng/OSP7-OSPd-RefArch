@@ -18,7 +18,6 @@ protocols and APIs. The EAP 6 MSA used in this reference architecture
 is a multi-tier shopping cart that processes customer transactions and
 logs them in a backend database.
 
-
 The complete reference architecture use case provides a comprehensive,
 end-to-end example of deploying a {ro} 7 cloud on baremetal using
 OpenStack director then implementing the microservices architecture via
@@ -50,3 +49,6 @@ and configuration procedure. All of the steps listed in this document
 were performed by the Red Hat Systems Engineering team. The
 complete use case was deployed in the Systems Engineering lab on bare
 metal servers using {ro} director and generally available code.
+
+This reference architecture has been updated for the Y1 release of
+{ospver}.

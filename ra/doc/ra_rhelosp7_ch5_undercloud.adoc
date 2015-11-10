@@ -65,7 +65,7 @@ repolist: 21,076
 +
 NOTE: Appendix D <<Appendix-required-channels>> lists the required channels.
 +
-5. Create the `stack` user
+5. Create the `stack` user. Use this account for all deployment tasks.
 +
 [subs=+quotes]
 ----
@@ -94,7 +94,7 @@ uid=1000(stack) gid=1000(stack) groups=1000(stack) context=unconfined_u:unconfin
 ----
 $ *sudo yum install -y -q python-rdomanager-oscplugin*
 $ *sudo rpm -q python-rdomanager-oscplugin*
-python-rdomanager-oscplugin-0.0.8-44.el7ost.noarch
+python-rdomanager-oscplugin-0.0.10-8.el7ost.noarch
 ----
 +
 3. Create the _undercloud.conf_. This file contains
@@ -119,26 +119,6 @@ python-rdomanager-oscplugin-0.0.8-44.el7ost.noarch
 
   [auth]
 
-  undercloud_db_password =
-  undercloud_admin_token =
-  undercloud_admin_password =
-  undercloud_glance_password =
-  undercloud_heat_encryption_key =
-  undercloud_heat_password =
-  undercloud_neutron_password =
-  undercloud_nova_password =
-  undercloud_ironic_password =
-  undercloud_tuskar_password =
-  undercloud_ceilometer_password =
-  undercloud_ceilometer_metering_secret =
-  undercloud_ceilometer_snmpd_user =
-  undercloud_ceilometer_snmpd_password =
-  undercloud_swift_password =
-  undercloud_rabbit_cookie =
-  undercloud_rabbit_password =
-  undercloud_rabbit_username =
-  undercloud_heat_stack_domain_admin_password =
-  undercloud_swift_hash_suffix =
 ----
 +
 `eno4` is the provisioning network interface. Blank passwords are
@@ -149,6 +129,9 @@ discovery interface.
 instances are booted to a RAMdisk image that runs a series of
 benchmark tests and reports outliers. This is beyond the scope of this
 reference architecture.
++
+NOTE: Leaving the passwords undefined in the _undercloud.conf_ will
+generate random passwords during installation.
 +
 NOTE: Installing with SSL support is beyond the scope of this
 reference architecture. For details on how to use SSL support for the
@@ -207,58 +190,6 @@ openstack-ceilometer-central (pid 15998) is active
 openstack-ceilometer-collector (pid 15965) is active
 openstack-ceilometer-notification (pid 15932) is active
 ...
-----
-+
-7. Increase the maximum database connections. This is recommended for
-   production cluster deployments in
-   https://access.redhat.com/articles/1432053[Performance Tuning the
-   Backend Database for Red Hat Enterprise Linux OpenStack Platform].
-+
-[subs=+quotes]
-----
-$ **sudo sed -i 's/max_connections =.\*$/max_connections = 4096/' /etc/my.cnf.d/server.cnf**
-----
-+
-8. Verify the connections have been increased.
-+
-[subs=+quotes]
-----
-$ *sudo grep max_connections /etc/my.cnf.d/server.cnf max_connections = 4096*
-----
-+
-9. Increase the connection limit for the running databases and verify.
-+
-[subs=+quotes]
-----
-$ *sudo mysql -e "SET GLOBAL max_connections = 4096"*
-$ *sudo mysql -e "SHOW GLOBAL VARIABLES LIKE 'max_connections'"*
-+-----------------+-------+
-| Variable_name   | Value |
-+-----------------+-------+
-| max_connections | 4096  |
-+-----------------+-------+
-----
-+
-10. Increase or disable `Neutron` port quotas. In this example the port
-   quota is disabled in order to accommodate all of the ports created
-   for the overcloud servers and Pacemaker VIPs.
-+
-NOTE: A https://bugzilla.redhat.com/show_bug.cgi?id=1243121[bug]
-tracking this issue has been filed to change the default `Neutron` port
-quota to accommodate network isolation.
-+
-[subs=+quotes]
-----
-$ *neutron quota-update --port -1*
-+---------------------+-------+
-| Field               | Value |
-+---------------------+-------+
-| network             | 10    |
-| port                | -1    |
-| security_group      | 10    |
-| security_group_rule | 100   |
-| subnet              | 10    |
-+---------------------+-------+
 ----
 
 <<<

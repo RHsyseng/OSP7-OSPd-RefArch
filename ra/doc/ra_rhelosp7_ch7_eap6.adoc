@@ -69,7 +69,7 @@ OS_NO_CACHE=True
 OS_CLOUDNAME=overcloud
 ----
 . Create an external network and subnet. This will be the public
-  network for the MSA application. Export the external network ID.
+  network for the MSA application.
 +
 [subs=+quotes]
 ----
@@ -156,16 +156,16 @@ $ *openstack project create demo-tenant*
 | name        | demo-tenant                      |
 +-------------+----------------------------------+
 ----
-. Add the __member__ role to the _demo-tenant_ user.
+. Add the __\_member___ role to the _demo-tenant_ user.
 +
 [subs=+quotes]
 ----
-$ *openstack role add --user demo --project demo-tenant _member_*
+$ *openstack role add --user demo --project demo-tenant \_member_*
 +-------+----------------------------------+
 | Field | Value                            |
 +-------+----------------------------------+
 | id    | 9fe2ff9ee4384b1894a90878d3e92bab |
-| name  | _member_                         |
+| name  | \_member_                         |
 +-------+----------------------------------+
 ----
 . Create and source a _keystonerc_ file for the demo user.

@@ -8,3 +8,6 @@ describes Red Hat's approach to implementing highly available OpenStack.
 The reference architecture concludes with instructions for
 implementing a microservices architecture that provides
 shopping cart functionality via a multi-tier web application.
+
+This reference architecture has been updated for the Y1 release of
+{ospver}.
