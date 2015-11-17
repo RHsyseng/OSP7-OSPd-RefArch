@@ -131,6 +131,13 @@ types:
     provisioning interface can act as a default gateway for
     the overcloud if there is no other gateway on the network.
 
+NOTE: {ro} director 7.1 supports static IPs on the provisioning network.
+    Using static IPs requires additional parameters in the network
+    isolation Heat templates for setting static IPs, routes, and DNS
+    servers. <<configure-network-isolation-section>> describes the
+    additional parameters for configuring static IPs on the
+    provisioning network.
+
 NOTE: Disable PXE on the remaining interfaces to ensure the servers boot from this network.
 
 *External*::

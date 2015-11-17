@@ -340,6 +340,7 @@ In this example, the 4 R510 servers are assigned to the Ceph profile, 3 M520
 servers are assigned to the control profile, and the remainder are assigned to
 the compute profile.
 
+[[configure-network-isolation-section]]
 === Configure network isolation
 Network isolation assigns specific types of OpenStack network traffic
 to specific interfaces or bonds. This section describes how network isolation
@@ -716,7 +717,7 @@ HEALTH_WARN too few PGs per OSD (19 < min 30)
 +
 [subs=+quotes]
 ----
-# *for i in rbd images volume vms; do
+# *for i in rbd images volumes vms; do
  ceph osd pool set $i pg_num 256;
  sleep 10
  ceph osd pool set $i pgp_num 256;
