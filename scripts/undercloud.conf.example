@@ -1,34 +1,19 @@
 [DEFAULT]
-deployment_mode=poc
-image_path=.
-local_ip=192.0.2.1/24
-local_interface=eno2
-masquerade_network=192.0.2.0/24
-dhcp_start=192.0.2.5
-dhcp_end=192.0.2.24
-network_cidr=192.0.2.0/24
-network_gateway=192.0.2.1
-discovery_interface=br-ctlplane
-discovery_iprange=192.0.2.100,192.0.2.120
-discovery_runbench=0
-undercloud_debug=true
+
+image_path = .
+local_ip = 192.0.2.1/24
+undercloud_public_vip = 192.0.2.2
+undercloud_admin_vip = 192.0.2.3
+#undercloud_service_certificate = /etc/pki/instack-certs/undercloud.pem
+local_interface = eno4
+masquerade_network = 192.0.2.0/24
+dhcp_start = 192.0.2.5
+dhcp_end = 192.0.2.24
+network_cidr = 192.0.2.0/24
+network_gateway = 192.0.2.1
+discovery_interface = br-ctlplane
+discovery_iprange = 192.0.2.100,192.0.2.120
+discovery_runbench = false
+undercloud_debug = true
+
 [auth]
-undercloud_db_password=
-undercloud_admin_token=
-undercloud_admin_password=
-undercloud_glance_password=
-undercloud_heat_password=
-undercloud_neutron_password=
-undercloud_nova_password=
-undercloud_ironic_password=
-undercloud_tuskar_password=
-undercloud_ceilometer_password=
-undercloud_ceilometer_metering_secret=
-undercloud_ceilometer_snmpd_user=
-undercloud_ceilometer_snmpd_password=
-undercloud_swift_password=
-undercloud_rabbit_cookie=
-undercloud_rabbit_password=
-undercloud_rabbit_username=
-undercloud_heat_stack_domain_admin_password=
-undercloud_swift_hash_suffix=

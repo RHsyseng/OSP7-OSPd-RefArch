@@ -1,11 +1,15 @@
 resource_registry:
-  OS::TripleO::BlockStorage::Net::SoftwareConfig: /home/stack/nic-configs/cinder-storage.yaml
+  #OS::TripleO::BlockStorage::Net::SoftwareConfig: /home/stack/nic-configs/cinder-storage.yaml
   OS::TripleO::Compute::Net::SoftwareConfig: /home/stack/nic-configs/compute.yaml
   OS::TripleO::Controller::Net::SoftwareConfig: /home/stack/nic-configs/controller.yaml
-  OS::TripleO::ObjectStorage::Net::SoftwareConfig: /home/stack/nic-configs/swift-storage.yaml
+  #OS::TripleO::ObjectStorage::Net::SoftwareConfig: /home/stack/nic-configs/swift-storage.yaml
   OS::TripleO::CephStorage::Net::SoftwareConfig: /home/stack/nic-configs/ceph-storage.yaml
 
 parameter_defaults:
+  ControlPlaneSubnetCidr: "24"
+  ControlPlaneDefaultRoute: 192.0.2.1
+  EC2MetadataIp: 192.0.2.1
+  DnsServers: ['10.19.143.247','10.11.5.19']
   NeutronExternalNetworkBridge: "br-ex"
   InternalApiNetCidr: 172.16.1.0/24
   StorageNetCidr: 172.16.2.0/24
@@ -22,6 +26,6 @@ parameter_defaults:
   StorageMgmtNetworkVlanID: 4043
   TenantNetworkVlanID: 4044
   ExternalNetworkVlanID: 168
-  ExternalInterfaceDefaultRoute: "10.19.143.254"
+  ExternalInterfaceDefaultRoute: 10.19.143.254
   BondInterfaceOvsOptions:
       "bond_mode=balance-tcp lacp=active other-config:lacp-fallback-ab=true"

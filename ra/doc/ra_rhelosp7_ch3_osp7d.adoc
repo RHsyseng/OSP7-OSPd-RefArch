@@ -310,7 +310,7 @@ balance connection requests. With the exception of `RabbitMQ` and
 round-robin fashion. `Galera` and `RabbitMQ` use persistent options to
 ensure requests go only to active and/or synchronized nodes. `Pacemaker`
 checks service health at 1 second intervals. Timeout settings vary by
-service. 
+service.
 
 ===== Benefits of combining Pacemaker and HAproxy
 
@@ -323,14 +323,17 @@ The combination of `Pacemaker` and `HAproxy`:
 * Provides a thoroughly tested code base that has been used in
   production clusters across a variety of use cases
 
-The following services deployed by {ro} director do not use the proxy
-server:
+The following services deployed by {ro} director do not use the
+`HAproxy` server:
 
 . `RabbitMQ`
 . `memcached`
 . `mongodb`
 
-Individual cluster services are discussed in the following section.
+These services have their own failover and HA mechanisms. In most
+cases the clients have full lists of all service endpoints and try
+them in a round robin fashion. Individual cluster services are
+discussed in the following section.
 
 NOTE: {ro} director uses `Pacemaker` and `HAproxy` for clustering. Red Hat
 also supports manually deployed {ro} 7 clustered with `keepalived` and
@@ -483,6 +486,9 @@ Clients have a full list of `RabbitMQ` hosts.
 |*NoSQL database*|Active/active|NoSQL database `mongodb` supports
 `Ceilometer` and `Heat`. Not managed by `HAproxy`. `Ceilometer` servers have a
 full list of `mongodb` hosts.
+|*Load Balancer*|Active/active|The load balancer `HAproxy` runs in
+active/activde mode but is accessed via a set of active/passive
+virtual IP addresses.
 |====
 
 ==== Compute Node and Swift ACO Clustering
