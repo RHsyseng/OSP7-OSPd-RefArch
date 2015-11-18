@@ -50,5 +50,4 @@ were performed by the Red Hat Systems Engineering team. The
 complete use case was deployed in the Systems Engineering lab on bare
 metal servers using {ro} director and generally available code.
 
-This reference architecture has been updated for the Y1 release of
-{ospver}.
+This reference architecture has been updated for {ro} director 7.1.

@@ -340,6 +340,7 @@ In this example, the 4 R510 servers are assigned to the Ceph profile, 3 M520
 servers are assigned to the control profile, and the remainder are assigned to
 the compute profile.
 
+[[configure-network-isolation-section]]
 === Configure network isolation
 Network isolation assigns specific types of OpenStack network traffic
 to specific interfaces or bonds. This section describes how network isolation
@@ -354,17 +355,17 @@ the network described in <<reference-architecture-diagram>>.
 +
 [source%autofit, ruby, numbered]
 ----
-resource_registry:
-  OS::TripleO::BlockStorage::Net::SoftwareConfig: /home/stack/nic-configs/cinder-storage.yaml
   OS::TripleO::Compute::Net::SoftwareConfig: /home/stack/nic-configs/compute.yaml
   OS::TripleO::Controller::Net::SoftwareConfig: /home/stack/nic-configs/controller.yaml
-  OS::TripleO::ObjectStorage::Net::SoftwareConfig: /home/stack/nic-configs/swift-storage.yaml
   OS::TripleO::CephStorage::Net::SoftwareConfig: /home/stack/nic-configs/ceph-storage.yaml
+  #OS::TripleO::ObjectStorage::Net::SoftwareConfig: /home/stack/nic-configs/swift-storage.yaml
+  #OS::TripleO::BlockStorage::Net::SoftwareConfig: /home/stack/nic-configs/cinder-storage.yaml
 
 parameter_defaults:
   ControlPlaneSubnetCidr: "24"
   ControlPlaneDefaultRoute: 192.0.2.1
   EC2MetadataIp: 192.0.2.1
+  DnsServers: ['10.19.143.247','10.11.5.19']
   NeutronExternalNetworkBridge: "br-ex"
   InternalApiNetCidr: 172.16.1.0/24
   StorageNetCidr: 172.16.2.0/24
@@ -381,13 +382,14 @@ parameter_defaults:
   StorageMgmtNetworkVlanID: 4043
   TenantNetworkVlanID: 4044
   ExternalNetworkVlanID: 168
-  ExternalInterfaceDefaultRoute: "10.19.143.254"
+  ExternalInterfaceDefaultRoute: 10.19.143.254
   BondInterfaceOvsOptions:
       "bond_mode=balance-tcp lacp=active other-config:lacp-fallback-ab=true"
 ----
 +
-The _resource_registery_ section defines role-specific configuration.
-These files are created in subsequent steps.
+The _resource_registery_ section defines role-specific configuration. In this
+example, the paths to _cinder-storage.yaml_ and _swift-storage.yaml_ are commented out
+because resources of these types are not used in this reference architecture.
 +
 The _parameter_defaults_ section defines default parameters used
 across the resource registry. These include CIDRs, VLAN IDs, and IP
@@ -402,6 +404,36 @@ in order to support multiple floating IP VLANs or physical interfaces. In
 this case there was only one floating IP network on the native VLAN of
 bridge _br-ex_, so the bridge was specified directly for performance
 reasons.
++
+NOTE: {ro} director 7.1 includes additional parameter defaults for assigning
+static IP addresses to the provisioning network. Static IP addresses ensure the
+provisioning network continues to function even if the servers' DHCP leases
+expire and are not renewed. The following text block contains example
+parameters that should be customized to match the environment.
++
+[subs=+quotes]
+----
+  parameters:
+    ControlPlaneIp:
+      default: ''
+      description: IP address/subnet on the ctlplane network
+      type: string
+    ControlPlaneSubnetCidr:           # Override this via parameter_defaults
+      default: '24'
+      description: The subnet CIDR of the control plane network.
+      type: string
+    DnsServers: # Override this via parameter_defaults
+      default: []
+      description: A list of DNS servers (2 max) to add to resolv.conf.
+      type: json
+    EC2MetadataIp:                   # Override this via parameter_defaults
+      description: The IP address of the EC2 metadata server.
+      type: string
+    ControlPlaneDefaultRoute:        # Gateway router for the provisioning network (or Undercloud IP)
+      default: METADATA_IP_ADDR      # default to the undercloud
+      description: The subnet CIDR of the control plane network.
+      type: string
+----
 2. Create the _nic-configs_ files to define network configuration for
    each interface by server role.
 +
@@ -412,19 +444,19 @@ $ *ls ~/nic-configs*
 ceph-storage.yaml  cinder-storage.yaml  compute.yaml  controller.yaml swift-storage.yaml
 ----
 Complete examples of each network configuration file are in Appendix I
-<<Appendix-nic-configuration-files>>.
+<<Appendix-nic-configuration-files>>. These examples include the updated
+syntax for {ro} director 7.1 to use static IP addresses on the provisioning
+network as well as:
+. Enforcing that the provisioning network will not use DHCP
+. Specifying the DNS servers with the new DnsServer parameter
+. Making the external network the default network for the controller
+  nodes
+. Using the provisioning network as the default gateway for the
+  compute and Ceph storage nodes
 +
 NOTE: `Swift` and `Cinder` servers are not used in this reference
 architecture. Their files are included for completeness but not called
 by the installer.
-+
-3. Set the provisioning network nameserver. The overcloud servers use
-   this nameserver for DNS resolution.
-+
-[subs=+quotes]
-----
-$ *neutron subnet-update $(neutron subnet-list | awk ' /192.0.2/ { print $2 } ') --dns-nameserver 10.19.143.247*
-----
 
 === Customize Ceph Storage
 Like network isolation, Ceph is customized by passing `Heat` additional
@@ -647,6 +679,21 @@ ip-10.19.137.121  (ocf::heartbeat:IPaddr2): Started overcloud-controller-1
 ----
 NOTE: Appendix G <<Appendix-overcloud-servce-list>> shows complete *pcs status*
 `Pacemaker` output for a deployed overcloud.
+10. Verify that the provisioning network IP address is statically
+    assigned.
++
+[subs=+quotes]
+----
+# cat */etc/sysconfig/network-scripts/ifcfg-em2*
+# This file is autogenerated by os-net-config
+DEVICE=em2
+ONBOOT=yes
+HOTPLUG=no
+NM_CONTROLLED=no
+BOOTPROTO=static
+IPADDR=192.0.2.9
+NETMASK=255.255.255.0
+----
 
 === Tune Ceph storage
 This section includes steps for increasing the number of Placement
@@ -716,7 +763,7 @@ HEALTH_WARN too few PGs per OSD (19 < min 30)
 +
 [subs=+quotes]
 ----
-# *for i in rbd images volume vms; do
+# *for i in rbd images volumes vms; do
  ceph osd pool set $i pg_num 256;
  sleep 10
  ceph osd pool set $i pgp_num 256;

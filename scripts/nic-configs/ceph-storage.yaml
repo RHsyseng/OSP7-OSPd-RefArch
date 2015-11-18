@@ -1,17 +1,31 @@
 heat_template_version: 2015-04-30
 
 description: >
-  Software Config to drive os-net-config with 2 bonded nics on a bridge
-  with a VLANs attached for the compute role.
+  Software Config to drive os-net-config to configure VLANs for the
+  ceph-storage role.
 
 parameters:
+  ControlPlaneIp:
+    default: ''
+    description: IP address/subnet on the ctlplane network
+    type: string
+  ControlPlaneSubnetCidr:
+    default: '24'
+    description: The subnet CIDR of the control plane network.
+    type: string
+  EC2MetadataIp:
+    description: The IP address of the EC2 metadata server.
+    type:  string
+  ControlPlaneDefaultRoute:
+    description: Default route for the control plane
+    type: string
+  DnsServers:
+    default: []
+    description: A list of DNS servers (2 max) to add to resolv.conf.
+    type: json
   ExternalIpSubnet:
     default: ''
     description: IP address/subnet on the external network
-    type: string
-  InternalApiIpSubnet:
-    default: ''
-    description: IP address/subnet on the internal API network
     type: string
   StorageIpSubnet:
     default: ''
@@ -21,17 +35,13 @@ parameters:
     default: ''
     description: IP address/subnet on the storage mgmt network
     type: string
-  TenantIpSubnet:
-    default: ''
-    description: IP address/subnet on the tenant network
-    type: string
   StorageNetworkVlanID:
     default: 4042
     description: Vlan ID for the storage network traffic.
     type: number
   StorageMgmtNetworkVlanID:
     default: 4043
-    description: Vlan ID for the storage network traffic.
+    description: Vlan ID for the storage mgmt network traffic.
     type: number
 
 resources:
@@ -46,30 +56,46 @@ resources:
               type: interface
               name: nic1
               use_dhcp: false
+              defroute: false
+            -
+              type: interface
+              name: nic2
+              use_dhcp: false
+              dns_servers: {get_param: DnsServers}
+              addresses:
+                -
+                  ip_netmask:
+                    list_join:
+                      - '/'
+                      - - {get_param: ControlPlaneIp}
+                        - {get_param: ControlPlaneSubnetCidr}
+              routes:
+                -
+                  ip_netmask: 169.254.169.254/32
+                  next_hop: {get_param: EC2MetadataIp}
+                -
+                  default: true
+                  next_hop: {get_param: ControlPlaneDefaultRoute}
             -
               type: ovs_bridge
               name: br-nic3
               use_dhcp: false
-              addresses:
-                -
-                  ip_netmask: {get_param: StorageMgmtIpSubnet}
               members:
                 -
                   type: interface
                   name: nic3
-                  primary: true
+                -
+                  type: vlan
+                  vlan_id: {get_param: StorageMgmtNetworkVlanID}
+                  addresses:
+                    -
+                      ip_netmask: {get_param: StorageMgmtIpSubnet}
             -
-              type: ovs_bridge
-              name: br-nic4
-              use_dhcp: false
+              type: interface
+              name: nic4
               addresses:
                 -
                   ip_netmask: {get_param: StorageIpSubnet}
-              members:
-                -
-                  type: interface
-                  name: nic4
-                  primary: true
 
 outputs:
   OS::stack_id:

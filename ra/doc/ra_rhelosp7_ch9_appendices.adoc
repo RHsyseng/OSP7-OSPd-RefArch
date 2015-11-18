@@ -506,16 +506,17 @@ because they were not used.
 [source%autofit, shell]
 ----
 resource_registry:
-  OS::TripleO::BlockStorage::Net::SoftwareConfig: /home/stack/nic-configs/cinder-storage.yaml
   OS::TripleO::Compute::Net::SoftwareConfig: /home/stack/nic-configs/compute.yaml
   OS::TripleO::Controller::Net::SoftwareConfig: /home/stack/nic-configs/controller.yaml
-  OS::TripleO::ObjectStorage::Net::SoftwareConfig: /home/stack/nic-configs/swift-storage.yaml
   OS::TripleO::CephStorage::Net::SoftwareConfig: /home/stack/nic-configs/ceph-storage.yaml
+  #OS::TripleO::ObjectStorage::Net::SoftwareConfig: /home/stack/nic-configs/swift-storage.yaml
+  #OS::TripleO::BlockStorage::Net::SoftwareConfig: /home/stack/nic-configs/cinder-storage.yaml
 
 parameter_defaults:
   ControlPlaneSubnetCidr: "24"
   ControlPlaneDefaultRoute: 192.0.2.1
   EC2MetadataIp: 192.0.2.1
+  DnsServers: ['10.19.143.247','10.11.5.19']
   NeutronExternalNetworkBridge: "br-ex"
   InternalApiNetCidr: 172.16.1.0/24
   StorageNetCidr: 172.16.2.0/24
@@ -532,7 +533,7 @@ parameter_defaults:
   StorageMgmtNetworkVlanID: 4043
   TenantNetworkVlanID: 4044
   ExternalNetworkVlanID: 168
-  ExternalInterfaceDefaultRoute: "10.19.143.254"
+  ExternalInterfaceDefaultRoute: 10.19.143.254
   BondInterfaceOvsOptions:
       "bond_mode=balance-tcp lacp=active other-config:lacp-fallback-ab=true"
 ----
@@ -557,6 +558,10 @@ parameters:
   EC2MetadataIp:
     description: The IP address of the EC2 metadata server.
     type:  string
+  DnsServers:
+    default: []
+    description: A list of DNS servers (2 max) to add to resolv.conf.
+    type: json
   ExternalIpSubnet:
     default: ''
     description: IP address/subnet on the external network
@@ -611,9 +616,25 @@ resources:
         os_net_config:
           network_config:
             -
+              type: interface
+              name: nic2
+              use_dhcp: false
+              addresses:
+                -
+                  ip_netmask:
+                    list_join:
+                      - '/'
+                      - - {get_param: ControlPlaneIp}
+                        - {get_param: ControlPlaneSubnetCidr}
+              routes:
+                -
+                  ip_netmask: 169.254.169.254/32
+                  next_hop: {get_param: EC2MetadataIp}
+            -
               type: ovs_bridge
               name: br-ex
               use_dhcp: false
+              dns_servers: {get_param: DnsServers}
               addresses:
               -
                 ip_netmask: {get_param: ExternalIpSubnet}
@@ -689,6 +710,13 @@ parameters:
   EC2MetadataIp:
     description: The IP address of the EC2 metadata server.
     type:  string
+  ControlPlaneDefaultRoute: # Override this via parameter_defaults
+    description: The subnet CIDR of the control plane network.
+    type: string
+  DnsServers:
+    default: []
+    description: A list of DNS servers (2 max) to add to resolv.conf.
+    type: json
   ExternalIpSubnet:
     default: ''
     description: IP address/subnet on the external network
@@ -734,10 +762,31 @@ resources:
               type: interface
               name: nic1
               use_dhcp: false
+              defroute: false
+            -
+              type: interface
+              name: nic2
+              use_dhcp: false
+              dns_servers: {get_param: DnsServers}
+              addresses:
+                -
+                  ip_netmask:
+                    list_join:
+                      - '/'
+                      - - {get_param: ControlPlaneIp}
+                        - {get_param: ControlPlaneSubnetCidr}
+              routes:
+                -
+                  ip_netmask: 169.254.169.254/32
+                  next_hop: {get_param: EC2MetadataIp}
+                -
+                  default: true
+                  next_hop: {get_param: ControlPlaneDefaultRoute}
             -
               type: ovs_bridge
               name: br-nic3
               use_dhcp: false
+              dns_servers: {get_param: DnsServers}
               addresses:
                 -
                   ip_netmask: {get_param: TenantIpSubnet}
@@ -792,13 +841,16 @@ parameters:
   EC2MetadataIp:
     description: The IP address of the EC2 metadata server.
     type:  string
+  ControlPlaneDefaultRoute:
+    description: Default route for the control plane
+    type: string
+  DnsServers:
+    default: []
+    description: A list of DNS servers (2 max) to add to resolv.conf.
+    type: json
   ExternalIpSubnet:
     default: ''
     description: IP address/subnet on the external network
-    type: string
-  InternalApiIpSubnet:
-    default: ''
-    description: IP address/subnet on the internal API network
     type: string
   StorageIpSubnet:
     default: ''
@@ -808,18 +860,6 @@ parameters:
     default: ''
     description: IP address/subnet on the storage mgmt network
     type: string
-  TenantIpSubnet:
-    default: ''
-    description: IP address/subnet on the tenant network
-    type: string
-  ExternalNetworkVlanID:
-    default: 168
-    description: Vlan ID for the external network traffic.
-    type: number
-  InternalApiNetworkVlanID:
-    default: 4041
-    description: Vlan ID for the internal_api network traffic.
-    type: number
   StorageNetworkVlanID:
     default: 4042
     description: Vlan ID for the storage network traffic.
@@ -828,14 +868,6 @@ parameters:
     default: 4043
     description: Vlan ID for the storage mgmt network traffic.
     type: number
-  TenantNetworkVlanID:
-    default: 4044
-    description: Vlan ID for the tenant network traffic.
-    type: number
-  ExternalInterfaceDefaultRoute:
-    default: '10.19.143.254'
-    description: Default route for the external network.
-    type: string
 
 resources:
   OsNetConfigImpl:
@@ -849,6 +881,26 @@ resources:
               type: interface
               name: nic1
               use_dhcp: false
+              defroute: false
+            -
+              type: interface
+              name: nic2
+              use_dhcp: false
+              dns_servers: {get_param: DnsServers}
+              addresses:
+                -
+                  ip_netmask:
+                    list_join:
+                      - '/'
+                      - - {get_param: ControlPlaneIp}
+                        - {get_param: ControlPlaneSubnetCidr}
+              routes:
+                -
+                  ip_netmask: 169.254.169.254/32
+                  next_hop: {get_param: EC2MetadataIp}
+                -
+                  default: true
+                  next_hop: {get_param: ControlPlaneDefaultRoute}
             -
               type: ovs_bridge
               name: br-nic3
@@ -874,106 +926,6 @@ outputs:
   OS::stack_id:
     description: The OsNetConfigImpl resource.
     value: {get_resource: OsNetConfigImpl}
-heat_template_version: 2015-04-3heat_template_version: 2015-04-30
-
-description: >
-  Software Config to drive os-net-config to configure VLANs for the
-  ceph-storage role.
-
-parameters:
-  ControlPlaneIp:
-    default: ''
-    description: IP address/subnet on the ctlplane network
-    type: string
-  ControlPlaneSubnetCidr:
-    default: '24'
-    description: The subnet CIDR of the control plane network.
-    type: string
-  EC2MetadataIp:
-    description: The IP address of the EC2 metadata server.
-    type:  string
-  ExternalIpSubnet:
-    default: ''
-    description: IP address/subnet on the external network
-    type: string
-  InternalApiIpSubnet:
-    default: ''
-    description: IP address/subnet on the internal API network
-    type: string
-  StorageIpSubnet:
-    default: ''
-    description: IP address/subnet on the storage network
-    type: string
-  StorageMgmtIpSubnet:
-    default: ''
-    description: IP address/subnet on the storage mgmt network
-    type: string
-  TenantIpSubnet:
-    default: ''
-    description: IP address/subnet on the tenant network
-    type: string
-  ExternalNetworkVlanID:
-    default: 168
-    description: Vlan ID for the external network traffic.
-    type: number
-  InternalApiNetworkVlanID:
-    default: 4041
-    description: Vlan ID for the internal_api network traffic.
-    type: number
-  StorageNetworkVlanID:
-    default: 4042
-    description: Vlan ID for the storage network traffic.
-    type: number
-  StorageMgmtNetworkVlanID:
-    default: 4043
-    description: Vlan ID for the storage mgmt network traffic.
-    type: number
-  TenantNetworkVlanID:
-    default: 4044
-    description: Vlan ID for the tenant network traffic.
-    type: number
-  ExternalInterfaceDefaultRoute:
-    default: '10.19.143.254'
-    description: Default route for the external network.
-    type: string
-
-resources:
-  OsNetConfigImpl:
-    type: OS::Heat::StructuredConfig
-    properties:
-      group: os-apply-config
-      config:
-        os_net_config:
-          network_config:
-            -
-              type: interface
-              name: nic1
-              use_dhcp: false
-            -
-              type: ovs_bridge
-              name: br-nic3
-              use_dhcp: false
-              members:
-                -
-                  type: interface
-                  name: nic3
-                -
-                  type: vlan
-                  vlan_id: {get_param: StorageMgmtNetworkVlanID}
-                  addresses:
-                    -
-                      ip_netmask: {get_param: StorageMgmtIpSubnet}
-            -
-              type: interface
-              name: nic4
-              addresses:
-                -
-                  ip_netmask: {get_param: StorageIpSubnet}
-
-outputs:
-  OS::stack_id:
-    description: The OsNetConfigImpl resource.
-    value: {get_resource: OsNetConfigImpl}0
 ----
 
 [appendix]
@@ -983,9 +935,14 @@ outputs:
 .Revision History
 [cols="a,a,a"]
 |====
+|Revision 2.1|Tuesday, November 17, 2015|Jacob Liberman
+3+|
+- Added example yaml files and supporting text to configure static IP
+  addresses on the provisioning network
+
 |Revision 2.0|Monday, November 9, 2015|Jacob Liberman
 3+|
-- Updates for Y1 release
+- Updates for RHEL-OSP director 7.1 release
 
 |Revision 1.0|Wednesday, September 9, 2015|Jacob Liberman
 3+|

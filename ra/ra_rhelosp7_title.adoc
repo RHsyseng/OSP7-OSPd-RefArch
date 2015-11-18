@@ -1,6 +1,6 @@
-= Deploying Red Hat Enterprise Linux OpenStack Platform 7: with RHEL-OSP director
+= Deploying Red Hat Enterprise Linux OpenStack Platform 7: with RHEL-OSP director 7.1
 Jacob Liberman <jliberma@redhat.com>
-v2.0, November 9, 2015
+v2.1, November 17, 2015
 :description: Reference architecture
 :doctype: book
 :title-logo-image: image:images/rh-ra-banner.jpg[scaledwidth=70%,align=center]

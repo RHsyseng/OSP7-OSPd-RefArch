@@ -131,6 +131,8 @@ types:
     provisioning interface can act as a default gateway for
     the overcloud if there is no other gateway on the network.
 
+NOTE: {ro} director 7.1 supports static IPs on the provisioning network. Using static IPs requires additional parameters in the network isolation Heat templates for setting static IPs, routes, and DNS servers. <<configure-network-isolation-section>> describes the additional parameters for configuring static IPs on the provisioning network.
+
 NOTE: Disable PXE on the remaining interfaces to ensure the servers boot from this network.
 
 *External*::
@@ -180,14 +182,15 @@ NOTE: Disable DHCP on unused interfaces to avoid unwanted routes and network
 loops.
 
 ==== Network Types by Server Role
-The previous section discussed <<server-roles, server roles>>. Each
-server role requires access to specific types of network traffic.
-Figure 3.1 <<network-topology-diagram>> depicts the network roles by server type in
-this reference architecture.
 
 [[network-topology-diagram]]
 .Network topology
 image::images/NETWORK.png[caption="Figure 3.1 " title="Network Topology" align="center", scaledwidth="60%"]
+
+The previous section discussed <<server-roles, server roles>>. Each
+server role requires access to specific types of network traffic.
+Figure 3.1 <<network-topology-diagram>> depicts the network roles by server type in
+this reference architecture.
 
 The network isolation feature allows {ro} director to segment network
 traffic by particular network types. When using network isolation,
@@ -303,7 +306,7 @@ balance connection requests. With the exception of `RabbitMQ` and
 round-robin fashion. `Galera` and `RabbitMQ` use persistent options to
 ensure requests go only to active and/or synchronized nodes. `Pacemaker`
 checks service health at 1 second intervals. Timeout settings vary by
-service. 
+service.
 
 ===== Benefits of combining Pacemaker and HAproxy
 
@@ -316,14 +319,17 @@ The combination of `Pacemaker` and `HAproxy`:
 * Provides a thoroughly tested code base that has been used in
   production clusters across a variety of use cases
 
-The following services deployed by {ro} director do not use the proxy
-server:
+The following services deployed by {ro} director do not use the
+`HAproxy` server:
 
 . `RabbitMQ`
 . `memcached`
 . `mongodb`
 
-Individual cluster services are discussed in the following section.
+These services have their own failover and HA mechanisms. In most
+cases the clients have full lists of all service endpoints and try
+them in a round robin fashion. Individual cluster services are
+discussed in the following section.
 
 NOTE: {ro} director uses `Pacemaker` and `HAproxy` for clustering. Red Hat
 also supports manually deployed {ro} 7 clustered with `keepalived` and
@@ -476,6 +482,9 @@ Clients have a full list of `RabbitMQ` hosts.
 |*NoSQL database*|Active/active|NoSQL database `mongodb` supports
 `Ceilometer` and `Heat`. Not managed by `HAproxy`. `Ceilometer` servers have a
 full list of `mongodb` hosts.
+|*Load Balancer*|Active/active|The load balancer `HAproxy` runs in
+active/activde mode but is accessed via a set of active/passive
+virtual IP addresses.
 |====
 
 ==== Compute Node and Swift ACO Clustering
