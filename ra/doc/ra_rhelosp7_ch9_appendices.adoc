@@ -935,9 +935,14 @@ outputs:
 .Revision History
 [cols="a,a,a"]
 |====
+|Revision 2.1|Tuesday, November 17, 2015|Jacob Liberman
+3+|
+- Added example yaml files and supporting text to configure static IP
+  addresses on the provisioning network
+
 |Revision 2.0|Monday, November 9, 2015|Jacob Liberman
 3+|
-- Updates for Y1 release
+- Updates for RHEL-OSP director 7.1 release
 
 |Revision 1.0|Wednesday, September 9, 2015|Jacob Liberman
 3+|

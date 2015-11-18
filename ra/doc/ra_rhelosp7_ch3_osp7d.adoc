@@ -131,12 +131,7 @@ types:
     provisioning interface can act as a default gateway for
     the overcloud if there is no other gateway on the network.
 
-NOTE: {ro} director 7.1 supports static IPs on the provisioning network.
-    Using static IPs requires additional parameters in the network
-    isolation Heat templates for setting static IPs, routes, and DNS
-    servers. <<configure-network-isolation-section>> describes the
-    additional parameters for configuring static IPs on the
-    provisioning network.
+NOTE: {ro} director 7.1 supports static IPs on the provisioning network. Using static IPs requires additional parameters in the network isolation Heat templates for setting static IPs, routes, and DNS servers. <<configure-network-isolation-section>> describes the additional parameters for configuring static IPs on the provisioning network.
 
 NOTE: Disable PXE on the remaining interfaces to ensure the servers boot from this network.
 
@@ -187,14 +182,15 @@ NOTE: Disable DHCP on unused interfaces to avoid unwanted routes and network
 loops.
 
 ==== Network Types by Server Role
-The previous section discussed <<server-roles, server roles>>. Each
-server role requires access to specific types of network traffic.
-Figure 3.1 <<network-topology-diagram>> depicts the network roles by server type in
-this reference architecture.
 
 [[network-topology-diagram]]
 .Network topology
 image::images/NETWORK.png[caption="Figure 3.1 " title="Network Topology" align="center", scaledwidth="60%"]
+
+The previous section discussed <<server-roles, server roles>>. Each
+server role requires access to specific types of network traffic.
+Figure 3.1 <<network-topology-diagram>> depicts the network roles by server type in
+this reference architecture.
 
 The network isolation feature allows {ro} director to segment network
 traffic by particular network types. When using network isolation,
